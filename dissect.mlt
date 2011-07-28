@@ -1,0 +1,44 @@
+##verbatim '%' = MuPlugin.mumode
+
+let d = "<%mu x,c%>"
+
+let title = "Dissecting {mu}"
+
+let packages = [
+  "inputenc" , "utf8" ;
+  "fontenc" , "T1" ;
+  "textcomp", "";
+  "microtype" , "" ;
+]
+
+let prelude = concat_with_sep [
+  (* Mis ici pour rester le plus "en dernier" possible. Plus d'options à mettre
+     à l'avenir, en particulier pour configurer le style des liens*)
+  command \"usepackage\" ~opt:begin T,"
+    pdftex,
+    pdftitle={within_braces "Dissecting mu"},
+    pdfauthor={within_braces "Arnaud Spiwack"},
+    linkbordercolor={within_braces "0 0 .8"},
+    pdfsubject={within_braces "Computing science"},
+    pdfcreator={within_braces "Arnaud Spiwack"},
+    pdfproducer={within_braces "Arnaud Spiwack"}
+    unicode
+  "end [T,"hyperref"] T ;
+  (* Nécessite et modifie hyperref, donc doit se trouver à sa suite.
+     À customiser en particulier pour utiliser unicode (peut-être qu'il
+     faut juste le faire dans hyperref) *)
+  command \"usepackage\" ~opt:begin T,"
+    open,
+    openlevel=0,
+    atend
+  "end [T,"bookmark"] T ;
+]
+
+let file = \"dissect.tex\"
+
+let _ = emit ~file (document ~documentclass:`Article
+		             ~title
+			     ~author:"Arnaud Spiwack"
+			     ~prelude
+			     ~packages
+			     d)

@@ -47,7 +47,7 @@ let next k = lexer
 	longvar id
     end
 
-  | "~~>" 
+  | "~~>" -> REDUCES
 
   | "<" -> POINTYL | ">" -> POINTYR
   | "|" -> BAR

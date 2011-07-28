@@ -15,10 +15,10 @@ let mode = match mode with
   | `Cairo -> A"-cairo"
 
 (*** List of plugins to metlpp ***)
-let plugins = ["util/coqdoc.cmxs" ]
+let plugins = []
 
 (*** List of extra dependencies on the .tex file compilation ***)
-let texdeps = ["faktor.sty";"style.tex";"style-def.tex";"library-fix.bib";"precious.bst";"logoecole.png"]
+let texdeps = []
 
 (*** Global constants ***)
 
