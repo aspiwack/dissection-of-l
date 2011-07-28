@@ -248,6 +248,13 @@ let _ = dispatch begin function
 	  flag ["ocaml"; "pp"; "use_ulex.syntax"] &
 	    S[A "-I"; P ulex_dir; P "pa_ulex.cma"] ;
 
+	  let menhirlib_dir = ocamlfind_query "menhirLib" in
+	  flag ["ocaml";"compile";"use_menhir"] &
+            S[A "-I"; P menhirlib_dir];
+	  flag ["ocaml";"link";"use_menhir"] &
+	    S[A "-I"; P menhirlib_dir; P "menhirLib.cmx"]; 
+	    
+
       (* workaround ocamlbuild's menhir bugs *)
 	    rule "ocaml: menhir (workaround)"
 	      ~prods:["%.ml"; "%.mli"]

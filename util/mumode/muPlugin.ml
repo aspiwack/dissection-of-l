@@ -27,7 +27,7 @@ let parse l =
       (fun x -> x)
       (fun _ -> Lexing.dummy_pos)
       (fun _ -> Lexing.dummy_pos)
-      Muparser.mu
+      MuParser.mu
   in
   let next =
     let lexbuf = Lex.init l in

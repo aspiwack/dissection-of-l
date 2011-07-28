@@ -1,6 +1,20 @@
 ##verbatim '%' = MuPlugin.mumode
 
+(*** prelude ***)
+
+let concat_with_sep l sep =
+  if l = [] then
+    concat []
+  else 
+    let l_with_one_too_many = List.flatten (List.map (fun t -> [ sep ; t ]) l) in
+    concat (List.tl l_with_one_too_many)
+
+
+(*** doc ***)
+
 let d = "<%mu x,c%>"
+
+(*** boilerplate ***)
 
 let title = "Dissecting {mu}"
 
@@ -32,7 +46,7 @@ let prelude = concat_with_sep [
     openlevel=0,
     atend
   "end [T,"bookmark"] T ;
-]
+] par
 
 let file = \"dissect.tex\"
 
