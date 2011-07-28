@@ -44,6 +44,22 @@ let texdeps = ["faktor.sty";"style.tex";"style-def.tex";"library-fix.bib";"preci
    in
    Cmd (S [dypgen ; Px arg ])
 
+(* working around ocamlbuild's bugs *)
+module Myocamlbuild = struct
+
+  open Pathname.Operators
+  open Tags.Operators
+  open Command
+
+  let menhir mly env build =
+    let mly = env mly in
+    let menhir = if !Options.ocamlyacc = N then V"MENHIR" else !Options.ocamlyacc in
+    Cmd(S[menhir;
+          A"--ocamlc"; Quote(S[!Options.ocamlc; T(tags_of_pathname mly++"ocaml"++"compile")]);
+          T(tags_of_pathname mly++"ocaml"++"parser"++"menhir");
+          A"--infer"; Px mly])
+end
+
 (*** Dispatch ***)
 
 let _ = dispatch begin function
@@ -232,11 +248,13 @@ let _ = dispatch begin function
 	  flag ["ocaml"; "pp"; "use_ulex.syntax"] &
 	    S[A "-I"; P ulex_dir; P "pa_ulex.cma"] ;
 
+      (* workaround ocamlbuild's menhir bugs *)
+	    rule "ocaml: menhir (workaround)"
+	      ~prods:["%.ml"; "%.mli"]
+	      ~deps:["%.mly"; "%.mly.depends"]
+	      ~insert:(`before "ocaml: menhir")
+	      (Myocamlbuild.menhir "%.mly");
 
-	  let dyp_dir =  ocamlfind_query "dyp" in
-	  ocaml_lib ~extern:true
-	                   ~dir:dyp_dir
-	                   "dyp"
 
       (*c Rules can be declared by a call of the form
           [rule name ~prod ~dep action].

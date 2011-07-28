@@ -1,5 +1,5 @@
+true: use_menhir
+<util> or <util/mumode> : include
 
-<util> : include
-
-<**/*.ml> or <**/*.mli>: use_unix , use_str , use_mlpost , use_dynlink , use_melt , use_bitstring , use_cairo , use_ulex , use_dyp
-<**/*.native> or <**/*.byte>: use_unix , use_str , use_mlpost , use_dynlink , use_melt, use_bitstring, use_cairo , use_ulex , use_dyp
+<**/*.ml> or <**/*.mli> or <**/*.mly> : use_unix , use_str , use_mlpost , use_dynlink , use_melt , use_bitstring , use_cairo , use_ulex
+<**/*.native> or <**/*.byte>: use_unix , use_str , use_mlpost , use_dynlink , use_melt, use_bitstring, use_cairo , use_ulex
