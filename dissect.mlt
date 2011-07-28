@@ -12,7 +12,7 @@ let concat_with_sep l sep =
 
 (*** doc ***)
 
-let d = "<%mu x,c%>"
+let d = "<%<mu x, c|y>%>"
 
 (*** boilerplate ***)
 

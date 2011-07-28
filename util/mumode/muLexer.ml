@@ -12,7 +12,7 @@ let number n = SYMB (mode M (text n))
 
 let keywords = []
 let map_ident = [
-  "MU" , MU ;
+  "mu" , MU ;
 ]
 
 let regexp whitespace = [ ' '  '\t' '\n' '\r' ]
@@ -54,6 +54,7 @@ let next k = lexer
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR
 
+  | "," -> COMMA | ";" -> SEMICOLON
   | "(" -> PARENL | ")" -> PARENR
   | "[" -> BRACKETL | "]" -> BRACKETR
   | "{" -> BRACEL | "}" -> BRACER
