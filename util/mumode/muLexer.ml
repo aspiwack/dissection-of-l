@@ -11,7 +11,9 @@ let number n = SYMB (mode M (text n))
 (*** Global tables ***)
 
 let keywords = []
-let map_ident = []
+let map_ident = [
+  "MU" , MU ;
+]
 
 let regexp whitespace = [ ' '  '\t' '\n' '\r' ]
 
@@ -44,5 +46,18 @@ let next k = lexer
       with Not_found ->
 	longvar id
     end
+
+  | "~~>" 
+
+  | "<" -> POINTYL | ">" -> POINTYR
+  | "|" -> BAR
+
+  | "\\(" -> METAPARENL | "\\)" -> METAPARENR
+
+  | "(" -> PARENL | ")" -> PARENR
+  | "[" -> BRACKETL | "]" -> BRACKETR
+  | "{" -> BRACEL | "}" -> BRACER
+  | "_" -> SUB | "^" -> SUP
+
   | whitespace -> k ()
   | number -> number (lexeme lexbuf)
