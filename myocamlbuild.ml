@@ -17,6 +17,9 @@ let mode = match mode with
 (*** List of plugins to metlpp ***)
 let plugins = []
 
+(*** List of extra dependencies to the melt program execution ***)
+let meltdep = []
+
 (*** List of extra dependencies on the .tex file compilation ***)
 let texdeps = []
 
@@ -30,19 +33,21 @@ let texdeps = []
 
  let meltpp arg out = 
    let meltpp = P "meltpp" in
-   let meltpp = S [meltpp ; Ocamlbuild_pack.Tools.flags_of_pathname arg ] in
+   let meltpp = S [meltpp ] in
    let opn m = S [A "-open" ; A m] in
    let add_open = S [ opn "Latex" ; opn "Melt" ] in
    let dir d = S [ A"-P" ; P d ] in
    let add_dirs = S [ dir "util" ] in
    Cmd (S [meltpp ; add_dirs ; add_open ; A "-o" ; Px out ; P arg ])
 
+(* uncomment for dypgen:
  let dypgen arg =
    let dypgen = P "dypgen" in
    let dypgen = 
-     S [dypgen ; A"--no-mli"; Ocamlbuild_pack.Tools.flags_of_pathname arg ] 
+     S [dypgen ; A"--no-mli" ] 
    in
    Cmd (S [dypgen ; Px arg ])
+*)
 
 (* working around ocamlbuild's bugs *)
 module Myocamlbuild = struct
@@ -89,11 +94,6 @@ let _ = dispatch begin function
   | After_rules -> 
       (*** Interpretation of Tags ***)
       flag ["melt";"show"] (A "-show");
-      flag ["melt";"moche"] (A "-moche");
-      flag ["melt";"intro"]  (A "-intro" );
-      flag ["melt";"part1"] (A "-part1");
-      flag ["melt";"part2"] (A "-part2");
-      flag ["melt";"part3"] (A "-part3");
 
       (*** rules ***)
       rule "ocamlopt: cmxa -> cmxs"
@@ -115,7 +115,7 @@ let _ = dispatch begin function
 
 	rule "meltrun: native -> tex"
 	  ~prods:["%.tex"]
-	  ~deps:["%.native"]
+	  ~deps:(["%.native"]@meltdep)
 	  begin fun env build ->
 	    let gen = env "./%.native" in
 	    let tags = tags_of_pathname gen in
@@ -128,7 +128,7 @@ let _ = dispatch begin function
 	    Cmd (date (
 		   time (S[
 		     Sh gen; mode;
-		     T(tags++"melt");(*A"-depends" ;*) Sh "> /dev/null"
+		     T(tags++"melt");(*A"-depends" ;*) Sh "> error.log"
 		   ])
 		))
 	  end;
@@ -200,6 +200,7 @@ let _ = dispatch begin function
 	    latex_c
 	  end;
 
+(* uncomment for dypgen
 	rule "dypgen: dyp -> ml"
 	  ~prods:["%.ml"]
 	  ~deps:["%.dyp"]
@@ -207,6 +208,7 @@ let _ = dispatch begin function
 	   let src = env "%.dyp" in
 	   dypgen src
 	 end;
+*)
 
 	rule "Fix bib"
 	  ~prods:["%-fix.bib"]
@@ -248,6 +250,14 @@ let _ = dispatch begin function
 	  flag ["ocaml"; "pp"; "use_ulex.syntax"] &
 	    S[A "-I"; P ulex_dir; P "pa_ulex.cma"] ;
 
+
+(* uncomment for dypgen
+	  let dyp_dir =  ocamlfind_query "dyp" in
+	  ocaml_lib ~extern:true
+	                   ~dir:dyp_dir
+	                   "dyp"
+*)
+
 	  let menhirlib_dir = ocamlfind_query "menhirLib" in
 	  flag ["ocaml";"compile";"use_menhir"] &
             S[A "-I"; P menhirlib_dir];
@@ -261,7 +271,6 @@ let _ = dispatch begin function
 	      ~deps:["%.mly"; "%.mly.depends"]
 	      ~insert:(`before "ocaml: menhir")
 	      (Myocamlbuild.menhir "%.mly");
-
 
       (*c Rules can be declared by a call of the form
           [rule name ~prod ~dep action].
