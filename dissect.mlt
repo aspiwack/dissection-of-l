@@ -2,23 +2,35 @@
 
 ##verbatim '%' = MuPlugin.mumode
 
-(*** prelude ***)
-
-let concat_with_sep l sep =
-  if l = [] then
-    concat []
-  else 
-    let l_with_one_too_many = List.flatten (List.map (fun t -> [ sep ; t ]) l) in
-    concat (List.tl l_with_one_too_many)
-
+open Prelude
 
 (*** doc ***)
+let abstract = "There will be an abstract some day."
 
 let d = "<%<mu x, c|y>%>"
 
 (*** boilerplate ***)
 
 let title = "Dissecting {mu}"
+let authors = [
+  { name = "Arnaud Spiwack";
+    email = Some "arnaud@spiwack.net";
+    address = "Inria -- {textsc "pps"} -- Université Paris Diderot, France"
+  };
+]
+
+let keywords = [
+  "Sequent calculus";
+  "Dependent types";
+  "Linear logic";
+  "Focusing";
+(*  "μμ̃"; Confuses latex *)
+]
+
+let acmclass = [
+  "F.3.1"; (* (un peu douteux) Specifying, and verifying and reasoning about programs http://dl.acm.org/ccs.cfm?part=author&coll=DL&dl=ACM&row=F.3.1&idx=6&idx2=F.3.1&idx3=3&query=Subject%3A%22Logics%20of%20programs%22&CFID=83889239&CFTOKEN=84492988 *)
+  "F.3.3"; (* (moins douteux) Studies of program constructs http://dl.acm.org/ccs.cfm?part=author&coll=DL&dl=ACM&row=F.3.3&idx=6&idx2=F.3.3&idx3=5&query=Subject%3A%22Type%20structure%22&CFID=83889239&CFTOKEN=84492988 *)
+]
 
 let packages = [
   "inputenc" , "utf8" ;
@@ -27,34 +39,16 @@ let packages = [
   "microtype" , "" ;
 ]
 
-let prelude = concat_with_sep [
-  (* Mis ici pour rester le plus "en dernier" possible. Plus d'options à mettre
-     à l'avenir, en particulier pour configurer le style des liens*)
-  command \"usepackage\" ~opt:begin T,"
-    pdftex,
-    pdftitle={within_braces "Dissecting mu"},
-    pdfauthor={within_braces "Arnaud Spiwack"},
-    linkbordercolor={within_braces "0 0 .8"},
-    pdfsubject={within_braces "Computing science"},
-    pdfcreator={within_braces "Arnaud Spiwack"},
-    pdfproducer={within_braces "Arnaud Spiwack"}
-    unicode
-  "end [T,"hyperref"] T ;
-  (* Nécessite et modifie hyperref, donc doit se trouver à sa suite.
-     À customiser en particulier pour utiliser unicode (peut-être qu'il
-     faut juste le faire dans hyperref) *)
-  command \"usepackage\" ~opt:begin T,"
-    open,
-    openlevel=0,
-    atend
-  "end [T,"bookmark"] T ;
-] par
+let prelude = concat_with_sep [] par
 
 let file = \"dissect.tex\"
 
-let _ = emit ~file (document ~documentclass:`Article
+let _ = emit ~file (document
 		             ~title
-			     ~author:"Arnaud Spiwack"
+			     ~authors
+                             ~keywords
+                             ~acmclass
 			     ~prelude
 			     ~packages
+                             ~abstract
 			     d)
