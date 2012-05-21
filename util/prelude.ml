@@ -47,3 +47,16 @@ let document ~title ?short_title ~authors ~keywords ~acmclass ~abstract ~prelude
   ] par
 
 
+
+(*** A short module for proof.sty *)
+module Infer = struct
+
+  let infer_gen cmd ?label premisses concl =
+    let premisses = concat_with_sep premisses (text" & ") in
+    let label = match label with None -> None | Some l -> Some (M,l) in
+    command cmd ~packages:["proof",""] ?opt:label [ M,concl ; M,premisses ] M
+
+  let rule = infer_gen "infer"
+  let derived = infer_gen "infer*"
+
+end

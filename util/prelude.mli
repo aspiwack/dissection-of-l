@@ -18,3 +18,13 @@ val document :
   packages:(Latex.t * Latex.t) list ->
   Latex.t
   -> Latex.t
+
+(*** A short module for proof.sty *)
+module Infer : sig
+
+  (** A single deduction step *)
+  val rule : ?label:Latex.t -> Latex.t list -> Latex.t -> Latex.t
+  (** Multiple deduction steps *)
+  val derived : ?label:Latex.t -> Latex.t list -> Latex.t -> Latex.t
+
+end
