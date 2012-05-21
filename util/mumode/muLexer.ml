@@ -13,6 +13,15 @@ let number n = SYMB (mode M (text n))
 let keywords = []
 let map_ident = [
   "mu" , MU ;
+  "mut" , MUT ;
+  "lambda" , LAMBDA ;
+  "PI" , PI ;
+  "SIGMA" , SIGMA ;
+
+  (*greek letters*)
+  "alpha" , SYMB alpha ;
+  "beta" , SYMB beta ;
+  "kappa" , SYMB kappa ;
 ]
 
 let regexp whitespace = [ ' '  '\t' '\n' '\r' ]
@@ -39,6 +48,7 @@ let map =
   (List.map (fun k -> k,keyword k) keywords)
 
 let next k = lexer
+  | lvar | uvar -> SYMB (mode M (text (lexeme lexbuf)))
   | ident ->
     let id = lexeme lexbuf in
     begin try 
@@ -51,14 +61,26 @@ let next k = lexer
 
   | "<" -> POINTYL | ">" -> POINTYR
   | "|" -> BAR
+  | "1." -> IOTA1 | "2." -> IOTA2
+  | "|_" -> LLCORNER | "_|" -> LRCORNER
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR
 
   | "," -> COMMA | ";" -> SEMICOLON
+  | ":" -> COLON
   | "(" -> PARENL | ")" -> PARENR
   | "[" -> BRACKETL | "]" -> BRACKETR
   | "{" -> BRACEL | "}" -> BRACER
+  | "{\n" -> BRACEBR
   | "_" -> SUB | "^" -> SUP
+
+  | "<+>" -> OPLUS | "<*>" -> OTIMES
+  | "&" -> WITH | "`&" -> PAR
+  | "!" -> BANG | "?" -> WHYNOT
+
+  | "^~" -> DUAL
+
+  | "\\_" -> WILDCARD
 
   | whitespace -> k ()
   | number -> number (lexeme lexbuf)

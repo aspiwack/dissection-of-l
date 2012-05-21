@@ -1,3 +1,5 @@
+(* -*- compile-command: "ocamlbuild -classic-display dissect.pdf && evince _build/dissect.pdf" -*- *)
+
 ##verbatim '%' = MuPlugin.mumode
 
 (*** prelude ***)
