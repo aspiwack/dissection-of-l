@@ -18,6 +18,8 @@ let map_ident = [
   "PI" , PI ;
   "SIGMA" , SIGMA ;
 
+  "subst", FUN3 (fun t x u -> concat [t;text"[";x;setminus;u;text"]"]);
+
   (*greek letters*)
   "alpha" , SYMB alpha ;
   "beta" , SYMB beta ;

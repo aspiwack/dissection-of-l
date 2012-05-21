@@ -46,6 +46,9 @@ let document ~title ?short_title ~authors ~keywords ~acmclass ~abstract ~prelude
     ] (text"\n%\n"));
   ] par
 
+let foreign = emph
+
+let grammardef = mode M (text"::=")
 
 
 (*** A short module for proof.sty *)
@@ -60,3 +63,8 @@ module Infer = struct
   let derived = infer_gen "infer*"
 
 end
+
+
+(*** Holes ***)
+
+let citation_needed = small (text"[citation]")

@@ -1,4 +1,3 @@
-
 val concat_with_sep : Latex.t list -> Latex.t -> Latex.t
 
 type author = {
@@ -19,6 +18,9 @@ val document :
   Latex.t
   -> Latex.t
 
+val foreign : Latex.t -> Latex.t
+val grammardef : Latex.t
+
 (*** A short module for proof.sty *)
 module Infer : sig
 
@@ -28,3 +30,7 @@ module Infer : sig
   val derived : ?label:Latex.t -> Latex.t list -> Latex.t -> Latex.t
 
 end
+
+(*** Holes ***)
+
+val citation_needed : Latex.t

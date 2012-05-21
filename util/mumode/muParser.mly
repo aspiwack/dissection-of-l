@@ -35,10 +35,13 @@ let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
 
 %token MU MUT
 
+%token <Latex.t->Latex.t->Latex.t->Latex.t> FUN3
+
 %start <Latex.t> mu
 
 %right REDUCES
 %nonassoc MU
+%right APP
 
 %%
 
@@ -50,6 +53,8 @@ expr:
 | METAPARENL e=expr METAPARENR { e }
 | s=SYMB { s }
 | WILDCARD { text"\\_" }
+
+| f=FUN3 e1=expr e2=expr e3=expr { f e1 e2 e3 } %prec APP
 
 | MU p=pattern COMMA e=expr { concat [Latex.mu;p;text".\\,";e] } %prec MU
 | MUT p=pattern COMMA e=expr { concat [tilde Latex.mu;p;text".\\,";e] } %prec MU
@@ -69,7 +74,7 @@ expr:
 | LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
-| t=expr u=expr { concat[t;text"~";u] }
+| t=expr u=expr { concat[t;text"~";u] } %prec APP
 
 | e=expr DUAL { exponent e bot }
 | a=expr OTIMES b=expr { concat[a;otimes;b] }

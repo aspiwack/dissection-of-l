@@ -4,11 +4,89 @@
 
 open Prelude
 
+(* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
+   pas à la même taille que celle de la fonte romane… ça n'est
+   pas très beau. *)
+
 (*** doc ***)
 let abstract = "There will be an abstract some day."
 
-let d = "<%<mu x, c|y>%>"
+let intro = "{section' "Foreword"}
 
+In this article I will discuss typing of a calculus -- or, to be
+fair, a family of calculus -- I call {mu}. It originates from a
+paper by Herbelin \& Curien~{citation_needed}, where it was
+called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
+often called simply ${mu}{tilde mu}$, or system L
+syntax~{citation_needed}. The latter name comes from
+proof-theoretical investigations, this article has more a programming
+language feel, and we will not see a {tilde mu}. Hence just {mu}.
+
+The {foreign "tour de force"} of {mu}, in my opinion, is to provide
+a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
+for natural deduction, contraction and weakening are done through
+variables: a bound variable which isn't used is weakened, if it is
+used twice or more it is contracted. This is, I would argue, why
+it makes a good foundation for a programming language.
+
+To me at least, the appeal of sequent calculus is hard to resist. It
+has a more symmetric structure than natural deduction, and proof search
+is more naturally expressed in it. Importantly for this article, Lengrand
+has shown~{citation_needed} that proof search is expressed naturally
+in a dependently typed (intuitionist) sequent calculus.
+
+The object of this paper, is to study {mu} as a programming language whose
+typing rules correspond to linear sequent calculus. And then to add dependent
+types to the mix. The main motivation is to use this calculus as a stepping
+stone to understand mathematics in presence of computational effects (as
+linear logic can be used, to some extent, to model effects~{citation_needed}).
+The choice of linear logic rather than some flavour of intuitionist linear
+logic might be a matter of taste, I tend to favour symmetry when I can; it
+was originally a challenge as well, as dependent types are somewhat antagonistic
+to the kind of commutation sequent calculus allow. In retrospect, though,
+it may very well be that linear dependent types are easier -- at least using
+{mu} as a framework -- than intuitionist linear dependent types.
+"
+
+let symbsep s =
+  `Sep ${quad}{s}{quad}$
+let coremu = "{section "Core {mu}"}
+
+Stripped down to its bare minimum, {mu} appears as a very simple calculus whose
+syntax is made of two kinds of objects, terms (<%t%>, <%u%>,<%v%>) and commands
+(<%c%>)
+{displaymath begin array [`L; symbsep grammardef; `L] [
+  array_line [ "<%t%>, <%u%>" ; "<%mu x, c%>" ];
+  array_line [ "<%c%>" ; "<%<t|u>%>" ];
+] end}
+Together with reduction rules
+{displaymath begin array [`L; symbsep leadsto; `L] [
+  array_line [ "<%<u|mu x,t>%>" ; "<%subst t x u%>" ];
+  array_line [ "<%<mu x,t|u>%>" ; "<%subst t x u%>" ];
+] end}
+The intent being that the vertical bar be read as commutative. We shall using
+as such from now on.
+
+Terms reduce to a value, whereas command just compute -- they are played only
+for there effects. The reduction rules look quite similar to {beta}-reduction,
+however this core calculus does not have nearly the power of {lambda}-calculus.
+Indeed the fact that there are two kinds of object is crucial here: from a
+functional programming perspective, it is like if the only construct was
+{textsf"let{ldots}in"}.
+
+Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
+the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
+<%<t|u>%> runs <%t%> with continuation <%u%> (or symmetrically, <%u%> with
+continuation <%t%>) it is read ``<%t%> against <%u%>''.
+"
+
+let d = concat [
+  intro;
+  coremu;
+]
+
+let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"
+      
 (*** boilerplate ***)
 
 let title = "Dissecting {mu}"
