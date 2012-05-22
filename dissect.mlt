@@ -40,6 +40,8 @@ typing rules correspond to linear sequent calculus. And then to add dependent
 types to the mix. The main motivation is to use this calculus as a stepping
 stone to understand mathematics in presence of computational effects (as
 linear logic can be used, to some extent, to model effects~{citation_needed}).
+I also hope to use dependent linear {mu} as a new lense through which
+usual dependently typed language could be further analysed.
 The choice of linear logic rather than some flavour of intuitionist linear
 logic might be a matter of taste, I tend to favour symmetry when I can; it
 was originally a challenge as well, as dependent types are somewhat antagonistic
@@ -67,17 +69,21 @@ Together with reduction rules
 The intent being that the vertical bar be read as commutative. We shall using
 as such from now on.
 
-Terms reduce to a value, whereas command just compute -- they are played only
-for there effects. The reduction rules look quite similar to {beta}-reduction,
-however this core calculus does not have nearly the power of {lambda}-calculus.
-Indeed the fact that there are two kinds of object is crucial here: from a
-functional programming perspective, it is like if the only construct was
-{textsf"let{ldots}in"}.
-
 Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
 the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
 <%<t|u>%> runs <%t%> with continuation <%u%> (or symmetrically, <%u%> with
 continuation <%t%>) it is read ``<%t%> against <%u%>''.
+Terms reduce to a value, whereas command just compute -- they are played only
+for there effects. Though it is possible to imagine otherwise, and consider
+{textsc"io"} of sorts, the only effects available to a computation in pure {mu}
+is returning to a continuation.
+
+The reduction rules look quite similar to {beta}-reduction,
+however this core calculus does not have nearly the power of {lambda}-calculus.
+Indeed the fact that there are two kinds of object is crucial here: from a
+functional programming perspective, it is like if the only construct was
+{textsf"let{ldots}in"}. (* arnaud: sûr ? Contrary to {lambda}-calculus we have practically no
+computation power without extending *)
 "
 
 let d = concat [
