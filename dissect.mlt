@@ -82,8 +82,18 @@ The reduction rules look quite similar to {beta}-reduction,
 however this core calculus does not have nearly the power of {lambda}-calculus.
 Indeed the fact that there are two kinds of object is crucial here: from a
 functional programming perspective, it is like if the only construct was
-{textsf"let{ldots}in"}. (* arnaud: sûr ? Contrary to {lambda}-calculus we have practically no
-computation power without extending *)
+{textsf"let{ldots}in"}. Contrary to {lambda}-calculus we have practically no
+computation power without additional constructs.
+
+However, we can already observe undesirable behaviours. For instance it is easy to
+cook up a non-terminating command <%<mu x,<x|x> | mu x,<x|x>>%>.
+Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
+<%<mu alpha, c_1 | mu alpha, c_2>%> where <%alpha%> is fresh. (*arnaud: essayer de regarder les conflits contraction/contraction et weakening/contraction*)
+
+{subsection "Typing as classical sequent calculus"}
+
+The original typing rules~{citation_needed} for {mu} corresponded closely to classical
+sequent calculus. Let us review them.
 "
 
 let d = concat [

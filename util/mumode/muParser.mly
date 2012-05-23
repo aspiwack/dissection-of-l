@@ -42,6 +42,7 @@ let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
 %right REDUCES
 %nonassoc MU
 %right APP
+%nonassoc SUBSUP
 
 %%
 
@@ -55,6 +56,11 @@ expr:
 | WILDCARD { text"\\_" }
 
 | f=FUN3 e1=expr e2=expr e3=expr { f e1 e2 e3 } %prec APP
+
+| e=expr SUB s=expr {index e s} %prec SUBSUP
+| e=expr SUP s=expr {exponent e s} %prec SUBSUP
+| e=expr SUB s1=expr SUP s2=expr {index_exponent e s1 s2} %prec SUBSUP
+| e=expr SUP s1=expr SUB s2=expr {index_exponent e s2 s1} %prec SUBSUP
 
 | MU p=pattern COMMA e=expr { concat [Latex.mu;p;text".\\,";e] } %prec MU
 | MUT p=pattern COMMA e=expr { concat [tilde Latex.mu;p;text".\\,";e] } %prec MU
