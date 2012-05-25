@@ -9,6 +9,8 @@ let ulcorner = command "ulcorner" ~packages:["amssymb",""] [] M
 let urcorner = command "urcorner" ~packages:["amssymb",""] [] M
 let llcorner = command "llcorner" ~packages:["amssymb",""] [] M
 let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
+
+let empty_context = Latex.empty
 %}
 
 %token EOL
@@ -18,6 +20,7 @@ let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
 %token METAPARENL METAPARENR 
 %token PARENL PARENR BRACKETL BRACKETR BRACEL BRACER BRACEBR
 %token WILDCARD
+%token TURNSTYLE
 
 %token POINTYL POINTYR BAR
 %token DUAL
@@ -48,6 +51,7 @@ let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
 
 mu:
 | e=expr EOL { mode M e }
+| s=sequent EOL {mode M s }
 
 expr:
 | PARENL e=expr PARENR { concat [text"(";e;text")"] }
@@ -99,4 +103,31 @@ typedpattern:
 
 pattern:
 | e=expr { e }
+
+context:
+| c=separated_list(COMMA,context_item) {
+  match c with
+  | [] -> empty_context
+  | a::l -> a ^^ Latex.concat (List.map (fun x-> text", "^^x) l)
+}
+
+context_item:
+| p=typedpattern { p }
+| s=expr { s }
+
+sequent_right_hand:
+| e=expr { e }
+| t=expr COLON a=expr { concat [ t ; text" : " ; a ] }
+
+sequent_left_hand:
+| gs=separated_nonempty_list(SEMICOLON,context) {
+  match gs with
+  | [] -> assert false
+  | a::l -> a ^^ Latex.concat (List.map (fun x-> text" ; "^^x) l)
+}
+
+sequent:
+| l=sequent_left_hand TURNSTYLE r=sequent_right_hand {
+  concat [ l ; vdash ; r ]
+}
 

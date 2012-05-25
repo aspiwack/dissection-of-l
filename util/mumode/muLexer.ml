@@ -24,6 +24,11 @@ let map_ident = [
   "alpha" , SYMB alpha ;
   "beta" , SYMB beta ;
   "kappa" , SYMB kappa ;
+  "Gamma" , SYMB gamma_;
+  "Delta" , SYMB delta_;
+  "Xi" , SYMB xi_;
+  "Pi" , SYMB pi_;
+  "Sigma" , SYMB sigma_;
 ]
 
 let regexp whitespace = [ ' '  '\t' '\n' '\r' ]
@@ -67,6 +72,8 @@ let next k = lexer
   | "|_" -> LLCORNER | "_|" -> LRCORNER
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR
+
+  | "|-" -> TURNSTYLE
 
   | "," -> COMMA | ";" -> SEMICOLON
   | ":" -> COLON

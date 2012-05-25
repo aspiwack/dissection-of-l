@@ -85,7 +85,7 @@ functional programming perspective, it is like if the only construct was
 {textsf"let{ldots}in"}. Contrary to {lambda}-calculus we have practically no
 computation power without additional constructs.
 
-However, we can already observe undesirable behaviours. For instance it is easy to
+Nonetheless, we can already observe undesirable behaviours. For instance it is easy to
 cook up a non-terminating command <%<mu x,<x|x> | mu x,<x|x>>%>.
 Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 <%<mu alpha, c_1 | mu alpha, c_2>%> where <%alpha%> is fresh. (*arnaud: essayer de regarder les conflits contraction/contraction et weakening/contraction*)
@@ -93,7 +93,34 @@ Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 {subsection "Typing as classical sequent calculus"}
 
 The original typing rules~{citation_needed} for {mu} corresponded closely to classical
-sequent calculus. Let us review them.
+sequent calculus. We shall present, here, a one-sided version of them. Core mu does not
+have any connective, however as is necessary in a one-sided sequent calculus, we shall
+assume that every formula <%A%> has a dual <%A^~%>, and that <%A^~^~%> is <%A%> itself.
+
+There are two kinds of sequents, one for each kind of objects: terms are typed with
+sequent of the form
+{displaymath "<%Gamma|-t:A%>"}
+and commands with sequents
+{displaymath "<%Gamma|-c%>"}
+
+Readers familiar with one-sided sequent calculi might wonder why we used this particular
+form for sequents. It was chosen mostly for its resemblance to natural deduction sequents,
+more familiar in the realm of programming languages; also it allows variables to appear
+with the same type in terms and in the context.
+
+The three typing rules for classical core {mu} are the identity rule, giving their type
+to variables
+{displaymath (Infer.rule ~label:"id" [] "<%Gamma,x:A|-x:A%>")}
+the {mu} rule, for {mu} abstractions
+{displaymath (Infer.rule ~label:mu ["<%Gamma, x:A|-c%>"] "<%Gamma|- mu x,c : A^~%>")}
+and the cut rule giving their types to interactions
+{displaymath (Infer.rule ~label:"cut" ["<%Gamma|-t:A%>";"<%Gamma|-u:A^~%>"] "<%Gamma|-<t|u>%>")}
+where the context is considered up to commutation of the comma.
+
+What should be taken away from these rules is that the identity and cut rules are sufficient
+to make weakening and contraction admissible. It is also the case that reduction is terminating,
+as terms like the aforementioned <%<mu x,<x|x> | mu x,<x|x>>%> cannot be typed. On the other hand,
+non-confluence is still as acute
 "
 
 let d = concat [
