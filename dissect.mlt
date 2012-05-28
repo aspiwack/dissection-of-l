@@ -4,6 +4,8 @@
 
 open Prelude
 
+let ae = command \"ae\" [] T
+
 (* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
@@ -120,7 +122,32 @@ where the context is considered up to commutation of the comma.
 What should be taken away from these rules is that the identity and cut rules are sufficient
 to make weakening and contraction admissible. It is also the case that reduction is terminating,
 as terms like the aforementioned <%<mu x,<x|x> | mu x,<x|x>>%> cannot be typed. On the other hand,
-non-confluence is still as acute
+non-confluence is still as acute as the following derivation demonstrates:
+{displaymath begin
+  Infer.rule [
+       Infer.rule [Infer.rule [] "<%Gamma,alpha:A^~|- c_1%>"] "<%Gamma|-mu alpha,c_1 : A%>";
+       Infer.rule [Infer.rule [] "<%Gamma,beta:A|- c_2%>"] "<%Gamma|-mu beta,c_2 : A^~%>"]
+  "<%Gamma|-<mu alpha,c_1|mu beta, c_2>%>"
+end}
+Hence, by the weakening property, if <%c_1%> and <%c_2%> are both typable in <%Gamma%>, then they are
+redux of a common typable term in <%Gamma%>. This is, in fact, nothing more than the classical
+weakening-weakening critical pair of cut elimination.
+
+{subsection "Typing as linear sequent calculus"}
+To address the confluence issue, we move from a classical sequent calculus. In the case of core
+{mu} this simply requires simple modifications of the identity rule
+{displaymath (Infer.rule ~label:"id" [] "<%x:A|-x:A%>")}
+and cut rule
+{displaymath (Infer.rule ~label:"cut" ["<%Gamma|-t:A%>";"<%Delta|-u:A^~%>"] "<%Gamma,Delta|-<t|u>%>")}
+to prevent weakening and contraction to happen. The {mu} rules stays as above.
+
+Would we to limit the exchange of formul{ae} in the context, we could play with the {mu} rule. We shall, however,
+keep reading the comma as commutative.
+"
+
+let llmu = "{section "Linear {mu}"}
+As mentioned in the previous section, core {mu} does not have all that much computing abilities.
+This has much to do with the fact that 
 "
 
 let d = concat [
