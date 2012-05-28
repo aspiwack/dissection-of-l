@@ -50,6 +50,8 @@ let foreign = emph
 
 let grammardef = mode M (text"::=")
 
+let parr = command "parr" ~packages:["cmll",""] [] M
+let larrow = command "multimap" ~packages:["amssymb",""] [] M
 
 (*** A short module for proof.sty *)
 module Infer = struct

@@ -56,11 +56,19 @@ module Myocamlbuild = struct
   open Tags.Operators
   open Command
 
+  let ocaml_add_include_flag x acc =
+    if x = Pathname.current_dir_name then acc else A"-I" :: A x :: acc
+      
+  let ocaml_include_flags path =
+    S (List.fold_right ocaml_add_include_flag (Pathname.include_dirs_of (Pathname.dirname path)) [])
+
   let menhir mly env build =
     let mly = env mly in
     let menhir = if !Options.ocamlyacc = N then V"MENHIR" else !Options.ocamlyacc in
+    let include_flags = ocaml_include_flags mly in
+    Ocamlbuild_pack.Ocaml_compiler.prepare_compile build mly;
     Cmd(S[menhir;
-          A"--ocamlc"; Quote(S[!Options.ocamlc; T(tags_of_pathname mly++"ocaml"++"compile")]);
+          A"--ocamlc"; Quote(S[!Options.ocamlc; include_flags; T(tags_of_pathname mly++"ocaml"++"compile")]);
           T(tags_of_pathname mly++"ocaml"++"parser"++"menhir");
           A"--infer"; Px mly])
 end
@@ -271,6 +279,7 @@ let _ = dispatch begin function
 	      ~deps:["%.mly"; "%.mly.depends"]
 	      ~insert:(`before "ocaml: menhir")
 	      (Myocamlbuild.menhir "%.mly");
+
 
       (*c Rules can be declared by a call of the form
           [rule name ~prod ~dep action].

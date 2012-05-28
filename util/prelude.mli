@@ -20,6 +20,8 @@ val document :
 
 val foreign : Latex.t -> Latex.t
 val grammardef : Latex.t
+val parr : Latex.t
+val larrow : Latex.t
 
 (*** A short module for proof.sty *)
 module Infer : sig

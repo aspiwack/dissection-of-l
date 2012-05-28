@@ -18,7 +18,7 @@ let map_ident = [
   "PI" , PI ;
   "SIGMA" , SIGMA ;
 
-  "subst", FUN3 (fun t x u -> concat [t;text"[";x;setminus;u;text"]"]);
+  "subst", SUBST;
 
   (*greek letters*)
   "alpha" , SYMB alpha ;
@@ -86,6 +86,8 @@ let next k = lexer
   | "<+>" -> OPLUS | "<*>" -> OTIMES
   | "&" -> WITH | "`&" -> PAR
   | "!" -> BANG | "?" -> WHYNOT
+
+  | "-o" -> LARROW
 
   | "^~" -> DUAL
 

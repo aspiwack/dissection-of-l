@@ -60,13 +60,13 @@ Stripped down to its bare minimum, {mu} appears as a very simple calculus whose
 syntax is made of two kinds of objects, terms (<%t%>, <%u%>,<%v%>) and commands
 (<%c%>)
 {displaymath begin array [`L; symbsep grammardef; `L] [
-  array_line [ "<%t%>, <%u%>" ; "<%mu x, c%>" ];
+  array_line [ "<%t%>, <%u%>" ; "<%mu x, c%> {mid} <%x%>" ];
   array_line [ "<%c%>" ; "<%<t|u>%>" ];
 ] end}
 Together with reduction rules
 {displaymath begin array [`L; symbsep leadsto; `L] [
-  array_line [ "<%<u|mu x,t>%>" ; "<%subst t x u%>" ];
-  array_line [ "<%<mu x,t|u>%>" ; "<%subst t x u%>" ];
+  array_line [ "<%<u|mu x,t>%>" ; "<%subst [u,x] t%>" ];
+  array_line [ "<%<mu x,t|u>%>" ; "<%subst [u,x] t%>" ];
 ] end}
 The intent being that the vertical bar be read as commutative. We shall using
 as such from now on.
@@ -147,12 +147,57 @@ keep reading the comma as commutative.
 
 let llmu = "{section "Linear {mu}"}
 As mentioned in the previous section, core {mu} does not have all that much computing abilities.
-This has much to do with the fact that 
-"
+This has much to do with the fact that its typing rules don't involve any connectives.
+In this section we shall extend {mu} constructs to reflect the whole range of linear logic
+connectives.
+
+{subsection "Multiplicative fragment"}
+The multiplicative connectives <%A<*>B%> and <%A`&B%> are reflected in the syntax as two
+term constructors
+{displaymath begin array [`L; symbsep grammardef; `L] [
+  array_line [ "<%t%>, <%u%>" ; "{ldots} {mid} <%(t,u)%> {mid} <%mu (x,y), c%>" ];
+] end}
+a pairing construct, and a pair elimination construct whose reduction rule is
+{displaymath begin array [`L; symbsep leadsto; `L] [
+  array_line [ "<%<(t,u)|mu (x,y),v>%>" ; "<%subst [t,x ; u,y] v%>" ];
+] end}
+In a pattern that will repeat itself throughout this article, the tensor product
+is a {emph"positive"} construction, and its proofs are, hence, built out of terms, and the
+par is a {emph"negative"} construction and its proofs are built out of command, and have
+a pattern-matching feel.
+
+The corresponding typing rules are fairly straightforward
+{displaymath (Infer.rule ~label:otimes ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>")}
+{displaymath (Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>")}
+
+Using these rules, we can encode the somewhat more familiar constructs of (linear) {lambda}-calculus. Writing,
+as usual, <%A-oB%> for <%A^~`&B%> we get abstraction
+{displaymath (Infer.rule ~label:parr [Infer.rule ~label:"cut" ["<%Gamma,x:A|-t:B%>";Infer.rule ~label:"id" [] "<%alpha:B^~|-alpha:B^~%>"]
+                                           "<%Gamma,x:A,alpha:B^~|-<t|alpha>%>"]
+                 "<%Gamma|-mu(x,alpha),<t|alpha>:A-oB%>")}
+and application
+{displaymath (Infer.rule ~label:mu [Infer.rule ~label:"cut" ["<%Gamma|-t:A-oB%>";Infer.rule ~label:otimes ["<%Delta|-u:A%>";Infer.rule ~label:"id" [] "<%alpha:B^~|-alpha:B^~%>"] "<%Delta,alpha:B^~|-(u,alpha):A<*>B^~%>"] "<%Gamma,Delta,alpha:B^~|- <t|(u,alpha)>%>"] "<%Gamma,Delta|-mu alpha, <t|(u,alpha)> : B%>")}
+
+We shall henceforth write <%lambda x,t%> for <%mu(x,alpha),<t|alpha>%> and <%t u%> for <%mu alpha, <t|(u,alpha)>%>.
+Apart from systematically deriving them from their desired typing rules, as above, the best way to understand these two derived construct is via abstract machines. Indeed, reading alpha as {emph"the stack"}, the application reads
+``play <%t%> against the stack augmented by <%u%>'', this is the {emph"push"} instruction of abstract machines.
+Abstraction, dually, reads as ``let <%x%> be the top of the stack, play <%t%> against the rest of the stack'',
+that is, the {emph"grab"} instruction of virtual machines.
+
+The correspondence with abstract machines is no coincidence, and we shall encounter it again. It can be
+viewed as a consequence of the fact that, through its core construction, {mu} internalises the notion of
+stack. In fact, when writing an abstract machine for {mu} there is no need of an explicit stack, everything
+stack-like is taken care of by the multiplicative constructs.
+
+{subsection "Additive fragment"}
+
+Additive type constructors include <%A<+>B%> and <%A&B%>, where the former is positive, hence built out
+of terms and the"
 
 let d = concat [
   intro;
   coremu;
+  llmu;
 ]
 
 let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"

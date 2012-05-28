@@ -1,9 +1,8 @@
 %{
  open Latex
- (*open Prelude*)
+ open Prelude
 
  (*let invamp = command "bindnasrepma" ~packages:["stmaryrd",""] [] M*)
-let invamp = command "parr" ~packages:["cmll",""] [] M
 
 let ulcorner = command "ulcorner" ~packages:["amssymb",""] [] M
 let urcorner = command "urcorner" ~packages:["amssymb",""] [] M
@@ -25,6 +24,7 @@ let empty_context = Latex.empty
 %token POINTYL POINTYR BAR
 %token DUAL
 %token OPLUS OTIMES WITH PAR ONE BOTTOM ZERO TOP
+%token LARROW
 %token BANG WHYNOT
 %token PI SIGMA
 
@@ -33,6 +33,7 @@ let empty_context = Latex.empty
 %token LAMBDA
 
 %token REDUCES
+%token SUBST
 
 %token SUB SUP
 
@@ -90,12 +91,24 @@ expr:
 | a=expr OTIMES b=expr { concat[a;otimes;b] }
 | a=expr OPLUS b=expr  { concat[a;oplus;b] }
 | a=expr WITH b=expr  { concat[a;text"\\&";b] }
-| a=expr PAR b=expr  { concat[a;invamp;b] }
+| a=expr PAR b=expr  { concat[a;parr;b] }
 | BANG a=expr { concat [text"\\,!";a] }
 | WHYNOT a=expr { concat [text"\\,?\\!";a] }
 | PI p=typedpattern COMMA b=expr { concat [ index prod p ; b ] }
 | SIGMA p=typedpattern COMMA b=expr { concat [ index sum p ; b ] }
 
+| a=expr LARROW b=expr { concat [a;larrow;b] }
+
+| SUBST l=delimited(BRACKETL, separated_nonempty_list(SEMICOLON,separated_pair(expr,COMMA,expr)) ,BRACKETR) e=expr
+  { let single (t,x) = concat[x;setminus;t] in
+    let subst =
+      match l with
+      | s::r ->
+          single s ^^ concat (List.map (fun s -> text", "^^single s) r)
+      | [] -> assert false
+    in
+    concat [e;text"[";subst;text"]"]
+  }
 | e=expr REDUCES f=expr { concat [e;leadsto;f] }
 
 typedpattern:
