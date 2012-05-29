@@ -23,6 +23,13 @@ val ae : Latex.t
 val foreign : Latex.t -> Latex.t
 val grammardef : Latex.t
 
+type block_line
+type block
+val block : Latex.t -> Latex.alignment list -> block_line list -> block
+val simple_block : Latex.t -> Latex.t -> block
+val block_line : ?sep:Latex.size -> Latex.t list -> block_line
+val figurerules : label:Latex.label -> caption:Latex.t -> block list -> Latex.t
+
 val tensor : Latex.t
 val parr : Latex.t
 val one : Latex.t
@@ -34,6 +41,12 @@ val top : Latex.t
 val zero : Latex.t
 val cutrule : Latex.t
 val idrule : Latex.t
+val iota1rule : Latex.t
+val iota2rule : Latex.t
+val apprule : Latex.t
+val recordrule : Latex.t
+val pi1rule : Latex.t
+val pi2rule : Latex.t
 
 (*** A short module for proof.sty *)
 module Infer : sig

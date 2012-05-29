@@ -52,6 +52,52 @@ let foreign = emph
 
 let grammardef = mode M (text"::=")
 
+type block_line = (Latex.size option)*Latex.t list
+let block_line ?sep l = sep , l
+
+type block = t * alignment list * block_line list
+let block title alignment content =
+  (title,alignment,content)
+let simple_block t c =
+  block t [`C] [block_line [c]]
+(*
+  let title_line x = array_line ~sep:(`Mm 3.) [textsc x] in
+  let block l = array_line ~sep:(`Mm 15.) l in
+  [ title_line title; block [ content ] ]
+*)
+(* arnaud: une implémentation correcte du ppcm est plus que bienvenue *)
+(* arnaud: puis enlever les printf *)
+let ppcm p q = p*q
+let figurerules ~label ~caption (l:block list) =
+  (*arnaud: separation entre les blocks ?*)
+  let widths = List.map (fun (_,a,_) -> List.length a) l in
+  let ppcm = List.fold_left ppcm 1 widths in
+  Format.printf "ppcm: %i\n" ppcm;
+  let title_line x = array_line ~layout:[ppcm,`C]~sep:(`Mm 3.) [textsc x] in
+  let block a bs =
+    let n = List.length a in
+    let w = ppcm/n in
+    let layout = List.map (fun x -> w,(x:>[alignment|`I])) a in
+    (*array_line ~layout ~sep:(`Mm 15.) b*)
+    Format.printf "w: %i\n" w;
+    Format.printf "length layout: %i\n" (List.length layout);
+    List.map (fun (sep,b) -> array_line ~layout ?sep b) bs
+  in
+  let l =
+    List.flatten (List.map (fun (t,a,b) -> title_line t :: block a b ) l)
+  in
+  let a =
+    let rec mk n =
+      if n = 0 then []
+      else `C::(mk (n-1))
+    in
+    mk ppcm
+  in
+  Format.printf "length a: %i\n" (List.length a);
+  figure ~label ~caption begin
+    array a l
+  end
+
 let tensor = otimes
 let parr = command "parr" ~packages:["cmll",""] [] M
 let larrow = command "multimap" ~packages:["amssymb",""] [] M
@@ -63,6 +109,12 @@ let top = Latex.top
 let zero = mode M (text"0")
 let idrule = mode T(text"id")
 let cutrule = mode T(text"cut")
+let iota1rule = mode T(plus^^text"l")
+let iota2rule = mode T(plus^^text"r")
+let apprule = mode T(text"app")
+let recordrule = mode T(text"record")
+let pi1rule = index pi (mode M (text"1"))
+let pi2rule = index pi (mode M (text"2"))
 
 
 (*** A short module for proof.sty *)
@@ -82,3 +134,4 @@ end
 (*** Holes ***)
 
 let citation_needed = small (text"[citation]")
+

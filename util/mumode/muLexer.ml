@@ -1,6 +1,6 @@
 open MuParser
 open Latex
-(*open Prelude*)
+open Prelude
 
 (*** Formatting primitive ***)
 
@@ -17,6 +17,9 @@ let map_ident = [
   "lambda" , LAMBDA ;
   "PI" , PI ;
   "SIGMA" , SIGMA ;
+
+  "bot" , SYMB bottom ;
+  "top" , SYMB top;
 
   "subst", SUBST;
 
@@ -85,6 +88,7 @@ let next k = lexer
   | "{\n" -> BRACEBR
   | "_" -> SUB | "^" -> SUP
 
+  | "1" -> SYMB one | "0" -> SYMB zero
   | "<+>" -> OPLUS | "<*>" -> OTIMES
   | "&" -> WITH | "`&" -> PAR
   | "!" -> BANG | "?" -> WHYNOT

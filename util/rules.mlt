@@ -41,5 +41,19 @@ module Typing = struct
 
   let pair = Infer.rule ~label:tensor ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>"
   let copair = Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>"
+  let unit = Infer.rule ~label:one [] "<%|-():1%>"
+  let counit = Infer.rule ~label:bottom ["<%Gamma|-c%>"] "<%Gamma|- mu (),c:bot%>"
+
+  let iota1 = Infer.rule ~label:iota1rule ["<%Gamma|-t:A%>"] "<%Gamma|- 1.t : A<+>B%>"
+  let iota2 = Infer.rule ~label:iota2rule ["<%Gamma|-u:B%>"] "<%Gamma|- 2.u : A<+>B%>"
+  let case = Infer.rule ~label:withc ["<%Gamma,x:A|-c_1%>";"<%Gamma,y:B|-c_2%>"] "<%Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+  let emptycase = Infer.rule ~label:top [] "<%Gamma|-{}:top%>"
+  let zero = "No rule for {zero}"
+
+  let lambda = Infer.rule ~label:lambda ["<%Gamma,x:A|-t:B%>"] "<%Gamma|-lambda x,t: A-oB%>"
+  let app = Infer.rule ~label:apprule ["<%Gamma|-t:A-oB%>";"<%Gamma|-u:A%>"] "<%Gamma|-t u:B%>"
+  let record = Infer.rule ~label:recordrule ["<%Gamma|-t:A%>";"<%Gamma|-u:B%>"] "<%Gamma|-{1=t,2=u} : A&B%>"
+  let pi1 = Infer.rule ~label:pi1rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.1:A%>"
+  let pi2 = Infer.rule ~label:pi2rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.2:B%>"
 end
 

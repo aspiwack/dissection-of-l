@@ -153,7 +153,7 @@ Would we to limit the exchange of formul{ae} in the context, we could play with 
 keep reading the comma as commutative.
 "
 
-let llmu = "{section "Linear {mu}"}
+        let llmu = "{section "Linear {mu}"}
 As mentioned in the previous section, core {mu} does not have all that much computing abilities.
 This has much to do with the fact that its typing rules don't involve any connectives.
 In this section we shall extend {mu} constructs to reflect the whole range of linear logic
@@ -223,42 +223,52 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
 (with <%alpha%> fresh). The projections are <%t.1%> and <%t.2%>, and stand for
 <%mu alpha,<t|1.alpha>%> and <%mu alpha,<t|2.alpha>%>, respectively.
 
-{figure ~label:l_mall ~caption:"Multiplicative and additive fragment"
-    begin
-      let title_line x = array_line [x] in
-      array [`C] [
-        title_line "Syntax";
-        array_line [ syntax [
-          syntax_line `Term Rules.Syntax.(core@multiplicative@additive);
-          commands
-          ];
-        ];
-        title_line "Reduction";
-        array_line [ reduction Rules.Reduction.(core@multiplicative@additive)
-        ];
-        title_line "Derived syntax";
-        array_line [ array [`L; symbsep $=$; `L] [
-          array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
-          array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
-          array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
-          array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
-          array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
-          ]
-        ];
-        title_line "Typing";
-        array_line [
-          let open Rules.Typing in
-              array [ `C ; `C ] [
-                array_line [ mu ; empty ];
-                array_line [ id ; cut ];
-                array_line [ pair ; copair ];
-              ]
-        ]
-      ]
-    end}
+{let sep = `Mm 2. in
+ figurerules ~label:l_mall ~caption:"Multiplicative and additive fragment" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@multiplicative@additive);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@multiplicative@additive)
+   end;
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end;
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ emptycase ; zero ];
+         ]
+   end;
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi2 ];
+           block_line ~sep [ empty  ; pi1 ];
+         ]
+   end;
+ ]}
 
-"}
-"
+{subsection "Exponentials"}
+The typing rules presented so far are purely linear, in the sense that there is no contraction
+happening. For instance, the term <%(x,x)%> is never
+"}"
 
 let d = concat [
   intro;

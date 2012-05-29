@@ -23,7 +23,7 @@ let empty_context = Latex.empty
 
 %token POINTYL POINTYR BAR
 %token DUAL
-%token OPLUS OTIMES WITH PAR ONE BOTTOM ZERO TOP
+%token OPLUS OTIMES WITH PAR
 %token LARROW
 %token BANG WHYNOT
 %token PI SIGMA
