@@ -67,16 +67,24 @@ let simple_block t c =
 *)
 (* arnaud: une implémentation correcte du ppcm est plus que bienvenue *)
 (* arnaud: puis enlever les printf *)
-let ppcm p q = p*q
+let rec euclid a b =
+  (* precondition a>=b *)
+  let c = a mod b in
+  if c = 0 then b
+  else euclid b c
+let gcd a b =
+  if a>=b then euclid a b
+  else euclid b a
+let lcm p q = p*(q/(gcd p q))
 let figurerules ~label ~caption (l:block list) =
   (*arnaud: separation entre les blocks ?*)
   let widths = List.map (fun (_,a,_) -> List.length a) l in
-  let ppcm = List.fold_left ppcm 1 widths in
-  Format.printf "ppcm: %i\n" ppcm;
-  let title_line x = array_line ~layout:[ppcm,`C]~sep:(`Mm 3.) [textsc x] in
+  let lcm = List.fold_left lcm 1 widths in
+  Format.printf "lcm: %i\n" lcm;
+  let title_line x = array_line ~layout:[lcm,`C]~sep:(`Mm 3.) [textsc x] in
   let block a bs =
     let n = List.length a in
-    let w = ppcm/n in
+    let w = lcm/n in
     let layout = List.map (fun x -> w,(x:>[alignment|`I])) a in
     (*array_line ~layout ~sep:(`Mm 15.) b*)
     Format.printf "w: %i\n" w;
@@ -91,7 +99,7 @@ let figurerules ~label ~caption (l:block list) =
       if n = 0 then []
       else `C::(mk (n-1))
     in
-    mk ppcm
+    mk lcm
   in
   Format.printf "length a: %i\n" (List.length a);
   figure ~label ~caption begin
