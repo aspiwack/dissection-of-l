@@ -29,6 +29,7 @@ let empty_context = Latex.empty
 %token PI SIGMA
 
 %token IOTA1 IOTA2
+%token PI1 PI2 FIELD1 FIELD2
 %token LLCORNER LRCORNER
 %token LAMBDA
 
@@ -80,17 +81,22 @@ expr:
 					phantom alpha; quad;u;newline;
                                         text"\\}"
                                       ]}
+| BRACEL BRACER { text"\\{\\}" }
 | IOTA1 u=expr { concat [text "1." ; u] }
 | IOTA2 u=expr { concat [text "2." ; u] }
+| u=expr PI1 { concat [u; text".1"] }
+| u=expr PI2 { concat [u; text".2"] }
+| FIELD1 u=expr { concat [text"1 = "; u] }
+| FIELD2 u=expr { concat [text"2 = "; u] }
 | LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP
 
 | e=expr DUAL { exponent e bot }
-| a=expr OTIMES b=expr { concat[a;otimes;b] }
-| a=expr OPLUS b=expr  { concat[a;oplus;b] }
-| a=expr WITH b=expr  { concat[a;text"\\&";b] }
+| a=expr OTIMES b=expr { concat[a;tensor;b] }
+| a=expr OPLUS b=expr  { concat[a;plus;b] }
+| a=expr WITH b=expr  { concat[a;withc;b] }
 | a=expr PAR b=expr  { concat[a;parr;b] }
 | BANG a=expr { concat [text"\\,!";a] }
 | WHYNOT a=expr { concat [text"\\,?\\!";a] }

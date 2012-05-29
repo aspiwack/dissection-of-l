@@ -18,10 +18,22 @@ val document :
   Latex.t
   -> Latex.t
 
+val ae : Latex.t
+
 val foreign : Latex.t -> Latex.t
 val grammardef : Latex.t
+
+val tensor : Latex.t
 val parr : Latex.t
+val one : Latex.t
+val bottom : Latex.t
 val larrow : Latex.t
+val plus : Latex.t
+val withc : Latex.t
+val top : Latex.t
+val zero : Latex.t
+val cutrule : Latex.t
+val idrule : Latex.t
 
 (*** A short module for proof.sty *)
 module Infer : sig

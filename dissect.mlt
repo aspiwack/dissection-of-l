@@ -4,8 +4,18 @@
 
 open Prelude
 
-let ae = command \"ae\" [] T
 
+let symbsep s = `Sep ${quad}{s}{quad}$
+let syntax_line k ?(extend=false) l =
+  let k = match k with
+    | `Term -> "<%t%>, <%u%>"
+    | `Command -> "<%c%>"
+  in
+  let l = if extend then ldots::l else l in
+  array_line [ k ; concat_with_sep l mid ]
+let commands = syntax_line `Command ["<%<t|u>%>"]
+let syntax l = array [`L;symbsep grammardef; `L] l
+let reduction l = array [`L; symbsep leadsto; `L] l
 (* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
@@ -52,21 +62,19 @@ it may very well be that linear dependent types are easier -- at least using
 {mu} as a framework -- than intuitionist linear dependent types.
 "
 
-let symbsep s =
-  `Sep ${quad}{s}{quad}$
 let coremu = "{section "Core {mu}"}
 
 Stripped down to its bare minimum, {mu} appears as a very simple calculus whose
-syntax is made of two kinds of objects, terms (<%t%>, <%u%>,<%v%>) and commands
+syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>) and commands
 (<%c%>)
-{displaymath begin array [`L; symbsep grammardef; `L] [
-  array_line [ "<%t%>, <%u%>" ; "<%mu x, c%> {mid} <%x%>" ];
-  array_line [ "<%c%>" ; "<%<t|u>%>" ];
+{displaymath begin syntax [
+  syntax_line `Term Rules.Syntax.core;
+  commands
 ] end}
 Together with reduction rules
-{displaymath begin array [`L; symbsep leadsto; `L] [
-  array_line [ "<%<u|mu x,t>%>" ; "<%subst [u,x] t%>" ];
-  array_line [ "<%<mu x,t|u>%>" ; "<%subst [u,x] t%>" ];
+{displaymath begin reduction [
+  Rules.Reduction.mu;
+  array_line [ "<%<mu x,c|t>%>" ; "<%subst [t,x] c%>" ];
 ] end}
 The intent being that the vertical bar be read as commutative. We shall using
 as such from now on.
@@ -112,11 +120,11 @@ with the same type in terms and in the context.
 
 The three typing rules for classical core {mu} are the identity rule, giving their type
 to variables
-{displaymath (Infer.rule ~label:"id" [] "<%Gamma,x:A|-x:A%>")}
+{displaymath Rules.Typing.id}
 the {mu} rule, for {mu} abstractions
-{displaymath (Infer.rule ~label:mu ["<%Gamma, x:A|-c%>"] "<%Gamma|- mu x,c : A^~%>")}
+{displaymath Rules.Typing.mu}
 and the cut rule giving their types to interactions
-{displaymath (Infer.rule ~label:"cut" ["<%Gamma|-t:A%>";"<%Gamma|-u:A^~%>"] "<%Gamma|-<t|u>%>")}
+{displaymath Rules.Typing.cut}
 where the context is considered up to commutation of the comma.
 
 What should be taken away from these rules is that the identity and cut rules are sufficient
@@ -136,9 +144,9 @@ weakening-weakening critical pair of cut elimination.
 {subsection "Typing as linear sequent calculus"}
 To address the confluence issue, we move from a classical sequent calculus. In the case of core
 {mu} this simply requires simple modifications of the identity rule
-{displaymath (Infer.rule ~label:"id" [] "<%x:A|-x:A%>")}
+{displaymath (Infer.rule ~label:idrule [] "<%x:A|-x:A%>")}
 and cut rule
-{displaymath (Infer.rule ~label:"cut" ["<%Gamma|-t:A%>";"<%Delta|-u:A^~%>"] "<%Gamma,Delta|-<t|u>%>")}
+{displaymath (Infer.rule ~label:cutrule ["<%Gamma|-t:A%>";"<%Delta|-u:A^~%>"] "<%Gamma,Delta|-<t|u>%>")}
 to prevent weakening and contraction to happen. The {mu} rules stays as above.
 
 Would we to limit the exchange of formul{ae} in the context, we could play with the {mu} rule. We shall, however,
@@ -154,12 +162,12 @@ connectives.
 {subsection "Multiplicative fragment"}
 The multiplicative connectives <%A<*>B%> and <%A`&B%> are reflected in the syntax as two
 term constructors
-{displaymath begin array [`L; symbsep grammardef; `L] [
-  array_line [ "<%t%>, <%u%>" ; "{ldots} {mid} <%(t,u)%> {mid} <%mu (x,y), c%>" ];
+{displaymath begin syntax [
+  syntax_line `Term ~extend:true Rules.Syntax.([ pair ; copair ]);
 ] end}
 a pairing construct, and a pair elimination construct whose reduction rule is
-{displaymath begin array [`L; symbsep leadsto; `L] [
-  array_line [ "<%<(t,u)|mu (x,y),v>%>" ; "<%subst [t,x ; u,y] v%>" ];
+{displaymath begin reduction [
+  Rules.Reduction.pair
 ] end}
 In a pattern that will repeat itself throughout this article, the tensor product
 is a {emph"positive"} construction, and its proofs are, hence, built out of terms, and the
@@ -167,16 +175,16 @@ par is a {emph"negative"} construction and its proofs are built out of command, 
 a pattern-matching feel.
 
 The corresponding typing rules are fairly straightforward
-{displaymath (Infer.rule ~label:otimes ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>")}
-{displaymath (Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>")}
+{displaymath Rules.Typing.pair}
+{displaymath Rules.Typing.copair}
 
 Using these rules, we can encode the somewhat more familiar constructs of (linear) {lambda}-calculus. Writing,
 as usual, <%A-oB%> for <%A^~`&B%> we get abstraction
-{displaymath (Infer.rule ~label:parr [Infer.rule ~label:"cut" ["<%Gamma,x:A|-t:B%>";Infer.rule ~label:"id" [] "<%alpha:B^~|-alpha:B^~%>"]
+{displaymath (Infer.rule ~label:parr [Infer.rule ~label:cutrule ["<%Gamma,x:A|-t:B%>";Infer.rule ~label:idrule [] "<%alpha:B^~|-alpha:B^~%>"]
                                            "<%Gamma,x:A,alpha:B^~|-<t|alpha>%>"]
                  "<%Gamma|-mu(x,alpha),<t|alpha>:A-oB%>")}
 and application
-{displaymath (Infer.rule ~label:mu [Infer.rule ~label:"cut" ["<%Gamma|-t:A-oB%>";Infer.rule ~label:otimes ["<%Delta|-u:A%>";Infer.rule ~label:"id" [] "<%alpha:B^~|-alpha:B^~%>"] "<%Delta,alpha:B^~|-(u,alpha):A<*>B^~%>"] "<%Gamma,Delta,alpha:B^~|- <t|(u,alpha)>%>"] "<%Gamma,Delta|-mu alpha, <t|(u,alpha)> : B%>")}
+{displaymath (Infer.rule ~label:mu [Infer.rule ~label:cutrule ["<%Gamma|-t:A-oB%>";Infer.rule ~label:tensor ["<%Delta|-u:A%>";Infer.rule ~label:idrule [] "<%alpha:B^~|-alpha:B^~%>"] "<%Delta,alpha:B^~|-(u,alpha):A<*>B^~%>"] "<%Gamma,Delta,alpha:B^~|- <t|(u,alpha)>%>"] "<%Gamma,Delta|-mu alpha, <t|(u,alpha)> : B%>")}
 
 We shall henceforth write <%lambda x,t%> for <%mu(x,alpha),<t|alpha>%> and <%t u%> for <%mu alpha, <t|(u,alpha)>%>.
 Apart from systematically deriving them from their desired typing rules, as above, the best way to understand these two derived construct is via abstract machines. Indeed, reading alpha as {emph"the stack"}, the application reads
@@ -189,10 +197,68 @@ viewed as a consequence of the fact that, through its core construction, {mu} in
 stack. In fact, when writing an abstract machine for {mu} there is no need of an explicit stack, everything
 stack-like is taken care of by the multiplicative constructs.
 
+(* arnaud: On pourrait penser à parler un peu des deux vues, quand A<*>B est le terme et A`&B le contexte
+   et vice-versa *)
+
 {subsection "Additive fragment"}
 
 Additive type constructors include <%A<+>B%> and <%A&B%>, where the former is positive, hence built out
-of terms and the"
+of terms and the latter negative and built out of commands. They are used to implement case analysis,
+with a term of type <%A<+>B%> is pattern-matched by the term of type <%A^~&B^~%> it is played against.
+Dually, a term of type <%A&B%> can be seen as a {emph"record"} and a term of type <%A^~<+>B^~%> provides
+the projection (together with its continuation).
+
+The syntax of their terms is as follows
+{displaymath begin syntax [
+  syntax_line `Term ~extend:true Rules.Syntax.([iota1;iota2;case])
+] end}
+and comes with the reduction rules
+{displaymath begin reduction Rules.Reduction.([ iota1 ; iota2 ]) end}
+{let l_mall = label ~name:\"l:mall\" () in
+"The typing rules are fairly straightforward. The whole multiplicative and additive fragment can
+be found in Figure {ref_ l_mall}.
+
+As for the multiplicative fragment, we can define useful derived term constructors. To better
+encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>
+(with <%alpha%> fresh). The projections are <%t.1%> and <%t.2%>, and stand for
+<%mu alpha,<t|1.alpha>%> and <%mu alpha,<t|2.alpha>%>, respectively.
+
+{figure ~label:l_mall ~caption:"Multiplicative and additive fragment"
+    begin
+      let title_line x = array_line [x] in
+      array [`C] [
+        title_line "Syntax";
+        array_line [ syntax [
+          syntax_line `Term Rules.Syntax.(core@multiplicative@additive);
+          commands
+          ];
+        ];
+        title_line "Reduction";
+        array_line [ reduction Rules.Reduction.(core@multiplicative@additive)
+        ];
+        title_line "Derived syntax";
+        array_line [ array [`L; symbsep $=$; `L] [
+          array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+          array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+          array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+          array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+          array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+          ]
+        ];
+        title_line "Typing";
+        array_line [
+          let open Rules.Typing in
+              array [ `C ; `C ] [
+                array_line [ mu ; empty ];
+                array_line [ id ; cut ];
+                array_line [ pair ; copair ];
+              ]
+        ]
+      ]
+    end}
+
+"}
+"
 
 let d = concat [
   intro;

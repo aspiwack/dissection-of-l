@@ -1,0 +1,45 @@
+##verbatim '%' = MuPlugin.mumode
+
+open Prelude
+
+module Syntax = struct
+  let var = "<%x%>"
+  let mu = "<%mu x,c%>"
+  let core = [ var ; mu ]
+
+  let pair = "<%(t,u)%>"
+  let copair = "<%mu(x,u),c%>"
+  let unit = "<%()%>"
+  let counit = "<%mu(),c%>"
+  let multiplicative = [ pair ; copair ; unit ; counit ]
+
+  let iota1 = "<%1.t%>"
+  let iota2 = "<%2.t%>"
+  let case =  "<%{mu(1.x),c_1 , mu(2.x),c_2}%>"
+  let emptycase = "<%{}%>"
+  let additive = [ iota1 ; iota2 ; case ; emptycase ]
+end
+
+module Reduction = struct
+  let mu = array_line ["<%<t|mu x,c>%>";"<%subst [t,x] c%>"]
+  let core = [mu]
+
+  let pair = array_line ["<%<(t,u)|mu(x,y),c>%>";"<%subst [t,x ; u,y] c%>"]
+  let unit = array_line ["<%<()|mu(),c>%>";"<%c%>"]
+  let multiplicative = [ pair ; unit ]
+
+  let iota1 = array_line ["<%<1.t|{mu(1.x),c_1,mu(2.y),c_2}>%>";"<%subst [t,x] c_1%>" ]
+  let iota2 = array_line ["<%<2.t|{mu(1.x),c_1,mu(2.y),c_2}>%>";"<%subst [t,y] c_2%>"]
+  let additive = [ iota1 ; iota2 ]
+end
+
+
+module Typing = struct
+  let id = Infer.rule ~label:idrule [] "<%Gamma,x:A|-x:A%>"
+  let mu = Infer.rule ~label:mu ["<%Gamma, x:A|-c%>"] "<%Gamma|- mu x,c : A^~%>"
+  let cut = Infer.rule ~label:cutrule ["<%Gamma|-t:A%>";"<%Gamma|-u:A^~%>"] "<%Gamma|-<t|u>%>"
+
+  let pair = Infer.rule ~label:tensor ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>"
+  let copair = Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>"
+end
+

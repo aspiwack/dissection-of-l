@@ -69,6 +69,8 @@ let next k = lexer
   | "<" -> POINTYL | ">" -> POINTYR
   | "|" -> BAR
   | "1." -> IOTA1 | "2." -> IOTA2
+  | ".1" -> PI1 | ".2" -> PI2
+  | "1=" -> FIELD1 | "2=" -> FIELD2
   | "|_" -> LLCORNER | "_|" -> LRCORNER
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR

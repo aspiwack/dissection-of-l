@@ -46,12 +46,24 @@ let document ~title ?short_title ~authors ~keywords ~acmclass ~abstract ~prelude
     ] (text"\n%\n"));
   ] par
 
+let ae = command "ae" [] T
+
 let foreign = emph
 
 let grammardef = mode M (text"::=")
 
+let tensor = otimes
 let parr = command "parr" ~packages:["cmll",""] [] M
 let larrow = command "multimap" ~packages:["amssymb",""] [] M
+let one = mode M (text"1")
+let bottom = bot
+let plus = oplus
+let withc = mode M (text" \\& ")
+let top = Latex.top
+let zero = mode M (text"0")
+let idrule = mode T(text"id")
+let cutrule = mode T(text"cut")
+
 
 (*** A short module for proof.sty *)
 module Infer = struct
