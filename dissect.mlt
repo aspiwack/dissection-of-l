@@ -120,11 +120,11 @@ with the same type in terms and in the context.
 
 The three typing rules for classical core {mu} are the identity rule, giving their type
 to variables
-{displaymath Rules.Typing.id}
+{displaymath Rules.Typing.Mall.id}
 the {mu} rule, for {mu} abstractions
-{displaymath Rules.Typing.mu}
+{displaymath Rules.Typing.Mall.mu}
 and the cut rule giving their types to interactions
-{displaymath Rules.Typing.cut}
+{displaymath Rules.Typing.Mall.cut}
 where the context is considered up to commutation of the comma.
 
 What should be taken away from these rules is that the identity and cut rules are sufficient
@@ -175,8 +175,8 @@ par is a {emph"negative"} construction and its proofs are built out of command, 
 a pattern-matching feel.
 
 The corresponding typing rules are fairly straightforward
-{displaymath Rules.Typing.pair}
-{displaymath Rules.Typing.copair}
+{displaymath Rules.Typing.Mall.pair}
+{displaymath Rules.Typing.Mall.copair}
 
 Using these rules, we can encode the somewhat more familiar constructs of (linear) {lambda}-calculus. Writing,
 as usual, <%A-oB%> for <%A^~`&B%> we get abstraction
@@ -190,7 +190,9 @@ We shall henceforth write <%lambda x,t%> for <%mu(x,alpha),<t|alpha>%> and <%t u
 Apart from systematically deriving them from their desired typing rules, as above, the best way to understand these two derived construct is via abstract machines. Indeed, reading alpha as {emph"the stack"}, the application reads
 ``play <%t%> against the stack augmented by <%u%>'', this is the {emph"push"} instruction of abstract machines.
 Abstraction, dually, reads as ``let <%x%> be the top of the stack, play <%t%> against the rest of the stack'',
-that is, the {emph"grab"} instruction of virtual machines.
+that is, the {emph"grab"} instruction of virtual machines. The reader can satisfy himself that {beta}-reduction
+is correctly simulated by the reduction rules of {mu}, {foreign"i.e."} for any term <%v%>,
+<%<(lambda x, t) u|v> ~~> <subst [u,x] t| v>%>.
 
 The correspondence with abstract machines is no coincidence, and we shall encounter it again. It can be
 viewed as a consequence of the fact that, through its core construction, {mu} internalises the notion of
@@ -244,7 +246,7 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
      ]
    end;
    block "Typing" [`C;`C] begin
-     let open Rules.Typing in
+     let open Rules.Typing.Mall in
          [
            block_line ~sep [ id ; cut ];
            block_line ~sep [ mu ; empty ];
@@ -256,7 +258,7 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
          ]
    end;
    block "Derived typing rules" [`C;`C] begin
-     let open Rules.Typing in
+     let open Rules.Typing.Mall in
          [
            block_line ~sep [ lambda ; app ];
            block_line ~sep [ record ; pi2 ];
@@ -267,7 +269,48 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
 
 {subsection "Exponentials"}
 The typing rules presented so far are purely linear, in the sense that there is no contraction
-happening. For instance, the term <%(x,x)%> is never
+-- or weakening -- happening. For instance, the term <%(x,x)%> can be given a type in no context.
+In~{citation_needed} this is solved by the following rule:
+{displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-t:B%>"] "<%Gamma,x:!A|-subst [x,y] t : B%>")}
+To this author, though, it feels like dodging the issue, somewhat. Indeed, it makes
+<%x:!A|-(x,x):!A<*>!A%> a correctly typed sequent, however, it does not really delegate
+contraction to variables, as type derivations need to linearise terms appropriately before
+contexts are split. Additionally, in traditional calculi, including {mu}, if one wants to
+contract to variables of the same type, they have to introduce an explicit construction
+(in {lambda}-calculus: <%(lambda x y, t) x x%>), so at the same time this rule is somewhat
+too strong.
+
+Instead, we shall choose, here, to use the dyadic presentation of linear logic, first introduced
+by Andreoli~{citation_needed}, where duplicable formul{ae} are rendered in an separate context.
+This choice happens to have non-trivial consequences: in~{citation_needed}, <%!A%> is built out
+of commands, whereas <%?A%> was built out of terms, in the version presented here, it is
+the opposite. (*arnaud: ma version est la version plus décomposée de l'exponentielle, mais
+pour en discuter il faudrait que je trouve quelque chose de concret à citer*)
+The syntax is
+{displaymath (syntax [
+  syntax_line ~extend:true `Term Rules.Syntax.exponential
+])}
+and the associated reduction rule
+{displaymath (reduction [
+  Rules.Reduction.exponential
+])}
+
+The typing judgement are now of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
+<%Gamma%> is the linear context as earlier, and <%Xi%> is the new context, containing
+duplicable formul{ae}, which can be contracted and weakened. Contracting and weakening,
+as in classical {mu} are handled implicitly, by duplicating <%Xi%> at forks {foreign"e.g."}
+{displaymath Rules.Typing.Ll.cut}
+and dropping <%Xi%> at leaves {foreign"e.g."}
+{displaymath Rules.Typing.Ll.id}
+
+We also need an extra structural rule to be able to use formul{ae} in <%Xi%>. This is
+usually given in form of the {emph"copy"}, or {emph"absorbtion"}, rule:
+
+The introduction rule for <%!A%> corresponds to the promotion rule of linear logic,
+{foreign"i.e."} a term of type <%A%> can be promoted to type <%!A%> is all its variables
+are duplicable:
+{displaymath Rules.Typing.Ll.bang}
+
 "}"
 
 let d = concat [

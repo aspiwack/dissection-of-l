@@ -47,6 +47,8 @@ val apprule : Latex.t
 val recordrule : Latex.t
 val pi1rule : Latex.t
 val pi2rule : Latex.t
+val bangrule : Latex.t
+val whynotrule : Latex.t
 
 (*** A short module for proof.sty *)
 module Infer : sig

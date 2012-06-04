@@ -18,6 +18,10 @@ module Syntax = struct
   let case =  "<%{mu(1.x),c_1 , mu(2.x),c_2}%>"
   let emptycase = "<%{}%>"
   let additive = [ iota1 ; iota2 ; case ; emptycase ]
+
+  let bang = "<%|_t_|%>"
+  let cobang = "<%mu|_x_|,c%>"
+  let exponential = [ bang;cobang ]
 end
 
 module Reduction = struct
@@ -31,29 +35,59 @@ module Reduction = struct
   let iota1 = array_line ["<%<1.t|{mu(1.x),c_1,mu(2.y),c_2}>%>";"<%subst [t,x] c_1%>" ]
   let iota2 = array_line ["<%<2.t|{mu(1.x),c_1,mu(2.y),c_2}>%>";"<%subst [t,y] c_2%>"]
   let additive = [ iota1 ; iota2 ]
+
+  let exponential = array_line [ "<%<|_t_| | mu|_x_|,c>%>" ; "<%subst [t,x] c%>"]
 end
 
 
 module Typing = struct
-  let id = Infer.rule ~label:idrule [] "<%Gamma,x:A|-x:A%>"
-  let mu = Infer.rule ~label:mu ["<%Gamma, x:A|-c%>"] "<%Gamma|- mu x,c : A^~%>"
-  let cut = Infer.rule ~label:cutrule ["<%Gamma|-t:A%>";"<%Gamma|-u:A^~%>"] "<%Gamma|-<t|u>%>"
+  module Mall = struct
+    let id = Infer.rule ~label:idrule [] "<%Gamma,x:A|-x:A%>"
+    let mu = Infer.rule ~label:mu ["<%Gamma, x:A|-c%>"] "<%Gamma|- mu x,c : A^~%>"
+    let cut = Infer.rule ~label:cutrule ["<%Gamma|-t:A%>";"<%Delta|-u:A^~%>"] "<%Gamma,Delta|-<t|u>%>"
 
-  let pair = Infer.rule ~label:tensor ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>"
-  let copair = Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>"
-  let unit = Infer.rule ~label:one [] "<%|-():1%>"
-  let counit = Infer.rule ~label:bottom ["<%Gamma|-c%>"] "<%Gamma|- mu (),c:bot%>"
+    let pair = Infer.rule ~label:tensor ["<%Gamma|-t:A%>"; "<%Delta|-u:B%>"] "<%Gamma,Delta|-(t,u):A<*>B%>"
+    let copair = Infer.rule ~label:parr ["<%Gamma,x:A,y:B|-c%>"] "<%Gamma|-mu(x,y),c:A^~`&B^~%>"
+    let unit = Infer.rule ~label:one [] "<%|-():1%>"
+    let counit = Infer.rule ~label:bottom ["<%Gamma|-c%>"] "<%Gamma|- mu (),c:bot%>"
 
-  let iota1 = Infer.rule ~label:iota1rule ["<%Gamma|-t:A%>"] "<%Gamma|- 1.t : A<+>B%>"
-  let iota2 = Infer.rule ~label:iota2rule ["<%Gamma|-u:B%>"] "<%Gamma|- 2.u : A<+>B%>"
-  let case = Infer.rule ~label:withc ["<%Gamma,x:A|-c_1%>";"<%Gamma,y:B|-c_2%>"] "<%Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
-  let emptycase = Infer.rule ~label:top [] "<%Gamma|-{}:top%>"
-  let zero = "No rule for {zero}"
+    let iota1 = Infer.rule ~label:iota1rule ["<%Gamma|-t:A%>"] "<%Gamma|- 1.t : A<+>B%>"
+    let iota2 = Infer.rule ~label:iota2rule ["<%Gamma|-u:B%>"] "<%Gamma|- 2.u : A<+>B%>"
+    let case = Infer.rule ~label:withc ["<%Gamma,x:A|-c_1%>";"<%Gamma,y:B|-c_2%>"] "<%Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let emptycase = Infer.rule ~label:top [] "<%Gamma|-{}:top%>"
+    let zero = "No rule for {zero}"
 
-  let lambda = Infer.rule ~label:lambda ["<%Gamma,x:A|-t:B%>"] "<%Gamma|-lambda x,t: A-oB%>"
-  let app = Infer.rule ~label:apprule ["<%Gamma|-t:A-oB%>";"<%Gamma|-u:A%>"] "<%Gamma|-t u:B%>"
-  let record = Infer.rule ~label:recordrule ["<%Gamma|-t:A%>";"<%Gamma|-u:B%>"] "<%Gamma|-{1=t,2=u} : A&B%>"
-  let pi1 = Infer.rule ~label:pi1rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.1:A%>"
-  let pi2 = Infer.rule ~label:pi2rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.2:B%>"
+    let lambda = Infer.rule ~label:lambda ["<%Gamma,x:A|-t:B%>"] "<%Gamma|-lambda x,t: A-oB%>"
+    let app = Infer.rule ~label:apprule ["<%Gamma|-t:A-oB%>";"<%Gamma|-u:A%>"] "<%Gamma|-t u:B%>"
+    let record = Infer.rule ~label:recordrule ["<%Gamma|-t:A%>";"<%Gamma|-u:B%>"] "<%Gamma|-{1=t,2=u} : A&B%>"
+    let pi1 = Infer.rule ~label:pi1rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.1:A%>"
+    let pi2 = Infer.rule ~label:pi2rule ["<%Gamma|-t:A&B%>"] "<%Gamma|-t.2:B%>"
+  end
+
+  module Ll = struct
+    let id = Infer.rule ~label:idrule [] "<%Xi;Gamma,x:A|-x:A%>"
+    let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A|-c%>"] "<%Xi;Gamma|- mu x,c : A^~%>"
+    let cut = Infer.rule ~label:cutrule ["<%Xi;Gamma|-t:A%>";"<%Xi;Delta|-u:A^~%>"] "<%Xi;Gamma,Delta|-<t|u>%>"
+
+    let pair = Infer.rule ~label:tensor ["<%Xi;Gamma|-t:A%>"; "<%Xi;Delta|-u:B%>"] "<%Xi;Gamma,Delta|-(t,u):A<*>B%>"
+    let copair = Infer.rule ~label:parr ["<%Xi;Gamma,x:A,y:B|-c%>"] "<%Xi;Gamma|-mu(x,y),c:A^~`&B^~%>"
+    let unit = Infer.rule ~label:one [] "<%Xi;|-():1%>"
+    let counit = Infer.rule ~label:bottom ["<%Xi;Gamma|-c%>"] "<%Xi;Gamma|- mu (),c:bot%>"
+
+    let iota1 = Infer.rule ~label:iota1rule ["<%Xi;Gamma|-t:A%>"] "<%Xi;Gamma|- 1.t : A<+>B%>"
+    let iota2 = Infer.rule ~label:iota2rule ["<%Xi;Gamma|-u:B%>"] "<%Xi;Gamma|- 2.u : A<+>B%>"
+    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let emptycase = Infer.rule ~label:top [] "<%Xi;Gamma|-{}:top%>"
+    let zero = "No rule for {zero}"
+
+    let bang = Infer.rule ~label:bangrule ["<%Xi;|-t:A%>"] "<%Xi;|-|_t_|:!A%>"
+    let whynot = Infer.rule ~label:whynotrule ["<%Xi,x:A;Gamma|-c%>"] "<%Xi;Gamma|-mu|_x_|,c:?A%>"
+
+    let lambda = Infer.rule ~label:lambda ["<%Xi;Gamma,x:A|-t:B%>"] "<%Xi;Gamma|-lambda x,t: A-oB%>"
+    let app = Infer.rule ~label:apprule ["<%Xi;Gamma|-t:A-oB%>";"<%Xi;Gamma|-u:A%>"] "<%Xi;Gamma|-t u:B%>"
+    let record = Infer.rule ~label:recordrule ["<%Xi;Gamma|-t:A%>";"<%Xi;Gamma|-u:B%>"] "<%Xi;Gamma|-{1=t,2=u} : A&B%>"
+    let pi1 = Infer.rule ~label:pi1rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.1:A%>"
+    let pi2 = Infer.rule ~label:pi2rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.2:B%>"
+  end
 end
 
