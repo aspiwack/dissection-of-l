@@ -305,11 +305,31 @@ and dropping <%Xi%> at leaves {foreign"e.g."}
 
 We also need an extra structural rule to be able to use formul{ae} in <%Xi%>. This is
 usually given in form of the {emph"copy"}, or {emph"absorbtion"}, rule:
+(*arnaud: penser à rajouter une règle dans le parser pour ne rien avoir après le |-,
+  ce sera mieux pour l'alignement *)
+{displaymath (Infer.rule ["<%Xi,A;Gamma|-A^~%>"] "<%Xi,A;Gamma|-%{phantom$a$}%%>")}
+where formul{ae} in <%Gamma%> are reverted into <%Xi%>. We shall, however, prefer a variant
+of the identity function:
+{displaymath Rules.Typing.Ll.iddup}
+it allows to see variables in <%Xi%> as regular variables which can be used any
+number of times. We can recover the copy rule using a cut:
+{displaymath begin
+  Infer.rule ~label:cutrule
+    ["<%Xi,x:A;Gamma|-t:A^~%>";
+     Infer.rule ~label:iddup [] "<%Xi,x:A; |- x:A%>"]
+    "<%Xi,x:A;Gamma|-< t | x >%>"
+end}
 
 The introduction rule for <%!A%> corresponds to the promotion rule of linear logic,
 {foreign"i.e."} a term of type <%A%> can be promoted to type <%!A%> is all its variables
 are duplicable:
 {displaymath Rules.Typing.Ll.bang}
+
+The introduction rule for <%?A%> corresponds to the dereliction rule:
+{displaymath Rules.Typing.Ll.whynot}
+
+The rest of the typing rules are barely affected. They can be found in Figure ??
+(* arnaud: remarque Xi is like deduction naturelle. *)
 
 "}"
 

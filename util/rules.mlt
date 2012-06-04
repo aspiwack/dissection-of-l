@@ -66,6 +66,7 @@ module Typing = struct
 
   module Ll = struct
     let id = Infer.rule ~label:idrule [] "<%Xi;Gamma,x:A|-x:A%>"
+    let iddup = Infer.rule ~label:iddup [] "<%Xi,x:A;|-x:A%>"
     let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A|-c%>"] "<%Xi;Gamma|- mu x,c : A^~%>"
     let cut = Infer.rule ~label:cutrule ["<%Xi;Gamma|-t:A%>";"<%Xi;Delta|-u:A^~%>"] "<%Xi;Gamma,Delta|-<t|u>%>"
 

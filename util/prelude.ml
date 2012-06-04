@@ -116,6 +116,7 @@ let withc = mode M (text" \\& ")
 let top = Latex.top
 let zero = mode M (text"0")
 let idrule = mode T(text"id")
+let iddup = mode T (text"id'")
 let cutrule = mode T(text"cut")
 let iota1rule = mode T(plus^^text"l")
 let iota2rule = mode T(plus^^text"r")

@@ -41,6 +41,7 @@ val top : Latex.t
 val zero : Latex.t
 val cutrule : Latex.t
 val idrule : Latex.t
+val iddup : Latex.t
 val iota1rule : Latex.t
 val iota2rule : Latex.t
 val apprule : Latex.t
