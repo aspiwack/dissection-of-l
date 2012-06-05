@@ -216,7 +216,7 @@ The syntax of their terms is as follows
 ] end}
 and comes with the reduction rules
 {displaymath begin reduction Rules.Reduction.([ iota1 ; iota2 ]) end}
-{let l_mall = label ~name:\"l:mall\" () in
+{let l_mall = label ~name:\"figure:mall\" () in
 "The typing rules are fairly straightforward. The whole multiplicative and additive fragment can
 be found in Figure {ref_ l_mall}.
 
@@ -328,9 +328,63 @@ are duplicable:
 The introduction rule for <%?A%> corresponds to the dereliction rule:
 {displaymath Rules.Typing.Ll.whynot}
 
-The rest of the typing rules are barely affected. They can be found in Figure ??
-(* arnaud: remarque Xi is like deduction naturelle. *)
+{let l_ll = label ~name:\"figure:ll\" () in
+ let l_lambda = label ~name:\"figure:lambda\" () in
+"The rest of the typing rules are barely affected. They can be found in Figure {ref_ l_ll}, along with the full description of the system.
+{let sep = `Mm 3. in
+ figurerules ~label:l_ll ~caption:"Linear {mu}" [
+   simple_block "Syntax" begin
+     syntax [
+       (* arnaud: on va probablement avoir besoin d'aller à la ligne ici pour
+          éviter l'overfull box *)
+       syntax_line `Term Rules.Syntax.(core@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@multiplicative@additive@[exponential])
+   end;
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Ll in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ iddup ; mu ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ emptycase ; zero ];
+           block_line ~sep [ bang ; whynot ]
+         ]
+   end;
+ ]
+}
 
+(* arnaud: je ne crois pas que j'ai parlé de la séquentialisation de contextes *)
+An noticeable property of the duplicable context, is that it behaves just as the context
+in natural deduction sequents. That is, typing derivation bottom up, it only grows as the
+derivation progresses, and is dropped
+at the leaves. No other manipulation are performed. As a consequence, we can embed quite literally simply
+typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
+{let sep = `Mm 3. in
+ figurerules ~label:l_lambda ~caption:"Embedding {lambda}-calculus" [
+    block "Typing" [`C;`C] [
+       block_line ~sep [ 
+          Infer.rule [] "<%Xi,x:A;|-x:A%>";
+          empty
+       ];
+       block_line ~sep [
+          Infer.rule ["<%Xi,x:A;|- t:B%>"] "<%Xi;|-lambda |_x_|, t : !A-oB%>";
+          Infer.rule ["<%Xi;|-t:!A-oB%>";"<%Xi;|-u:A%>"] "<%Xi;|-t |_u_| : B%>";
+       ];
+    ]
+ ]
+}
+
+(* maintenant on veut écrire quelques programmes en mu *)
+(* après on veut parler de confluence *)
+
+"}
 "}"
 
 let d = concat [

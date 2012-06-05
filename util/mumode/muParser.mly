@@ -74,7 +74,7 @@ expr:
 
 | PARENL t=expr COMMA u=expr PARENR { concat [text"(";t;text",";u;text")"] }
 | PARENL PARENR { text"()" }
-| BRACEL t=expr COMMA u=expr BRACER { concat [text"\\{";t;text",";u;text"\\}"] }
+| BRACEL t=expr COMMA u=expr BRACER { concat [text"\\{~";t;text"\\,,\\,";u;text"~\\}"] }
 | BRACEBR t=expr COMMA u=expr BRACER { concat [
                                         text"\\{";newline;
                                         phantom alpha; quad;t;text",";newline;
@@ -118,7 +118,7 @@ expr:
 | e=expr REDUCES f=expr { concat [e;leadsto;f] }
 
 typedpattern:
-| p = pattern COLON a=expr { concat [ p ; text":" ; a ] }
+| p = pattern COLON a=expr { concat [ p ; text"{:}" ; a ] }
 
 pattern:
 | e=expr { e }
@@ -142,7 +142,7 @@ sequent_left_hand:
 | gs=separated_nonempty_list(SEMICOLON,context) {
   match gs with
   | [] -> assert false
-  | a::l -> a ^^ Latex.concat (List.map (fun x-> text" ; "^^x) l)
+  | a::l -> a ^^ Latex.concat (List.map (fun x-> text"~;~"^^x) l)
 }
 
 sequent:
