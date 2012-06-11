@@ -26,12 +26,13 @@ let map_ident = [
   (*greek letters*)
   "alpha" , SYMB alpha ;
   "beta" , SYMB beta ;
-  "kappa" , SYMB kappa ;
   "Gamma" , SYMB gamma_;
   "Delta" , SYMB delta_;
-  "Xi" , SYMB xi_;
+  "kappa" , SYMB kappa ;
   "Pi" , SYMB pi_;
   "Sigma" , SYMB sigma_;
+  "phi" , SYMB varphi ;
+  "Xi" , SYMB xi_;
 ]
 
 let regexp whitespace = [ ' '  '\t' '\n' '\r' ]

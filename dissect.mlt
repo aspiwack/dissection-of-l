@@ -261,8 +261,8 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
      let open Rules.Typing.Mall in
          [
            block_line ~sep [ lambda ; app ];
-           block_line ~sep [ record ; pi2 ];
-           block_line ~sep [ empty  ; pi1 ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
          ]
    end;
  ]}
@@ -361,6 +361,11 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
 }
 
 (* arnaud: je ne crois pas que j'ai parlé de la séquentialisation de contextes *)
+(* arnaud: je crois que le commentaire précédent fait référence au nesting de pattern.
+           Et que je devais être dans un sale état. *)
+(* arnaud: même remarque que plus bas: le nesting de pattern dans le lambda est pas
+           aussi trivial que je veux bien le faire croire. Justifier que la syntaxe
+           donnée dans ce paragraphe est correcte. *)
 An noticeable property of the duplicable context, is that it behaves just as the context
 in natural deduction sequents. That is, typing derivation bottom up, it only grows as the
 derivation progresses, and is dropped
@@ -381,16 +386,57 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
  ]
 }
 
-(* maintenant on veut écrire quelques programmes en mu *)
-(* après on veut parler de confluence *)
-
 "}
 "}"
+
+let examples = "{section"Using {mu}"}
+  (* arnaud: j'écrirai le baratin plus tard *)
+  (* arnaud: les patterns avec lambda ne fonctionnent pas bien (dans le sens où ils ne
+             sont pas macro-expressibles en terme de lambda. Ils se comportent comme
+             prévu, mais le typage est chiant à écrire. *)
+
+  Isomorphism between <%!(A&B)%> and <%!A<*>!B%>:
+  {displaymath $"<%phi%>"="<%lambda |_x_|, (x.1,x.2)%>"$}
+  typed as
+  {displaymath begin
+    Infer.rule ~label:parr
+       [Infer.rule ~label:cutrule
+           [ Infer.rule ~label:whynotrule
+               [ Infer.rule ~label:cutrule
+                   [ Infer.rule ~label:tensor
+                        [ Infer.rule ~label:bangrule
+                             [ Infer.rule ~label:pi1rule
+                                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"] 
+                                 "<%x:A&B;|- x.1 : A%>" ]
+                             "<%x:A&B;|- |_x.1_| : !A%>";
+                          Infer.rule ~label:bangrule
+                             [ Infer.rule ~label:pi2rule
+                                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"]
+                                 "<%x:A&B;|- x.2 : B%>" ]
+                             "<%x:A&B;|- |_x.2_| : !B%>"]
+                        "<%x:A&B; |- (|_x.1_|,|_x.2_|) : !A<*>!B%>";
+                    Infer.rule ~label:idrule [] "<%;beta:?A&?B|-beta:?A&?B%>"]
+                   "<%x:A&B;beta:?A`&?B |- <(|_x.1_|,|_x.2_|)|beta>%>"]
+               "<%;beta:?A`&?B|- mu |_x_|,<(|_x.1_|,|_x.2_|)|beta> : ?(A<+>B) %>";
+             Infer.rule ~label:idrule [] "<%;alpha:!(A&B) |- alpha:!(A&B)%>"]
+           "<%;alpha:!(A&B),beta:?A`&?B |- <mu |_x_|,<(|_x.1_|,|_x.2_|)|beta>|alpha> %>"]
+       "<%|- lambda |_x_|, (|_x.1_|,|_x.2_|) : !(A&B) -o !A<*>!B %>"
+  end}
+  and
+  {displaymath $"<%phi^\(-1\)%>"="<%lambda (|_a_|,|_b_|), |_{ 1= a , 2= b }_|%>"$}
+  typed as
+  (* arnaud: je ne me tappe pas la preuve que lambda-pattern se comporte bien, cette fois-ci *)
+
+"
+
+(* maintenant on veut écrire quelques programmes en mu *)
+(* après on veut parler de confluence *)
 
 let d = concat [
   intro;
   coremu;
   llmu;
+  examples;
 ]
 
 let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"
