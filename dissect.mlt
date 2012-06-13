@@ -10,6 +10,7 @@ let syntax_line k ?(extend=false) l =
   let k = match k with
     | `Term -> "<%t%>, <%u%>"
     | `Command -> "<%c%>"
+    | `Other x -> x
   in
   let l = if extend then ldots::l else l in
   array_line [ k ; concat_with_sep l mid ]
@@ -329,7 +330,6 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
 {displaymath Rules.Typing.Ll.whynot}
 
 {let l_ll = label ~name:\"figure:ll\" () in
- let l_lambda = label ~name:\"figure:lambda\" () in
 "The rest of the typing rules are barely affected. They can be found in Figure {ref_ l_ll}, along with the full description of the system.
 {let sep = `Mm 3. in
  figurerules ~label:l_ll ~caption:"Linear {mu}" [
@@ -359,14 +359,73 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
    end;
  ]
 }
+"}
+"}"
 
-(* arnaud: je ne crois pas que j'ai parlé de la séquentialisation de contextes *)
-(* arnaud: je crois que le commentaire précédent fait référence au nesting de pattern.
-           Et que je devais être dans un sale état. *)
-(* arnaud: même remarque que plus bas: le nesting de pattern dans le lambda est pas
-           aussi trivial que je veux bien le faire croire. Justifier que la syntaxe
-           donnée dans ce paragraphe est correcte. *)
-An noticeable property of the duplicable context, is that it behaves just as the context
+let examples = "{section"Using {mu}"}
+  (* arnaud: j'écrirai le baratin plus tard *)
+  {subsection "Patterns"}
+  We shall make a liberal use of nested patterns, or at least irrefutable patterns, defined
+  as
+  {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%()%>";"<%(p,q)%>";"<%|_p_|%>"]])}
+
+  A very common use for patterns involves the cut rule. If <%p%> has type <%vec x:A ; vec y:B |- p:P%>
+  then the following rule is admissible:
+  {displaymath begin
+    Infer.rule ~label:(cutp "<%p%>")
+      ["<%Xi,vec x:A; Gamma |- t : P^~%>"]
+      "<%Xi,vec x:A; Gamma,vec y:B |- < t | p>%>"
+   end}
+   The justification is direct, by weakening in the duplicable context:
+  {displaymath begin
+    Infer.rule ~label:cutrule
+     [ "<%Xi,vec x:A; Gamma |- t : P^~%>";
+       Infer.derived [] "<%Xi, vec x:A; vec y:B |- p : P%>"]
+     "<%Xi,vec x:A; Gamma, vec y:B |- < t | p > %>"
+   end}
+
+  More importantly, we can use patterns to do pattern matching.
+  The syntax <%mu p,c%> is expanded as successive primitive patterns. For instance, <%mu(p,q),c%>
+  is defined as:
+  {displaymath "<%mu(alpha,beta),<mu p,<mu q,c|beta>|alpha>%>"}
+  Each patterns has a derived typing rule: if the <%p%>, seen as a term, is typed as
+  <%vec x:A ; vec y:B |- p:P%> then
+  {displaymath begin
+    Infer.rule ~label:"<%p%>"
+      ["<%Xi,vec x:A ; Gamma, vec y:B |- c%>"]
+      "<%Xi;Gamma|- mu p,c:P^~%>"
+  end}
+
+  The justification is inductive, let us prove the case of the pair pattern: <%(p,q)%> is typed as
+  <%vec x:A, vec x':A'; vec y:B, vec y':B' |- (p,q):P<*>Q%>, for <%vec x:A; vec y:B|- p:P%> and
+  <%vec x':A'; vec y':B'|- q:Q%>. We can, hence, write
+  {displaymath begin
+    Infer.rule ~label:parr
+      [Infer.rule ~label:(cutp "<%alpha%>")
+         [Infer.rule ~label:"<%p%>"
+          [Infer.rule ~label:(cutp "<%beta%>")
+            [ Infer.rule ~label:"<%q%>"
+                ["<%Xi,vec x:A, vec x':A'; Gamma,vec y:B, vec y':B' |- c%>"]
+                "<%Xi,vec x:A;Gamma,vec y:B |- mu q,c:Q^~%>"]
+            "<%Xi,vec x:A;Gamma, vec y:B, beta:Q |- <mu q,c|beta>%>"]
+          "<%Xi;Gamma,beta:Q|- mu p,<mu q,c|beta>:P^~%>"]
+         "<%Xi;Gamma,alpha:P,beta:Q|-<mu p,<mu q,c|beta>|alpha>%>"]
+      "<%Xi;Gamma|-mu(p,q),c : P^~`&Q^~%>"
+  end}
+
+  We can also give meaning to <%lambda p,t%>. It is defined as
+  <%mu(alpha,beta), <mu p,<t|beta>|alpha>%>. It is straitforward to check
+  that the derived typing rule, for <%vec x:A; vec y:B|-p:P%> is
+  {displaymath begin
+     Infer.rule ~label:(lambdap "<%p%>")
+       ["<%Xi, vec x:A; Gamma, vec y:B |- t :Q%>"]
+       "<%Xi;Gamma|-lambda p, t : P-oQ%>"
+   end}
+
+  General patterns are more involved, see~{citation_needed} for an in-depth discussion.
+{let l_lambda = label ~name:\"figure:lambda\" () in
+"{subsection "Natural deduction"}
+A noticeable property of the duplicable context, is that it behaves just as the context
 in natural deduction sequents. That is, typing derivation bottom up, it only grows as the
 derivation progresses, and is dropped
 at the leaves. No other manipulation are performed. As a consequence, we can embed quite literally simply
@@ -384,49 +443,101 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
        ];
     ]
  ]
-}
+}"}
 
-"}
-"}"
+{subsection "Linear logic constructs"}
+  Contrapositive: <%contra%> of type <%(A-o B)-o (B^~-o A^~)%>:
+  <%lambda f, lambda x, mu y, <f y|x>%>. Typed as
+  {displaymath begin
+     Infer.rule ~label:lambda
+       [ Infer.rule ~label:lambda
+           [Infer.rule ~label:mu
+              [Infer.rule ~label:(cutp "<%x%>")
+                 [Infer.rule ~label:apprule
+                    [Infer.rule ~label:idrule [] "<%;f:A-o B|-f:A-oB%>";
+                     Infer.rule ~label:idrule [] "<%;y:A|-y:A%>"]
+                    "<%;f:A-o B, y:A|- f y:B%>"]
+                 "<%;f:A-o B, x:B^~, y:A|- <f y|x>%>"]
+              "<%;f:A-o B, x:B^~ |- mu y, <f y|x> : A^~%>"]
+           "<%;f:A-o B|- lambda x, mu y, <f y|x> : B^~-o A^~%>"]
+       "<%|- contra : (A-o B)-o (B^~-o A^~)%>"
+   end}
+   An alternative definition of contra can be read off another way to write its type
+   <%(A^~<*>B^~)`&(B`&A)%>: <%mu(x,(y,z)), <x|(z,y)>%>.
 
-let examples = "{section"Using {mu}"}
-  (* arnaud: j'écrirai le baratin plus tard *)
-  (* arnaud: les patterns avec lambda ne fonctionnent pas bien (dans le sens où ils ne
-             sont pas macro-expressibles en terme de lambda. Ils se comportent comme
-             prévu, mais le typage est chiant à écrire. *)
+  Duplication <%dup%> of type <%!A-o !A<*>!A%>: <%lambda|_x_|, (|_x_|,|_x_|)%>. Using the duality,
+  <%codup%>, defined as <%contra dup%> has type <%?A`&?A-o?A%>.
 
   Isomorphism between <%!(A&B)%> and <%!A<*>!B%>:
   {displaymath $"<%phi%>"="<%lambda |_x_|, (x.1,x.2)%>"$}
   typed as
   {displaymath begin
-    Infer.rule ~label:parr
-       [Infer.rule ~label:cutrule
-           [ Infer.rule ~label:whynotrule
-               [ Infer.rule ~label:cutrule
-                   [ Infer.rule ~label:tensor
-                        [ Infer.rule ~label:bangrule
-                             [ Infer.rule ~label:pi1rule
-                                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"] 
-                                 "<%x:A&B;|- x.1 : A%>" ]
-                             "<%x:A&B;|- |_x.1_| : !A%>";
-                          Infer.rule ~label:bangrule
-                             [ Infer.rule ~label:pi2rule
-                                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"]
-                                 "<%x:A&B;|- x.2 : B%>" ]
-                             "<%x:A&B;|- |_x.2_| : !B%>"]
-                        "<%x:A&B; |- (|_x.1_|,|_x.2_|) : !A<*>!B%>";
-                    Infer.rule ~label:idrule [] "<%;beta:?A&?B|-beta:?A&?B%>"]
-                   "<%x:A&B;beta:?A`&?B |- <(|_x.1_|,|_x.2_|)|beta>%>"]
-               "<%;beta:?A`&?B|- mu |_x_|,<(|_x.1_|,|_x.2_|)|beta> : ?(A<+>B) %>";
-             Infer.rule ~label:idrule [] "<%;alpha:!(A&B) |- alpha:!(A&B)%>"]
-           "<%;alpha:!(A&B),beta:?A`&?B |- <mu |_x_|,<(|_x.1_|,|_x.2_|)|beta>|alpha> %>"]
+    Infer.rule ~label:(lambdap "<%|_x_|%>")
+       [Infer.rule ~label:tensor
+          [ Infer.rule ~label:bangrule
+              [ Infer.rule ~label:pi1rule
+                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"] 
+                 "<%x:A&B;|- x.1 : A%>" ]
+              "<%x:A&B;|- |_x.1_| : !A%>";
+            Infer.rule ~label:bangrule
+              [ Infer.rule ~label:pi2rule
+                  [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"]
+                  "<%x:A&B;|- x.2 : B%>" ]
+              "<%x:A&B;|- |_x.2_| : !B%>"]
+         "<%x:A&B; |- (|_x.1_|,|_x.2_|) : !A<*>!B%>"]
        "<%|- lambda |_x_|, (|_x.1_|,|_x.2_|) : !(A&B) -o !A<*>!B %>"
   end}
   and
   {displaymath $"<%phi^\(-1\)%>"="<%lambda (|_a_|,|_b_|), |_{ 1= a , 2= b }_|%>"$}
   typed as
-  (* arnaud: je ne me tappe pas la preuve que lambda-pattern se comporte bien, cette fois-ci *)
+  {displaymath begin
+    Infer.rule ~label:(lambdap "<%(|_a_|,|_b_|)%>")
+       [ Infer.rule ~label:bangrule
+           [ Infer.rule ~label:recordrule
+               [ Infer.rule ~label:iddup [] "<%a:A,b:B;|- a:A%>";
+                 Infer.rule ~label:iddup [] "<%a:A,b:B;|- b:B%>"]
+               "<%a:A,b:B;|- {1=a,2=b} : A&B%>" ]
+           "<%a:A,b:B; |- |_{1=a,2=b}_| : !(A&B)%>" ]
+       "<%;|- lambda (|_a_|,|_b_|), |_{1=a,2=b}_| : !A<*>!B -o !(A&B)%>"
+   end}
 
+   Thanks to duality, <%contra phi%> and <%contra phi^\(-1\)%> form an isomorphism
+   between <%?(A<+>B)%> and <%?A`&?B%>.
+
+   {subsection "Programming constructs"}
+
+   There are several variants of callcc, we shall consider that corresponding to Peirce's law as
+   it is more constrained type-wise. To be true to the standard definition, the first thing to do
+   is, given a continuation of <%A%>, to package it into a function <%A-o X%>, as the continuation
+   of <%X%> will never be called (a continuation never returns), it needs to be duplicable, hence
+   <%X%> must be of the form <%?B%>. We define <%throw%> of type <%A^~ -o A -o ?B%>
+   by <%lambda k, lambda x, mu|_  _|, <x|k>%>. In the definition of <%callcc%>,
+   the continuation will be duplicated, and we shall allow the body to duplicate the continuation
+   as well, hence its type is <%(!(?A-o?B)-o ?A)-o ?A%>. It is defined as
+   <%lambda f, mu |_k_|, < f |_ throw |_k_| _| | |_k_|>%>. Its typing derivation is
+   {displaymath begin
+       Infer.rule ~label:lambda
+         [ Infer.rule ~label:whynotrule
+             [Infer.rule ~label:(cutp "<%|_k_|%>")
+                [Infer.rule ~label:apprule
+                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(?A-o?B)-o?A |- f:!(?A-o?B)-o?A%>";
+                     Infer.derived [] "<%k:A^~; |- |_throw |_k_|_| : !(?A-o?B)%>"]
+                   "<%k:A^~;f:!(?A-o?B)-o?A |- f |_ throw |_k_| _| : ?A%>"]
+                "<%k:A^~;f:!(?A-o?B)-o?A |- < f |_ throw |_k_| _| | |_k_|>%>"]
+             "<%;f:!(?A-o?B)-o?A |- mu|_k_|,< f |_ throw |_k_| _| | |_k_|> : ?A%>" ]
+         "<%|- callcc : (!(?A-o?B)-o ?A)-o ?A%>"
+    end}
+
+   Similarly, we can model exception quite directly: the type of expressions of type <%A%> which
+   may raise an exception of type <%E%> is represented as <%?A`&?E%>. The programming style is
+   then reminiscent of that of imperative programming language: we write <%mu(|_return_|,|_raise_|),c%>,
+   then <%c%> can use <%<return|v>%> to return the value <%v%>, and <%<raise|e>%> to raise the exception
+   <%e%>. This is less precise, yet more akin to the usual practice of programming with exception than
+   using the type <%A<+>E%>. Indeed, in the latter case, we need to thread throughout the program whether
+   we raised an exception or not, where in the former, <%<raise|x>%> is truly a non-local operation.
+
+   A <%catch%> operation of type <%?A -o ?A`&?E -o ?A%> can be written as 
+   
 "
 
 (* maintenant on veut écrire quelques programmes en mu *)

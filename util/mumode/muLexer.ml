@@ -12,6 +12,8 @@ let number n = SYMB (mode M (text n))
 
 let keywords = []
 let map_ident = [
+  "vec" , VEC ;
+
   "mu" , MU ;
   "mut" , MUT ;
   "lambda" , LAMBDA ;

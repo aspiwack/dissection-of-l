@@ -9,7 +9,7 @@ let urcorner = command "urcorner" ~packages:["amssymb",""] [] M
 let llcorner = command "llcorner" ~packages:["amssymb",""] [] M
 let lrcorner = command "lrcorner" ~packages:["amssymb",""] [] M
 
-let empty_context = Latex.empty
+let empty_context = Latex.cdot
 %}
 
 %token EOL
@@ -19,7 +19,7 @@ let empty_context = Latex.empty
 %token METAPARENL METAPARENR 
 %token PARENL PARENR BRACKETL BRACKETR BRACEL BRACER BRACEBR
 %token WILDCARD
-%token TURNSTYLE
+%token TURNSTYLE VEC
 
 %token POINTYL POINTYR BAR
 %token DUAL
@@ -89,6 +89,7 @@ expr:
 | FIELD1 u=expr { concat [text"1 = "; u] }
 | FIELD2 u=expr { concat [text"2 = "; u] }
 | LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
+| LLCORNER LRCORNER { concat [left `Floor;phantom(text"x");right `Floor] }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP
@@ -119,16 +120,19 @@ expr:
 
 typedpattern:
 | p = pattern COLON a=expr { concat [ p ; text"{:}" ; a ] }
+| VEC p=pattern COLON a=expr { concat [ overline p ; text"{:}" ; overline a ] }
 
 pattern:
 | e=expr { e }
 
-context:
-| c=separated_list(COMMA,context_item) {
-  match c with
-  | [] -> empty_context
-  | a::l -> a ^^ Latex.concat (List.map (fun x-> text", "^^x) l)
+
+nonempty_context:
+| c=separated_nonempty_list(COMMA,context_item) {
+  List.hd c ^^ Latex.concat (List.map (fun x -> text", "^^x) (List.tl c))
 }
+context:
+| c=nonempty_context { c }
+|   { empty_context }
 
 context_item:
 | p=typedpattern { p }
@@ -139,11 +143,11 @@ sequent_right_hand:
 | t=expr COLON a=expr { concat [ t ; text" : " ; a ] }
 
 sequent_left_hand:
-| gs=separated_nonempty_list(SEMICOLON,context) {
-  match gs with
-  | [] -> assert false
-  | a::l -> a ^^ Latex.concat (List.map (fun x-> text"~;~"^^x) l)
+| g=context SEMICOLON gs=separated_nonempty_list(SEMICOLON,context) {
+  g ^^ Latex.concat (List.map (fun x-> text"~;~"^^x) gs)
 }
+| c=nonempty_context { c }
+| { Latex.empty }
 
 sequent:
 | l=sequent_left_hand TURNSTYLE r=sequent_right_hand {

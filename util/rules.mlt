@@ -82,7 +82,7 @@ module Typing = struct
     let zero = "No rule for {zero}"
 
     let bang = Infer.rule ~label:bangrule ["<%Xi;|-t:A%>"] "<%Xi;|-|_t_|:!A%>"
-    let whynot = Infer.rule ~label:whynotrule ["<%Xi,x:A;Gamma|-c%>"] "<%Xi;Gamma|-mu|_x_|,c:?A%>"
+    let whynot = Infer.rule ~label:whynotrule ["<%Xi,x:A;Gamma|-c%>"] "<%Xi;Gamma|-mu|_x_|,c:?A^~%>"
 
     let lambda = Infer.rule ~label:lambda ["<%Xi;Gamma,x:A|-t:B%>"] "<%Xi;Gamma|-lambda x,t: A-oB%>"
     let app = Infer.rule ~label:apprule ["<%Xi;Gamma|-t:A-oB%>";"<%Xi;Gamma|-u:A%>"] "<%Xi;Gamma|-t u:B%>"
