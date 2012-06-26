@@ -313,7 +313,8 @@ where formul{ae} in <%Gamma%> are reverted into <%Xi%>. We shall, however, prefe
 of the identity function:
 {displaymath Rules.Typing.Ll.iddup}
 it allows to see variables in <%Xi%> as regular variables which can be used any
-number of times. We can recover the copy rule using a cut:
+number of times. This was also the original presentation in~{citation_needed}(*andreoli*)
+We can recover the copy rule using a cut:
 {displaymath begin
   Infer.rule ~label:cutrule
     ["<%Xi,x:A;Gamma|-t:A^~%>";
@@ -536,18 +537,23 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
    using the type <%A<+>E%>. Indeed, in the latter case, we need to thread throughout the program whether
    we raised an exception or not, where in the former, <%<raise|x>%> is truly a non-local operation.
 
-   A <%catch%> operation of type <%?A -o ?A`&?E -o ?A%> can be written as 
+   A <%catch%> operation of type <%(E-o?A) -o ?A`&?E -o ?A%> can be written as 
+   (* arnaud: je finirai plus tard *)
    
 "
 
-(* maintenant on veut écrire quelques programmes en mu *)
-(* après on veut parler de confluence *)
+let focusing = "{section "Focalised {mu}"}
+(* arnaud: on veut parler de confluence ou de cbv or something*)
+
+"
+
 
 let d = concat [
   intro;
   coremu;
   llmu;
   examples;
+  focusing;
 ]
 
 let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"
