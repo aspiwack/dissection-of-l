@@ -76,29 +76,10 @@ end
 (*** Dispatch ***)
 
 let _ = dispatch begin function
+  | Before_options ->
 
-  (*c Here one can change the default value of options, they can still be updated by a command line option. *)
-  | Before_options -> ()
+      Options.use_ocamlfind := true
 
-  (*c Here one can change the final value of options. *)
-  | After_options -> ()
-
-      (*c This avoids the creation of symbolic links to the build directory. *)
-
-  (*c This hook is called before the hygiene phase.
-      This phase also serve as collecting all the information about the
-      source tree. *)
-  | Before_hygiene -> ()
-
-      (*c Here you can dynamically tag some files or directories. *)
-
-  (*c One can also do things after the hygiene step. *)
-  | After_hygiene -> ()
-
-  (*c One can setup rules before the standard ones but that's not recommended. *)
-  | Before_rules -> ()
-
-  (*c Here one can add or override new rules *)
   | After_rules -> 
       (*** Interpretation of Tags ***)
       flag ["melt";"show"] (A "-show");
@@ -112,7 +93,7 @@ let _ = dispatch begin function
           Cmd (S [!Options.ocamlopt;A"-linkall";A"-shared";A"-o";cmxs;cmxa])
         end;
 
-       rule "meltpp: mlt -> ml"
+      rule "meltpp: mlt -> ml"
 	~prod:"%.ml"
 	~deps:(["%.mlt"]@plugins)
 	begin fun env build ->
@@ -121,171 +102,124 @@ let _ = dispatch begin function
 	  meltpp src prod
 	end;
 
-	rule "meltrun: native -> tex"
-	  ~prods:["%.tex"]
-	  ~deps:(["%.native"]@meltdep)
-	  begin fun env build ->
-	    let gen = env "./%.native" in
-	    let tags = tags_of_pathname gen in
-	    let date x = S[Sh "date >> ../melt.log ;";x] in
-	    let time x = S[
-	      Sh "/usr/bin/time -ao ../melt.log -f \"User %Us\\nReal %es\\n\"" ;
-	      x
-	    ]
-	    in
-	    Cmd (date (
-		   time (S[
-		     Sh gen; mode;
-		     T(tags++"melt");(*A"-depends" ;*) Sh "> error.log"
-		   ])
-		))
-	  end;
+      rule "meltrun: native -> tex"
+	~prods:["%.tex"]
+	~deps:(["%.native"]@meltdep)
+	begin fun env build ->
+	  let gen = env "./%.native" in
+	  let tags = tags_of_pathname gen in
+	  let date x = S[Sh "date >> ../melt.log ;";x] in
+	  let time x = S[
+	    Sh "/usr/bin/time -ao ../melt.log -f \"User %Us\\nReal %es\\n\"" ;
+	    x
+	  ]
+	  in
+	  Cmd (date (
+	    time (S[
+	      Sh gen; mode;
+	      T(tags++"melt");(*A"-depends" ;*) Sh "> error.log"
+	    ])
+	  ))
+	end;
 
-(*
-	rule "meltrun: byte -> tex"
+        (*
+	  rule "meltrun: byte -> tex"
 	  ~prods:["%.tex"]
 	  ~deps:["%.byte"]
 	  begin fun env build ->
-	    let gen = env "./%.native" in
-	    Cmd (S[Sh gen; mode; Sh "> /dev/null"])
+	  let gen = env "./%.native" in
+	  Cmd (S[Sh gen; mode; Sh "> /dev/null"])
 	  end;
-*)
+        *)
 
-	rule "meltrun: native -> spiwack.tex"
-	  ~prods:["%.spiwack.tex"]
-	  ~deps:(["%.native"]@texdeps)
-	       (*texdeps here, since they are used by mlpost | doesn't work yet*)
-	  begin fun env build ->
-	    let gen = env "./%.native" in
-	    let tags = tags_of_pathname gen in
-	    Cmd (S[Sh gen; mode; T(tags++"melt"++"show"); Sh "> /dev/null"])
-	  end;
+      rule "meltrun: native -> spiwack.tex"
+	~prods:["%.spiwack.tex"]
+	~deps:(["%.native"]@texdeps)
+	  (*texdeps here, since they are used by mlpost | doesn't work yet*)
+	begin fun env build ->
+	  let gen = env "./%.native" in
+	  let tags = tags_of_pathname gen in
+	  Cmd (S[Sh gen; mode; T(tags++"melt"++"show"); Sh "> /dev/null"])
+	end;
 
-	rule "pdflatex: tex -> aux"
-	  ~prods:["%.aux";"%.idx"]
-	  ~deps:(["%.tex"]@texdeps)
-	       (* texdeps here, because if they change, the pdf should change
-		  as well *)
-	  begin fun env build ->
-	    let src = env "%.tex" in
-	    let src_stripped = env "%" in
-	    let latex_c =
-	      Cmd(S [ P "pdflatex" ;
-		      A "-halt-on-error" ;
-		      Px src ; Sh "> /dev/null"])
-	    in
-	    let bibtex_c =
-	      Cmd(S [P "bibtex" ; Px src_stripped ; Sh "> /dev/null || /bin/true"])
-	    in
-	    Seq [ latex_c ; bibtex_c ; latex_c ]
-	  end;
+      rule "pdflatex: tex -> aux"
+	~prods:["%.aux";"%.idx"]
+	~deps:(["%.tex"]@texdeps)
+	  (* texdeps here, because if they change, the pdf should change
+	     as well *)
+	begin fun env build ->
+	  let src = env "%.tex" in
+	  let src_stripped = env "%" in
+	  let latex_c =
+	    Cmd(S [ P "pdflatex" ;
+		    A "-halt-on-error" ;
+		    Px src ; Sh "> /dev/null"])
+	  in
+	  let bibtex_c =
+	    Cmd(S [P "bibtex" ; Px src_stripped ; Sh "> /dev/null || /bin/true"])
+	  in
+	  Seq [ latex_c ; bibtex_c ; latex_c ]
+	end;
 
-	rule "makeindex: idx -> ind"
-	  ~prod:"%.ind"
-	  ~deps:["%.idx"]
-	  begin fun env build ->
-	    let src = env "%.idx" in
-	    Cmd(S [ P "makeindex" ;
-                     Px src ; Sh "> /dev/null || /bin/true"])
-	  end;
+      rule "makeindex: idx -> ind"
+	~prod:"%.ind"
+	~deps:["%.idx"]
+	begin fun env build ->
+	  let src = env "%.idx" in
+	  Cmd(S [ P "makeindex" ;
+                  Px src ; Sh "> /dev/null || /bin/true"])
+	end;
 
-	rule "pdflatex: aux -> pdf"
-	  ~prod:"%.pdf"
-	  ~deps:(["%.aux";"%.ind"]@texdeps)
-	       (* texdeps here, because if they change, the pdf should change
-		  as well *)
-	  begin fun env build ->
-	    let src = env "%.tex" in
+      rule "pdflatex: aux -> pdf"
+	~prod:"%.pdf"
+	~deps:(["%.aux";"%.ind"]@texdeps)
+	  (* texdeps here, because if they change, the pdf should change
+	     as well *)
+	begin fun env build ->
+	  let src = env "%.tex" in
 	    (*let src_stripped = env "%" in*)
-	    let latex_c = Cmd(S [ P "pdflatex" ;
-                     A "-halt-on-error" ; A "-interaction=batchmode" ;
-                     Px src ; Sh "> /dev/null"])
-	    in
+	  let latex_c = Cmd(S [ P "pdflatex" ;
+                                A "-halt-on-error" ; A "-interaction=batchmode" ;
+                                Px src ; Sh "> /dev/null"])
+	  in
 	    (*let bibtex_c =
 	      Cmd(S [P "bibtex" ; Px src_stripped ; Sh "> /dev/null"])
-	    in
-	    Seq [ bibtex_c ; latex_c ; latex_c ]*)
-	    latex_c
-	  end;
+	      in
+	      Seq [ bibtex_c ; latex_c ; latex_c ]*)
+	  latex_c
+	end;
 
-(* uncomment for dypgen
-	rule "dypgen: dyp -> ml"
-	  ~prods:["%.ml"]
-	  ~deps:["%.dyp"]
-         begin fun env build ->
-	   let src = env "%.dyp" in
-	   dypgen src
-	 end;
-*)
-
-	rule "Fix bib"
-	  ~prods:["%-fix.bib"]
-	  ~deps:["%.bib"]
-         begin fun env build ->
-	   let src = env "%.bib" in
-	   let tgt = env "%-fix.bib" in
-	   Cmd (S[Sh "sed \"s/~{}/~/g\""; Px src; Sh">"; P tgt])
-	 end;
+      rule "Fix bib"
+	~prods:["%-fix.bib"]
+	~deps:["%.bib"]
+        begin fun env build ->
+	  let src = env "%.bib" in
+	  let tgt = env "%-fix.bib" in
+	  Cmd (S[Sh "sed \"s/~{}/~/g\""; Px src; Sh">"; P tgt])
+	end;
 
           (*** Libs ***)
-          let bitstring = ocamlfind_query "bitstring" in 
-	  ocaml_lib ~extern:true
-	                   ~dir:bitstring
-	                   "bitstring" ;
-
-	  ocaml_lib ~extern:true
-	                   ~dir:"+cairo"
-	                   "cairo" ;
-
-	  let mlpostdir = ocamlfind_query "mlpost" in
-	  ocaml_lib ~extern:true
-	                   ~tag_name:"use_mlpost"
-	                   ~dir:mlpostdir
-	                    "mlpost" ;
+      let mlpostdir = ocamlfind_query "mlpost" in
+      ocaml_lib ~extern:true
+	~tag_name:"use_mlpost"
+	~dir:mlpostdir
+	"mlpost" ;
 
 
-	  let meltdir = ocamlfind_query "melt" in
-	  ocaml_lib ~extern:true
-	                   ~tag_name:"use_melt"
-	                   ~dir:meltdir
-	                   "melt" ;
+      let meltdir = ocamlfind_query "melt" in
+      ocaml_lib ~extern:true
+	~tag_name:"use_melt"
+	~dir:meltdir
+	"melt" ;
       
-	  let ulex_dir = ocamlfind_query "ulex" in
-	  ocaml_lib ~extern:true 
-	                  ~tag_name:"use_ulex"
-                           ~dir:ulex_dir 
-                           "ulexing";
-	  flag ["ocaml"; "pp"; "use_ulex.syntax"] &
-	    S[A "-I"; P ulex_dir; P "pa_ulex.cma"] ;
+
+            (* workaround ocamlbuild's menhir bugs *)
+      rule "ocaml: menhir (workaround)"
+	~prods:["%.ml"; "%.mli"]
+	~deps:["%.mly"; "%.mly.depends"]
+	~insert:(`before "ocaml: menhir")
+	(Myocamlbuild.menhir "%.mly");
 
 
-(* uncomment for dypgen
-	  let dyp_dir =  ocamlfind_query "dyp" in
-	  ocaml_lib ~extern:true
-	                   ~dir:dyp_dir
-	                   "dyp"
-*)
-
-	  let menhirlib_dir = ocamlfind_query "menhirLib" in
-	  flag ["ocaml";"compile";"use_menhir"] &
-            S[A "-I"; P menhirlib_dir];
-	  flag ["ocaml";"link";"use_menhir"] &
-	    S[A "-I"; P menhirlib_dir; P "menhirLib.cmx"]; 
-	    
-
-      (* workaround ocamlbuild's menhir bugs *)
-	    rule "ocaml: menhir (workaround)"
-	      ~prods:["%.ml"; "%.mli"]
-	      ~deps:["%.mly"; "%.mly.depends"]
-	      ~insert:(`before "ocaml: menhir")
-	      (Myocamlbuild.menhir "%.mly");
-
-
-      (*c Rules can be declared by a call of the form
-          [rule name ~prod ~dep action].
-          The first argument is the name of the rule.
-          [~prod:string] specifies the product of the rule.
-          Note that [~prods:string list] also exists.
-          [~dep] and [~deps] are for dependencies *)
-        
+  | _ -> ()        
 end

@@ -1,7 +1,8 @@
 true: use_menhir
 <util> or <util/mumode> : include
 
-<**/*.ml> or <**/*.mli> or <**/*.mly> : use_unix , use_str , use_mlpost , use_dynlink , use_melt , use_bitstring , use_cairo , use_ulex, use_menhir
-<**/*.native> or <**/*.byte>: use_unix , use_str , use_mlpost , use_dynlink , use_melt, use_bitstring, use_cairo , use_ulex, use_menhir
+<**/*.ml> or <**/*.mli> or <**/*.mly> : use_unix , use_str , package(mlpost) , use_dynlink , package(melt.latex,melt) , package(bitstring,cairo,ulex,menhirLib)
+<**/*.native> or <**/*.byte>: package(mlpost) , use_dynlink , package(melt.latex,melt), package(bitstring,cairo,ulex,menhirLib)
+<**/*.mly> : use_mlpost, use_melt
 
-<util/mumode/muLexer.ml>: use_ulex.syntax, camlp4o
+<util/mumode/muLexer.ml>: package(ulex), syntax(camlp4o,ulex)
