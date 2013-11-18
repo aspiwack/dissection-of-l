@@ -23,6 +23,10 @@ let map_ident = [
   "bot" , SYMB bottom ;
   "top" , SYMB top;
 
+  "val" , VAL ;
+  "shiftn" , SHIFTN ;
+  "shiftp" , SHIFTP ;
+
   "subst", SUBST;
 
   (*greek letters*)
@@ -81,7 +85,7 @@ let next k = lexer
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR
 
-  | "|-" -> TURNSTYLE
+  | "|-" -> TURNSTYLE | "|-_v" -> TURNSTYLEV
 
   | "," -> COMMA | ";" -> SEMICOLON
   | ":" -> COLON

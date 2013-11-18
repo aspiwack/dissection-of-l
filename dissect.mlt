@@ -547,7 +547,15 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
 
 let focusing = "{section "Focalised {mu}"}
 (* arnaud: on veut parler de confluence ou de cbv or something*)
-
+{let sep = `Mm 3. in
+ let f_fll = label ~name:\"f_fll\" () in
+ figurerules ~label:f_fll ~caption:"Focalised {mu}" [
+    block "Typing" [`C;`C] [
+       block_line ~sep [ Rules.Typing.Fll.id ; Rules.Typing.Fll.iddup ];
+       block_line ~sep [ Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp ; ];
+    ];
+ ]
+}
 "
 
 

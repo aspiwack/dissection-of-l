@@ -50,6 +50,8 @@ val pi1rule : Latex.t
 val pi2rule : Latex.t
 val bangrule : Latex.t
 val whynotrule : Latex.t
+val positiveshift : Latex.t
+val negativeshift : Latex.t
 
 val lambdap : Latex.t -> Latex.t
 val cutp : Latex.t -> Latex.t

@@ -19,19 +19,21 @@ let empty_context = Latex.cdot
 %token METAPARENL METAPARENR 
 %token PARENL PARENR BRACKETL BRACKETR BRACEL BRACER BRACEBR
 %token WILDCARD
-%token TURNSTYLE VEC
+%token TURNSTYLE TURNSTYLEV VEC
 
 %token POINTYL POINTYR BAR
 %token DUAL
 %token OPLUS OTIMES WITH PAR
 %token LARROW
 %token BANG WHYNOT
+%token SHIFTP SHIFTN
 %token PI SIGMA
 
 %token IOTA1 IOTA2
 %token PI1 PI2 FIELD1 FIELD2
 %token LLCORNER LRCORNER
 %token LAMBDA
+%token VAL
 
 %token REDUCES
 %token SUBST
@@ -90,6 +92,7 @@ expr:
 | FIELD2 u=expr { concat [text"2 = "; u] }
 | LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
 | LLCORNER LRCORNER { concat [left `Floor;phantom(text"x");right `Floor] }
+| VAL u=expr { just_left (`Double `Down) u }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP
@@ -101,6 +104,8 @@ expr:
 | a=expr PAR b=expr  { concat[a;parr;b] }
 | BANG a=expr { concat [text"\\,!";a] }
 | WHYNOT a=expr { concat [text"\\,?\\!";a] }
+| SHIFTP a = expr { concat [text"\\,";downarrow;text"\\!";a] }
+| SHIFTN a = expr { concat [text"\\,";uparrow;text"\\!";a] }
 | PI p=typedpattern COMMA b=expr { concat [ index prod p ; b ] }
 | SIGMA p=typedpattern COMMA b=expr { concat [ index sum p ; b ] }
 
@@ -151,6 +156,7 @@ sequent_left_hand:
 
 sequent:
 | l=sequent_left_hand TURNSTYLE r=sequent_right_hand {
-  concat [ l ; vdash ; r ]
-}
+  concat [ l ; vdash ; r ] }
+| l=sequent_left_hand TURNSTYLEV r=sequent_right_hand {
+  concat [ l ; vdash ; text"_" ; text"v" ; r ] }
 
