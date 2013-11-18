@@ -33,7 +33,7 @@ called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
 often called simply ${mu}{tilde mu}$, or system L
 syntax~{citation_needed}. The latter name comes from
 proof-theoretical investigations, this article has more a programming
-language feel, and we will not see a {tilde mu}. Hence just {mu}.
+language feel, and will not feature a {tilde mu}. Hence simply {mu}.
 
 The {foreign "tour de force"} of {mu}, in my opinion, is to provide
 a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
@@ -77,7 +77,7 @@ Together with reduction rules
   Rules.Reduction.mu;
   array_line [ "<%<mu x,c|t>%>" ; "<%subst [t,x] c%>" ];
 ] end}
-The intent being that the vertical bar be read as commutative. We shall using
+The intent being that the vertical bar be read as commutative. We shall use it
 as such from now on.
 
 Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
@@ -104,7 +104,7 @@ Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 {subsection "Typing as classical sequent calculus"}
 
 The original typing rules~{citation_needed} for {mu} corresponded closely to classical
-sequent calculus. We shall present, here, a one-sided version of them. Core mu does not
+sequent calculus. We shall present, in this section, a one-sided version of the classical {mu}. Core mu does not
 have any connective, however as is necessary in a one-sided sequent calculus, we shall
 assume that every formula <%A%> has a dual <%A^~%>, and that <%A^~^~%> is <%A%> itself.
 
@@ -121,11 +121,11 @@ with the same type in terms and in the context.
 
 The three typing rules for classical core {mu} are the identity rule, giving their type
 to variables
-{displaymath Rules.Typing.Mall.id}
+{displaymath Rules.Typing.Classical.id}
 the {mu} rule, for {mu} abstractions
-{displaymath Rules.Typing.Mall.mu}
+{displaymath Rules.Typing.Classical.mu}
 and the cut rule giving their types to interactions
-{displaymath Rules.Typing.Mall.cut}
+{displaymath Rules.Typing.Classical.cut}
 where the context is considered up to commutation of the comma.
 
 What should be taken away from these rules is that the identity and cut rules are sufficient
@@ -145,9 +145,9 @@ weakening-weakening critical pair of cut elimination.
 {subsection "Typing as linear sequent calculus"}
 To address the confluence issue, we move from a classical sequent calculus. In the case of core
 {mu} this simply requires simple modifications of the identity rule
-{displaymath (Infer.rule ~label:idrule [] "<%x:A|-x:A%>")}
+{displaymath Rules.Typing.Mall.id}
 and cut rule
-{displaymath (Infer.rule ~label:cutrule ["<%Gamma|-t:A%>";"<%Delta|-u:A^~%>"] "<%Gamma,Delta|-<t|u>%>")}
+{displaymath Rules.Typing.Mall.cut}
 to prevent weakening and contraction to happen. The {mu} rules stays as above.
 
 Would we to limit the exchange of formul{ae} in the context, we could play with the {mu} rule. We shall, however,
@@ -202,6 +202,7 @@ stack-like is taken care of by the multiplicative constructs.
 
 (* arnaud: On pourrait penser à parler un peu des deux vues, quand A<*>B est le terme et A`&B le contexte
    et vice-versa *)
+(* arnaud: Il manque 1 et \bot. Mais ils sont dans la figure*)
 
 {subsection "Additive fragment"}
 
@@ -273,11 +274,11 @@ The typing rules presented so far are purely linear, in the sense that there is 
 -- or weakening -- happening. For instance, the term <%(x,x)%> can be given a type in no context.
 In~{citation_needed} this is solved by the following rule:
 {displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-t:B%>"] "<%Gamma,x:!A|-subst [x,y] t : B%>")}
-To this author, though, it feels like dodging the issue, somewhat. Indeed, it makes
+To this author, though, it feels somewhat like dodging the issue. Indeed, it makes
 <%x:!A|-(x,x):!A<*>!A%> a correctly typed sequent, however, it does not really delegate
 contraction to variables, as type derivations need to linearise terms appropriately before
 contexts are split. Additionally, in traditional calculi, including {mu}, if one wants to
-contract to variables of the same type, they have to introduce an explicit construction
+contract two variables of the same type, they have to introduce an explicit construction
 (in {lambda}-calculus: <%(lambda x y, t) x x%>), so at the same time this rule is somewhat
 too strong.
 
@@ -323,10 +324,11 @@ We can recover the copy rule using a cut:
 end}
 
 The introduction rule for <%!A%> corresponds to the promotion rule of linear logic,
-{foreign"i.e."} a term of type <%A%> can be promoted to type <%!A%> is all its variables
+{foreign"i.e."} a term of type <%A%> can be promoted to type <%!A%> if all its variables
 are duplicable:
 {displaymath Rules.Typing.Ll.bang}
 
+(* arnaud: ce n'est pas tout à fait la forme usuelle pour la déréliction *)
 The introduction rule for <%?A%> corresponds to the dereliction rule:
 {displaymath Rules.Typing.Ll.whynot}
 
@@ -370,6 +372,7 @@ let examples = "{section"Using {mu}"}
   as
   {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%()%>";"<%(p,q)%>";"<%|_p_|%>"]])}
 
+  (* arnaud: je crois que cette remarque voulait juste dire qu'on a une règle admissible pratique, par pattern. Je ne sais pas si je l'utilise autre part que pour prouver qu'on peut définir la règle de typage des patterns profonds. *)
   A very common use for patterns involves the cut rule. If <%p%> has type <%vec x:A ; vec y:B |- p:P%>
   then the following rule is admissible:
   {displaymath begin
@@ -397,7 +400,7 @@ let examples = "{section"Using {mu}"}
       "<%Xi;Gamma|- mu p,c:P^~%>"
   end}
 
-  The justification is inductive, let us prove the case of the pair pattern: <%(p,q)%> is typed as
+  The justification is inductive. Let us prove the case of the pair pattern: <%(p,q)%> is typed as
   <%vec x:A, vec x':A'; vec y:B, vec y':B' |- (p,q):P<*>Q%>, for <%vec x:A; vec y:B|- p:P%> and
   <%vec x':A'; vec y':B'|- q:Q%>. We can, hence, write
   {displaymath begin
@@ -464,13 +467,13 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
        "<%|- contra : (A-o B)-o (B^~-o A^~)%>"
    end}
    An alternative definition of contra can be read off another way to write its type
-   <%(A^~<*>B^~)`&(B`&A)%>: <%mu(x,(y,z)), <x|(z,y)>%>.
+   <%(A<*>B^~)`&(B`&A^~)%>: <%mu(x,(y,z)), <x|(z,y)>%>.
 
   Duplication <%dup%> of type <%!A-o !A<*>!A%>: <%lambda|_x_|, (|_x_|,|_x_|)%>. Using the duality,
   <%codup%>, defined as <%contra dup%> has type <%?A`&?A-o?A%>.
 
   Isomorphism between <%!(A&B)%> and <%!A<*>!B%>:
-  {displaymath $"<%phi%>"="<%lambda |_x_|, (x.1,x.2)%>"$}
+  {displaymath $"<%phi%>"="<%lambda |_x_|, (|_x.1_|,|_x.2_|)%>"$}
   typed as
   {displaymath begin
     Infer.rule ~label:(lambdap "<%|_x_|%>")
@@ -533,7 +536,7 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
    may raise an exception of type <%E%> is represented as <%?A`&?E%>. The programming style is
    then reminiscent of that of imperative programming language: we write <%mu(|_return_|,|_raise_|),c%>,
    then <%c%> can use <%<return|v>%> to return the value <%v%>, and <%<raise|e>%> to raise the exception
-   <%e%>. This is less precise, yet more akin to the usual practice of programming with exception than
+   <%e%>. The type <%?A`&?E%> is less precise, yet more akin to the usual practice of programming with exception, than
    using the type <%A<+>E%>. Indeed, in the latter case, we need to thread throughout the program whether
    we raised an exception or not, where in the former, <%<raise|x>%> is truly a non-local operation.
 
