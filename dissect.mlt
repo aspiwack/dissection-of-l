@@ -256,7 +256,7 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
            block_line ~sep [ unit ; counit ];
            block_line ~sep [ iota1 ; case ];
            block_line ~sep [ iota2 ; empty];
-           block_line ~sep [ emptycase ; zero ];
+           block_line ~sep [ zero ; emptycase ];
          ]
    end;
    block "Derived typing rules" [`C;`C] begin
@@ -293,9 +293,9 @@ The syntax is
   syntax_line ~extend:true `Term Rules.Syntax.exponential
 ])}
 and the associated reduction rule
-{displaymath (reduction [
+{displaymath (reduction 
   Rules.Reduction.exponential
-])}
+)}
 
 The typing judgement are now of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
 <%Gamma%> is the linear context as earlier, and <%Xi%> is the new context, containing
@@ -345,7 +345,7 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
      ]
    end;
    simple_block "Reduction" begin
-     reduction Rules.Reduction.(core@multiplicative@additive@[exponential])
+     reduction Rules.Reduction.(core@multiplicative@additive@exponential)
    end;
    block "Typing" [`C;`C] begin
      let open Rules.Typing.Ll in
@@ -356,7 +356,7 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
            block_line ~sep [ unit ; counit ];
            block_line ~sep [ iota1 ; case ];
            block_line ~sep [ iota2 ; empty];
-           block_line ~sep [ emptycase ; zero ];
+           block_line ~sep [ zero ; emptycase ];
            block_line ~sep [ bang ; whynot ]
          ]
    end;
@@ -547,6 +547,7 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
 
 let focusing = "{section "Focalised {mu}"}
 (* arnaud: on veut parler de confluence ou de cbv or something*)
+(* arnaud: clean
 {let sep = `Mm 3. in
  let f_fll = label ~name:\"f_fll\" () in
  figurerules ~label:f_fll ~caption:"Focalised {mu}" [
@@ -555,9 +556,118 @@ let focusing = "{section "Focalised {mu}"}
        block_line ~sep [ Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp ; ];
     ];
  ]
-}
+}*)
+{let sep = `Mm 2. in
+ let f_fll = label ~name:\"f_fll\" () in
+ figurerules ~label:f_fll ~caption:"Focalised {mu}" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
+   end;
+(*
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end; *)
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Fll in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ shiftn ; shiftp ; ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ];
+         ]
+   end;
+(*
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+*)
+ ]}
+
+(* arnaud: just a sketch*)
+(* arnaud: je ne suis même pas sûr de ces types *)
+We can embed both cbv and cbn simply typed {lambda}-calculus:
+{itemize [
+  "cbv: <%!A -o B%>";
+  "cbn: <%!\(shiftn A\) -o shiftn B%>"
+]}
 "
 
+let dependent = "{section"Dependent types"}
+
+{subsection"Weakly dependent types"}
+{let sep = `Mm 2. in
+ let f_fll = label ~name:\"f_dll0\" () in
+ figurerules ~label:f_fll ~caption:"Dependent {mu}" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
+   end;
+(*
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end; *)
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Dll0 in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ shiftn ; shiftp ; ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ];
+         ]
+   end;
+(*
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+*)
+ ]}
+
+{subsection"Dependent elimination"}
+
+"
 
 let d = concat [
   intro;
@@ -565,6 +675,7 @@ let d = concat [
   llmu;
   examples;
   focusing;
+  dependent;
 ]
 
 let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"
