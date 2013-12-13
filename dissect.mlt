@@ -241,7 +241,7 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
    simple_block "Derived syntax" begin
      array [`L; symbsep $=$; `L] [
        array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
-       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
        array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
        array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
        array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
@@ -370,7 +370,7 @@ let examples = "{section"Using {mu}"}
   {subsection "Patterns"}
   We shall make a liberal use of nested patterns, or at least irrefutable patterns, defined
   as
-  {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%()%>";"<%(p,q)%>";"<%|_p_|%>"]])}
+  {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%|_x_|%>";"<%()%>";"<%(p,q)%>";]])}
 
   (* arnaud: je crois que cette remarque voulait juste dire qu'on a une règle admissible pratique, par pattern. Je ne sais pas si je l'utilise autre part que pour prouver qu'on peut définir la règle de typage des patterns profonds. *)
   A very common use for patterns involves the cut rule. If <%p%> has type <%vec x:A ; vec y:B |- p:P%>
@@ -517,19 +517,19 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
    <%X%> must be of the form <%?B%>. We define <%throw%> of type <%A^~ -o A -o ?B%>
    by <%lambda k, lambda x, mu|_  _|, <x|k>%>. In the definition of <%callcc%>,
    the continuation will be duplicated, and we shall allow the body to duplicate the continuation
-   as well, hence its type is <%(!(?A-o?B)-o ?A)-o ?A%>. It is defined as
-   <%lambda f, mu |_k_|, < f |_ throw |_k_| _| | |_k_|>%>. Its typing derivation is
+   as well, hence its type is <%(!(A-o?B)-o A)-o A%>. It is defined as
+   <%lambda f, mu |_k_|, < f |_ throw k _| | k >%>. Its typing derivation is
    {displaymath begin
        Infer.rule ~label:lambda
          [ Infer.rule ~label:whynotrule
-             [Infer.rule ~label:(cutp "<%|_k_|%>")
+             [Infer.rule ~label:(cutp "<%k%>")
                 [Infer.rule ~label:apprule
-                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(?A-o?B)-o?A |- f:!(?A-o?B)-o?A%>";
-                     Infer.derived [] "<%k:A^~; |- |_throw |_k_|_| : !(?A-o?B)%>"]
-                   "<%k:A^~;f:!(?A-o?B)-o?A |- f |_ throw |_k_| _| : ?A%>"]
-                "<%k:A^~;f:!(?A-o?B)-o?A |- < f |_ throw |_k_| _| | |_k_|>%>"]
-             "<%;f:!(?A-o?B)-o?A |- mu|_k_|,< f |_ throw |_k_| _| | |_k_|> : ?A%>" ]
-         "<%|- callcc : (!(?A-o?B)-o ?A)-o ?A%>"
+                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(A-o?B)-oA |- f:!(A-o?B)-oA%>";
+                     Infer.derived [] "<%k:A^~; |- |_throw k_| : !(A-o?B)%>"]
+                   "<%k:A^~;f:!(A-o?B)-oA |- f |_ throw k _| : A%>"]
+                "<%k:A^~;f:!(A-o?B)-oA |- < f |_ throw k _| | k >%>"]
+             "<%;f:!(A-o?B)-oA |- mu|_k_|,< f |_ throw k _| | k > : A%>" ]
+         "<%|- callcc : (!(A-o?B)-o A)-o A%>"
     end}
 
    Similarly, we can model exception quite directly: the type of expressions of type <%A%> which
@@ -540,17 +540,17 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
    using the type <%A<+>E%>. Indeed, in the latter case, we need to thread throughout the program whether
    we raised an exception or not, where in the former, <%<raise|x>%> is truly a non-local operation.
 
-   A <%catch%> operation of type <%(E-o?A) -o ?A`&?E -o ?A%> can be written as 
+   A <%catch%> operation of type <%!(E-o?A) -o ?A`&?E -o ?A%> can be written as 
    (* arnaud: je finirai plus tard *)
    
 "
 
-let focusing = "{section "Focalised {mu}"}
+let focusing = "{section "Polarised {mu}"}
 (* arnaud: on veut parler de confluence ou de cbv or something*)
 (* arnaud: clean
 {let sep = `Mm 3. in
  let f_fll = label ~name:\"f_fll\" () in
- figurerules ~label:f_fll ~caption:"Focalised {mu}" [
+ figurerules ~label:f_fll ~caption:"Polarised {mu}" [
     block "Typing" [`C;`C] [
        block_line ~sep [ Rules.Typing.Fll.id ; Rules.Typing.Fll.iddup ];
        block_line ~sep [ Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp ; ];
@@ -559,7 +559,7 @@ let focusing = "{section "Focalised {mu}"}
 }*)
 {let sep = `Mm 2. in
  let f_fll = label ~name:\"f_fll\" () in
- figurerules ~label:f_fll ~caption:"Focalised {mu}" [
+ figurerules ~label:f_fll ~caption:"Polarised {mu}" [
    simple_block "Syntax" begin
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
@@ -573,7 +573,7 @@ let focusing = "{section "Focalised {mu}"}
    simple_block "Derived syntax" begin
      array [`L; symbsep $=$; `L] [
        array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
-       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
        array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
        array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
        array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
@@ -583,7 +583,7 @@ let focusing = "{section "Focalised {mu}"}
      let open Rules.Typing.Fll in
          [
            block_line ~sep [ id ; cut ];
-           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ iddup ; mu ];
            block_line ~sep [ shiftn ; shiftp ; ];
            block_line ~sep [ pair ; copair ];
            block_line ~sep [ unit ; counit ];
@@ -607,10 +607,10 @@ let focusing = "{section "Focalised {mu}"}
 
 (* arnaud: just a sketch*)
 (* arnaud: je ne suis même pas sûr de ces types *)
-We can embed both cbv and cbn simply typed {lambda}-calculus:
+We can embed both cbv and cbn linear simply typed {lambda}-calculus:
 {itemize [
-  "cbv: <%!A -o B%>";
-  "cbn: <%!\(shiftn A\) -o shiftn B%>"
+  "cbv (monadic): <%A -o shiftp B%>";
+  "cbn (comonadic?): <%\(shiftn N\) -o M%>"
 ]}
 "
 
@@ -633,7 +633,7 @@ let dependent = "{section"Dependent types"}
    simple_block "Derived syntax" begin
      array [`L; symbsep $=$; `L] [
        array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
-       array_line ["<%t u%>"; "<%mu alpha, <t|(alpha,u)>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
        array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
        array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
        array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
@@ -643,7 +643,7 @@ let dependent = "{section"Dependent types"}
      let open Rules.Typing.Dll0 in
          [
            block_line ~sep [ id ; cut ];
-           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ iddup ; mu ];
            block_line ~sep [ shiftn ; shiftp ; ];
            block_line ~sep [ pair ; copair ];
            block_line ~sep [ unit ; counit ];
@@ -666,6 +666,54 @@ let dependent = "{section"Dependent types"}
  ]}
 
 {subsection"Dependent elimination"}
+
+{let sep = `Mm 2. in
+ let f_fll = label ~name:\"f_dll1\" () in
+ figurerules ~label:f_fll ~caption:"Dependent {mu} with dependent elimination" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
+   end;
+(*
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end; *)
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Dll1 in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ iddup ; mu ];
+           block_line ~sep [ shiftn ; shiftp ; ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ];
+         ]
+   end;
+(*
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+*)
+ ]}
 
 "
 
@@ -723,3 +771,65 @@ let _ = emit ~file (document
 			     ~packages
                              ~abstract
 			     d)
+
+(* arnaud: random trucs sur la version polarisee:
+
+have: t:A -o N , u:↓A
+need: N
+
+μk.⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
+
+
+have: t:A -o N, u:↓A, k:N~
+need: command
+
+⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
+
+have: t:A -o N, x:A, k:N~
+need: command
+
+⟨ t x | k ⟩
+
+
+=====================================================
+
+Unary product
+
+Γ ⊢v t:A
+————————
+Γ ⊢v (t):⊗A
+
+
+have: t:↓A
+need: ↓⊗A
+
+μk.⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
+
+have: t:↓A k:↑(⊗A)~
+need: command
+
+⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
+
+have x:A, k:↑(⊗A)~
+need command
+
+⟨ k | ⇓(x) ⟩
+
+=====================================================
+
+have x:↓↑↓A
+need ↓A
+
+μk.⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
+
+have x:↓↑↓A, k:↑A~
+need command
+
+⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
+
+have y:↑↓A k:↑A~
+need command
+
+⟨ ⇓k | y ⟩
+
+*)

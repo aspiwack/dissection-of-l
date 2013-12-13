@@ -29,6 +29,8 @@ let map_ident = [
 
   "subst", SUBST;
 
+  "cv" , SYMB bullet ;
+
   (*greek letters*)
   "alpha" , SYMB alpha ;
   "beta" , SYMB beta ;
