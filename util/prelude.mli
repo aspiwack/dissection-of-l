@@ -1,3 +1,6 @@
+
+val cite : ?extra:Latex.t -> Latex.t -> Latex.t
+
 val concat_with_sep : Latex.t list -> Latex.t -> Latex.t
 
 type author = {
@@ -68,4 +71,4 @@ end
 
 (*** Holes ***)
 
-val citation_needed : Latex.t
+(* val citation_needed : Latex.t *)

@@ -1,5 +1,11 @@
 open Latex
 
+let cite ?extra t =
+  let opt = match extra with
+    | None -> None
+    | Some x -> Some (T,x)
+  in
+  command "cite" ?opt [T,t] T
 
 
 let concat_with_sep l sep =

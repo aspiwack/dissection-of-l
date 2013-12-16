@@ -29,10 +29,10 @@ let intro = "{section' "Foreword"}
 
 In this article I will discuss typing of a calculus -- or, to be
 fair, a family of calculus -- I call {muname}. It originates from a
-paper by Herbelin \& Curien~{citation_needed}, where it was
+paper by Herbelin \& Curien~{cite"Curien2000"}, where it was
 called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
 often called simply ${mu}{tilde mu}$, or system L
-syntax~{citation_needed}. The latter name comes from
+syntax~{cite"Herbelin08"}. The latter name comes from
 proof-theoretical investigations, this article has more a programming
 language feel, and will not feature a {tilde mu}. Hence simply {muname}.
 
@@ -45,15 +45,15 @@ it makes a good foundation for a programming language.
 
 To me at least, the appeal of sequent calculus is hard to resist. It
 has a more symmetric structure than natural deduction, and proof search
-is more naturally expressed in it. Importantly for this article, Lengrand
-has shown~{citation_needed} that proof search is expressed naturally
+is more naturally expressed in it. Importantly for this article, Lengrand, Dyckhoff and McKinna
+have shown~{cite"Lengrand2010"} that proof search is expressed naturally
 in a dependently typed (intuitionist) sequent calculus.
 
 The object of this paper, is to study {muname} as a programming language whose
 typing rules correspond to linear sequent calculus. And then to add dependent
 types to the mix. The main motivation is to use this calculus as a stepping
 stone to understand mathematics in presence of computational effects (as
-linear logic can be used, to some extent, to model effects~{citation_needed}).
+linear logic can be used, to some extent, to model effects~{cite"Benton1996"}).
 I also hope to use dependent linear {muname} as a new lense through which
 usual dependently typed language could be further analysed.
 The choice of linear logic rather than some flavour of intuitionist linear
@@ -104,7 +104,7 @@ Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 
 {subsection "Typing as classical sequent calculus"}
 
-The original typing rules~{citation_needed} for {muname} corresponded closely to classical
+The original typing rules~{cite"Curien2000"} for {muname} corresponded closely to classical
 sequent calculus. We shall present, in this section, a one-sided version of the classical {muname}. Core {muname} does not
 have any connective, however as is necessary in a one-sided sequent calculus, we shall
 assume that every formula <%A%> has a dual <%A^~%>, and that <%A^~^~%> is <%A%> itself.
@@ -273,7 +273,7 @@ encode records, we write <%{1=t,2=u}%> for <%{mu(1.alpha),<t|alpha> , mu(2.alpha
 {subsection "Exponentials"}
 The typing rules presented so far are purely linear, in the sense that there is no contraction
 -- or weakening -- happening. For instance, the term <%(x,x)%> can be given a type in no context.
-In~{citation_needed} this is solved by the following rule:
+In~{cite"Munch2009"} it is solved by the following rule:
 {displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-t:B%>"] "<%Gamma,x:!A|-subst [x,y] t : B%>")}
 To this author, though, it feels somewhat like dodging the issue. Indeed, it makes
 <%x:!A|-(x,x):!A<*>!A%> a correctly typed sequent, however, it does not really delegate
@@ -284,8 +284,8 @@ contract two variables of the same type, they have to introduce an explicit cons
 too strong.
 
 Instead, we shall choose, here, to use the dyadic presentation of linear logic, first introduced
-by Andreoli~{citation_needed}, where duplicable formul{ae} are rendered in an separate context.
-This choice happens to have non-trivial consequences: in~{citation_needed}, <%!A%> is built out
+by Andreoli~{cite"Andreoli1992"}, where duplicable formul{ae} are rendered in an separate context.
+This choice happens to have non-trivial consequences: in~{cite"Munch2009"}, <%!A%> is built out
 of commands, whereas <%?A%> was built out of terms, in the version presented here, it is
 the opposite. (*arnaud: ma version est la version plus décomposée de l'exponentielle, mais
 pour en discuter il faudrait que je trouve quelque chose de concret à citer*)
@@ -315,7 +315,7 @@ where formul{ae} in <%Gamma%> are reverted into <%Xi%>. We shall, however, prefe
 of the identity function:
 {displaymath Rules.Typing.Ll.iddup}
 it allows to see variables in <%Xi%> as regular variables which can be used any
-number of times. This was also the original presentation in~{citation_needed}(*andreoli*)
+number of times. This was also the original presentation in~{cite"Andreoli1992"}
 We can recover the copy rule using a cut:
 {displaymath begin
   Infer.rule ~label:cutrule
@@ -427,7 +427,7 @@ let examples = "{section"Using {muname}"}
        "<%Xi;Gamma|-lambda p, t : P-oQ%>"
    end}
 
-  General patterns are more involved, see~{citation_needed} for an in-depth discussion.
+  General patterns are more involved, see~{cite"Curien2010"} for an in-depth discussion.
 {let l_lambda = label ~name:\"figure:lambda\" () in
 "{subsection "Natural deduction"}
 A noticeable property of the duplicable context, is that it behaves just as the context
@@ -725,6 +725,8 @@ let d = concat [
   examples;
   focusing;
   dependent;
+(*  command \"bibliography\" [A,"library"] A;*)
+  environment \"bibliography\" ~args:[A,"library"] (A,empty) A;
 ]
 
 let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"}"
@@ -744,6 +746,7 @@ let keywords = [
   "Dependent types";
   "Linear logic";
   "Focusing";
+  "System L";
 (*  "μμ̃"; Confuses latex *)
 ]
 
@@ -759,7 +762,9 @@ let packages = [
   "microtype" , "" ;
 ]
 
-let prelude = concat_with_sep [] par
+let prelude = concat_with_sep [
+  (* command \"bibliographystyle\" [A,"alpha"] A; *)
+] par
 
 let file = \"dissect.tex\"
 
