@@ -20,6 +20,14 @@
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{amsart}}
 \ProcessOptions\relax
 
+% Bibliographystyle
+%% spiwack: fix: without moving the command here (it was initially
+%% right at the bottom of the file), \bibstyle is emitted (at least in
+%% my configuration) on the standard output instead of inside the .aux
+%% file, which caused bibtex to fail.
+\bibliographystyle{alpha}
+
+
 \LoadClass[11pt,reqno]{amsart}
 \usepackage{helvet,cclicenses}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -505,8 +513,5 @@
 }
 \newenvironment{iteMize}[1]{\begin{enumerate}[#1]}{\end{enumerate}}
 \newenvironment{desCription}{\begin{enumerate}[\hbox to8 pt{\hfill}]}{\end{enumerate}}
-% Bibliographystyle
-
-\bibliographystyle{alpha}
 
 \endinput
