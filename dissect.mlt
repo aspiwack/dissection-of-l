@@ -4,6 +4,7 @@
 
 open Prelude
 
+let muname = "L"
 
 let symbsep s = `Sep ${quad}{s}{quad}$
 let syntax_line k ?(extend=false) l =
@@ -27,15 +28,15 @@ let abstract = "There will be an abstract some day."
 let intro = "{section' "Foreword"}
 
 In this article I will discuss typing of a calculus -- or, to be
-fair, a family of calculus -- I call {mu}. It originates from a
+fair, a family of calculus -- I call {muname}. It originates from a
 paper by Herbelin \& Curien~{citation_needed}, where it was
 called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
 often called simply ${mu}{tilde mu}$, or system L
 syntax~{citation_needed}. The latter name comes from
 proof-theoretical investigations, this article has more a programming
-language feel, and will not feature a {tilde mu}. Hence simply {mu}.
+language feel, and will not feature a {tilde mu}. Hence simply {muname}.
 
-The {foreign "tour de force"} of {mu}, in my opinion, is to provide
+The {foreign "tour de force"} of {muname}, in my opinion, is to provide
 a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
 for natural deduction, contraction and weakening are done through
 variables: a bound variable which isn't used is weakened, if it is
@@ -48,24 +49,24 @@ is more naturally expressed in it. Importantly for this article, Lengrand
 has shown~{citation_needed} that proof search is expressed naturally
 in a dependently typed (intuitionist) sequent calculus.
 
-The object of this paper, is to study {mu} as a programming language whose
+The object of this paper, is to study {muname} as a programming language whose
 typing rules correspond to linear sequent calculus. And then to add dependent
 types to the mix. The main motivation is to use this calculus as a stepping
 stone to understand mathematics in presence of computational effects (as
 linear logic can be used, to some extent, to model effects~{citation_needed}).
-I also hope to use dependent linear {mu} as a new lense through which
+I also hope to use dependent linear {muname} as a new lense through which
 usual dependently typed language could be further analysed.
 The choice of linear logic rather than some flavour of intuitionist linear
 logic might be a matter of taste, I tend to favour symmetry when I can; it
 was originally a challenge as well, as dependent types are somewhat antagonistic
 to the kind of commutation sequent calculus allow. In retrospect, though,
 it may very well be that linear dependent types are easier -- at least using
-{mu} as a framework -- than intuitionist linear dependent types.
+{muname} as a framework -- than intuitionist linear dependent types.
 "
 
-let coremu = "{section "Core {mu}"}
+let coremu = "{section "Core {muname}"}
 
-Stripped down to its bare minimum, {mu} appears as a very simple calculus whose
+Stripped down to its bare minimum, {muname} appears as a very simple calculus whose
 syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>) and commands
 (<%c%>)
 {displaymath begin syntax [
@@ -86,7 +87,7 @@ the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
 continuation <%t%>) it is read ``<%t%> against <%u%>''.
 Terms reduce to a value, whereas command just compute -- they are played only
 for there effects. Though it is possible to imagine otherwise, and consider
-{textsc"io"} of sorts, the only effects available to a computation in pure {mu}
+{textsc"io"} of sorts, the only effects available to a computation in pure {muname}
 is returning to a continuation.
 
 The reduction rules look quite similar to {beta}-reduction,
@@ -103,8 +104,8 @@ Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 
 {subsection "Typing as classical sequent calculus"}
 
-The original typing rules~{citation_needed} for {mu} corresponded closely to classical
-sequent calculus. We shall present, in this section, a one-sided version of the classical {mu}. Core mu does not
+The original typing rules~{citation_needed} for {muname} corresponded closely to classical
+sequent calculus. We shall present, in this section, a one-sided version of the classical {muname}. Core {muname} does not
 have any connective, however as is necessary in a one-sided sequent calculus, we shall
 assume that every formula <%A%> has a dual <%A^~%>, and that <%A^~^~%> is <%A%> itself.
 
@@ -119,7 +120,7 @@ form for sequents. It was chosen mostly for its resemblance to natural deduction
 more familiar in the realm of programming languages; also it allows variables to appear
 with the same type in terms and in the context.
 
-The three typing rules for classical core {mu} are the identity rule, giving their type
+The three typing rules for classical core {muname} are the identity rule, giving their type
 to variables
 {displaymath Rules.Typing.Classical.id}
 the {mu} rule, for {mu} abstractions
@@ -154,10 +155,10 @@ Would we to limit the exchange of formul{ae} in the context, we could play with 
 keep reading the comma as commutative.
 "
 
-        let llmu = "{section "Linear {mu}"}
-As mentioned in the previous section, core {mu} does not have all that much computing abilities.
+        let llmu = "{section "Linear {muname}"}
+As mentioned in the previous section, core {muname} does not have all that much computing abilities.
 This has much to do with the fact that its typing rules don't involve any connectives.
-In this section we shall extend {mu} constructs to reflect the whole range of linear logic
+In this section we shall extend {muname} constructs to reflect the whole range of linear logic
 connectives.
 
 {subsection "Multiplicative fragment"}
@@ -196,8 +197,8 @@ is correctly simulated by the reduction rules of {mu}, {foreign"i.e."} for any t
 <%<(lambda x, t) u|v> ~~> <subst [u,x] t| v>%>.
 
 The correspondence with abstract machines is no coincidence, and we shall encounter it again. It can be
-viewed as a consequence of the fact that, through its core construction, {mu} internalises the notion of
-stack. In fact, when writing an abstract machine for {mu} there is no need of an explicit stack, everything
+viewed as a consequence of the fact that, through its core construction, {muname} internalises the notion of
+stack. In fact, when writing an abstract machine for {muname} there is no need of an explicit stack, everything
 stack-like is taken care of by the multiplicative constructs.
 
 (* arnaud: On pourrait penser à parler un peu des deux vues, quand A<*>B est le terme et A`&B le contexte
@@ -277,7 +278,7 @@ In~{citation_needed} this is solved by the following rule:
 To this author, though, it feels somewhat like dodging the issue. Indeed, it makes
 <%x:!A|-(x,x):!A<*>!A%> a correctly typed sequent, however, it does not really delegate
 contraction to variables, as type derivations need to linearise terms appropriately before
-contexts are split. Additionally, in traditional calculi, including {mu}, if one wants to
+contexts are split. Additionally, in traditional calculi, including {muname}, if one wants to
 contract two variables of the same type, they have to introduce an explicit construction
 (in {lambda}-calculus: <%(lambda x y, t) x x%>), so at the same time this rule is somewhat
 too strong.
@@ -300,7 +301,7 @@ and the associated reduction rule
 The typing judgement are now of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
 <%Gamma%> is the linear context as earlier, and <%Xi%> is the new context, containing
 duplicable formul{ae}, which can be contracted and weakened. Contracting and weakening,
-as in classical {mu} are handled implicitly, by duplicating <%Xi%> at forks {foreign"e.g."}
+as in classical {muname} are handled implicitly, by duplicating <%Xi%> at forks {foreign"e.g."}
 {displaymath Rules.Typing.Ll.cut}
 and dropping <%Xi%> at leaves {foreign"e.g."}
 {displaymath Rules.Typing.Ll.id}
@@ -335,7 +336,7 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
 {let l_ll = label ~name:\"figure:ll\" () in
 "The rest of the typing rules are barely affected. They can be found in Figure {ref_ l_ll}, along with the full description of the system.
 {let sep = `Mm 3. in
- figurerules ~label:l_ll ~caption:"Linear {mu}" [
+ figurerules ~label:l_ll ~caption:"Linear {muname}" [
    simple_block "Syntax" begin
      syntax [
        (* arnaud: on va probablement avoir besoin d'aller à la ligne ici pour
@@ -365,7 +366,7 @@ The introduction rule for <%?A%> corresponds to the dereliction rule:
 "}
 "}"
 
-let examples = "{section"Using {mu}"}
+let examples = "{section"Using {muname}"}
   (* arnaud: j'écrirai le baratin plus tard *)
   {subsection "Patterns"}
   We shall make a liberal use of nested patterns, or at least irrefutable patterns, defined
@@ -433,7 +434,7 @@ A noticeable property of the duplicable context, is that it behaves just as the 
 in natural deduction sequents. That is, typing derivation bottom up, it only grows as the
 derivation progresses, and is dropped
 at the leaves. No other manipulation are performed. As a consequence, we can embed quite literally simply
-typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
+typed {lambda}-calculus in linear {muname}, see Figure {ref_ l_lambda}.
 {let sep = `Mm 3. in
  figurerules ~label:l_lambda ~caption:"Embedding {lambda}-calculus" [
     block "Typing" [`C;`C] [
@@ -545,12 +546,12 @@ typed {lambda}-calculus in linear {mu}, see Figure {ref_ l_lambda}.
    
 "
 
-let focusing = "{section "Polarised {mu}"}
+let focusing = "{section "Polarised {muname}"}
 (* arnaud: on veut parler de confluence ou de cbv or something*)
 (* arnaud: clean
 {let sep = `Mm 3. in
  let f_fll = label ~name:\"f_fll\" () in
- figurerules ~label:f_fll ~caption:"Polarised {mu}" [
+ figurerules ~label:f_fll ~caption:"Polarised {muname}" [
     block "Typing" [`C;`C] [
        block_line ~sep [ Rules.Typing.Fll.id ; Rules.Typing.Fll.iddup ];
        block_line ~sep [ Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp ; ];
@@ -559,7 +560,7 @@ let focusing = "{section "Polarised {mu}"}
 }*)
 {let sep = `Mm 2. in
  let f_fll = label ~name:\"f_fll\" () in
- figurerules ~label:f_fll ~caption:"Polarised {mu}" [
+ figurerules ~label:f_fll ~caption:"Polarised {muname}" [
    simple_block "Syntax" begin
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
@@ -619,7 +620,7 @@ let dependent = "{section"Dependent types"}
 {subsection"Weakly dependent types"}
 {let sep = `Mm 2. in
  let f_fll = label ~name:\"f_dll0\" () in
- figurerules ~label:f_fll ~caption:"Dependent {mu}" [
+ figurerules ~label:f_fll ~caption:"Dependent {muname}" [
    simple_block "Syntax" begin
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
@@ -669,7 +670,7 @@ let dependent = "{section"Dependent types"}
 
 {let sep = `Mm 2. in
  let f_fll = label ~name:\"f_dll1\" () in
- figurerules ~label:f_fll ~caption:"Dependent {mu} with dependent elimination" [
+ figurerules ~label:f_fll ~caption:"Dependent {muname} with dependent elimination" [
    simple_block "Syntax" begin
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
@@ -730,7 +731,7 @@ let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"
       
 (*** boilerplate ***)
 
-let title = "Dissecting {mu}"
+let title = "Dissecting {muname}"
 let authors = [
   { name = "Arnaud Spiwack";
     email = Some "arnaud@spiwack.net";
