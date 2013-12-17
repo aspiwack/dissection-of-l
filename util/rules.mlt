@@ -45,6 +45,32 @@ module Reduction = struct
   let shift = [ array_line [ "<%< mu\(val x\),c | val t >%>" ; "<%subst [t,x] c%>"] ]
 end
 
+module Types = struct
+
+    module Polarised = struct
+
+        let shiftn = "<%shiftn N%>"
+        let shiftp = "<%shiftp P%>"
+
+        let prod = "<%A<*>B%>"
+        let coprod = "<%N`&M%>"
+        let unit = "<%1%>"
+        let bot = "<%bot%>"
+
+        let sum = "<%A<+>B%>"
+        let cosum = "<%A&B%>"
+        let top = "<%top%>"
+        let zero = "<%0%>"
+
+        let bang = "<%!A%>"
+        let maybe = "<%?A%>"
+
+        let positive = [ prod ; unit ; sum ; zero ; bang ; shiftn ; ]
+        let negative = [ coprod ; bot ; cosum ; top ; maybe ; shiftp ;]
+
+    end
+
+end
 
 module Typing = struct
   module Classical = struct

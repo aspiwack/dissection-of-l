@@ -21,10 +21,13 @@ let reduction l = array [`L; symbsep leadsto; `L] l
 (* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
+(* arnaud: il faut ^etre plus clair sur la dualit'e entre les types. *)
 
 (*** labels ***)
 
 let s_core = label ~name:\"s_core\" ()
+let f_fll = label ~name:\"f_fll\" ()
+
 
 (*** doc ***)
 (* arnaud: ne pas oublier l'abstract *)
@@ -568,23 +571,19 @@ The solution, according to the latter view is to distinguish between terms that 
 
 As we shall see, the name ``call-by-value'' is somewhat inadequate, if only because it has little to do with functions. However, since <%(x,y)%> will be an appropriate value, and <%(mu z,c,y)%> will not, it will be important that variables only stand for values. We may call this discipline ``substitute-by-value''.
 
-The solution proposed in this section has a lot in common with Andreoli's focusing~{cite"Andreoli1992"}, however it is a little different. First, focusing implies a notion of synthetic connectives, which corresponds to deep pattern-matching as in~{cite"Curien2010"} (albeit in a classical logic setting)(*arnaud: Zeilberger?*). Also, focusing is cut free and restricts the axiom rules to atomic types (in term of {lambda}-calculus, focalised proofs are in some kind of {beta}-normal and {eta}-long form). We will instead consider a system akin to~{cite"Munch2009"} which deserved the name {emph"polarised"} more than {emph"focalised"}.
+The solution proposed in this section has a lot in common with Andreoli's focusing~{cite"Andreoli1992"}, however it is a little different. First, focusing implies a notion of synthetic connectives, which corresponds to deep pattern-matching as in~{cite"Curien2010"} (albeit in a classical logic setting)(*arnaud: Zeilberger?*). Also, focusing is cut free and restricts the axiom rules to atomic types (in term of {lambda}-calculus, focalised proofs are in some kind of {beta}-normal and {eta}-long form). We will instead consider a system more akin to~{cite"Munch2009"} which deserves the name {emph"polarised"} more than {emph"focalised"}.
 
-In the {muname} literature, the separation between values and non-value terms is generally presented as syntactic. To offer a counterpoint, we will separate values from non-values purely at the type level, without imposing restrictions to the untyped calculus. The idea, which comes from focusing, is to classify the types in two polarities: {emph"positive"} and {emph"negative"} (respectively {emph"synchronous"} and {emph"asynchronous"} in~{cite"Andreoli1992"}(*arnaud:v'erifier*)). Here, positive types (of which <%A<*>B%> is one) are types of {emph"values"}, whereas negative types ({foreign"e.g."} <%A`&B%>) are types of {emph"computations"}.
+In the {muname} literature, the separation between values and non-value terms is generally presented as syntactic. To offer a counterpoint, we will separate values from non-values purely at the type level, without imposing restrictions to the untyped calculus. The resulting system is not essentially different from one obtained through syntax restrictions, it is only a matter of presentation.
 
-(* arnaud: on veut parler de confluence ou de cbv or something*)
-(* arnaud: clean
-{let sep = `Mm 3. in
- let f_fll = label ~name:\"f_fll\" () in
- figurerules ~label:f_fll ~caption:"Polarised {muname}" [
-    block "Typing" [`C;`C] [
-       block_line ~sep [ Rules.Typing.Fll.id ; Rules.Typing.Fll.iddup ];
-       block_line ~sep [ Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp ; ];
-    ];
- ]
-}*)
+The idea, which comes from focusing, is to classify the types in two polarities: {emph"positive"} and {emph"negative"} (respectively {emph"synchronous"} and {emph"asynchronous"} in~{cite"Andreoli1992"}(*arnaud:v'erifier*)). Here, positive types (of which <%A<*>B%> is one) are types of {emph"values"}, whereas negative types ({foreign"e.g."} <%A`&B%>) are types of {emph"computations"}. Here is the classification of types where <%A%> and <%B%> denote positive types and <%N%> and <%M%> denote negative types.
+{displaymath begin syntax [
+  syntax_line (`Other "<%A%>, <%B%>") Rules.Types.Polarised.positive;
+  syntax_line (`Other "<%N%>, <%M%>") Rules.Types.Polarised.negative;
+] end}
+
+Notice the two new types <%shiftn N%> and <%shiftp P%> which permit to embed positive and negative types into negative and positive types respectively. They both read ``shift''. Here again there was some amount of choice available: in Andreoli's treatment of focusing~{cite"Andreoli1992"}, every linear logic type is a valid type, the polarity only depends on the head connective and shifts are completely implicit (this approach is followed for {muname} in~{cite"Munch2009"}). In early {textsc"llp"} works~{citation_needed}(* arnaud: Olivier Laurent *), shifts were explicit, but conflated with the exponential connective <%!N%> was positive and <%?A%> was negative, it does not seem, however, easily amenable to the style of this article. In any case, the shift connectives have useful interpretations from a programming language perspective, which makes them interesting to study, hence their inclusion.
+
 {let sep = `Mm 2. in
- let f_fll = label ~name:\"f_fll\" () in
  figurerules ~label:f_fll ~caption:"Polarised {muname}" [
    simple_block "Syntax" begin
      syntax [
@@ -630,6 +629,8 @@ In the {muname} literature, the separation between values and non-value terms is
    end;
 *)
  ]}
+
+The complete polarised system is given in Figure~{ref_ f_fll}. The typing rules are not very different from the rules of linear {muname}
 
 (* arnaud: just a sketch*)
 (* arnaud: je ne suis même pas sûr de ces types *)
