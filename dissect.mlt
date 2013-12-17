@@ -22,7 +22,12 @@ let reduction l = array [`L; symbsep leadsto; `L] l
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
 
+(*** labels ***)
+
+let s_core = label ~name:\"s_core\" ()
+
 (*** doc ***)
+(* arnaud: ne pas oublier l'abstract *)
 let abstract = "There will be an abstract some day."
 
 let intro = "{section' "Foreword"}
@@ -64,7 +69,7 @@ it may very well be that linear dependent types are easier -- at least using
 {muname} as a framework -- than intuitionist linear dependent types.
 "
 
-let coremu = "{section "Core {muname}"}
+let coremu = "{section "Core {muname}" ~label:s_core}
 
 Stripped down to its bare minimum, {muname} appears as a very simple calculus whose
 syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>) and commands
@@ -547,6 +552,26 @@ typed {lambda}-calculus in linear {muname}, see Figure {ref_ l_lambda}.
 "
 
 let focusing = "{section "Polarised {muname}"}
+
+Linear {muname} solves the non-confluence example of Section {ref_ s_core}: to erase a variable, one must introduce a binder <%mu|_x_|,c%> which has no critical pair. However, there are still critical pairs of the form <%<mu x,c|mu y,c'>%> which can be typed in linear {muname}. It is conceivable that the reduction of linearly typed {muname} term is still non-confluent. And indeed, here is a counter-example.
+{displaymath "<%<mu x,<(x,z)|v> | mu y,<(t,y)|w>>%>"}
+which reduces both to
+{displaymath "<% <(t,mu x,<(x,z)|v>)|w>%>
+{qquad}and{qquad}
+<%<(mu y,<(t,y)|w>,z)|v>%>"}
+two distinct normal forms, yet has the following type:
+{displaymath "<%t:A,z:A^~,v:A^~`&A,w:A^~`&A|-<mu x,<(x,z)|v> | mu y,<(t,y)|w>>%>"}.
+
+There are several ways to think about this example. The first one would be to say that the syntax is inadequate and we should move to a syntax which identifies both terms, like proof nets(*arnaud:citation?*). But we can also realise that <%mu x,c%> does not really make sense by itself: it is an active term which expects a counter-part. In that view, it does not really make sense to capture such a term in a pair <%(mu x,c,u)%> where the {mu} cannot be resolved.
+
+The solution, according to the latter view is to distinguish between terms that are values and terms that are not, and treat values and non-values differently, so that the term <%(mu x,c,u)%> is not a proper one. This idea is present in the original {muname} paper~{cite"Curien2000"}, where, because sequents are two-sided, there are two resolutions one is shown to correspond to the call-by-name strategy of {lambda}-calculus and the other to call-by-value. More recent works~{cite"Dyckhoff2006,Munch2009,Curien2010"}(*arnaud: il manque du Zeilberger non?*) consider the connection with focusing~{cite"Andreoli1992"}.
+
+As we shall see, the name ``call-by-value'' is somewhat inadequate, if only because it has little to do with functions. However, since <%(x,y)%> will be an appropriate value, and <%(mu z,c,y)%> will not, it will be important that variables only stand for values. We may call this discipline ``substitute-by-value''.
+
+The solution proposed in this section has a lot in common with Andreoli's focusing~{cite"Andreoli1992"}, however it is a little different. First, focusing implies a notion of synthetic connectives, which corresponds to deep pattern-matching as in~{cite"Curien2010"} (albeit in a classical logic setting)(*arnaud: Zeilberger?*). Also, focusing is cut free and restricts the axiom rules to atomic types (in term of {lambda}-calculus, focalised proofs are in some kind of {beta}-normal and {eta}-long form). We will instead consider a system akin to~{cite"Munch2009"} which deserved the name {emph"polarised"} more than {emph"focalised"}.
+
+In the {muname} literature, the separation between values and non-value terms is generally presented as syntactic. To offer a counterpoint, we will separate values from non-values purely at the type level, without imposing restrictions to the untyped calculus. The idea, which comes from focusing, is to classify the types in two polarities: {emph"positive"} and {emph"negative"} (respectively {emph"synchronous"} and {emph"asynchronous"} in~{cite"Andreoli1992"}(*arnaud:v'erifier*)). Here, positive types (of which <%A<*>B%> is one) are types of {emph"values"}, whereas negative types ({foreign"e.g."} <%A`&B%>) are types of {emph"computations"}.
+
 (* arnaud: on veut parler de confluence ou de cbv or something*)
 (* arnaud: clean
 {let sep = `Mm 3. in
