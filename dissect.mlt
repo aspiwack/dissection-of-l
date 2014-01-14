@@ -646,6 +646,8 @@ let dependent = "{section"Dependent types"}
 
 {subsection"Weakly dependent types"}
 
+As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.
+
 See Figure~{ref_ f_wdll}. Can almost encode dependently typed {lambda}-calculus.
 
 {let sep = `Mm 2. in
@@ -733,7 +735,7 @@ end}
 
 {subsection"Dependent elimination"}
 
-See Figure~{ref_ f_dll}.
+See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
 {let sep = `Mm 2. in
  figurerules ~label:f_dll ~caption:"Dependent {muname} with dependent elimination" [
    simple_block "Syntax" begin
