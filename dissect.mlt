@@ -40,9 +40,9 @@ fair, a family of calculus -- I call {muname}. It originates from a
 paper by Herbelin \& Curien~{cite"Curien2000"}, where it was
 called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
 often called simply ${mu}{tilde mu}$, or system L
-syntax~{cite"Herbelin08"}. The latter name comes from
-proof-theoretical investigations, this article has more a programming
-language feel, and will not feature a {tilde mu}. Hence simply {muname}.
+syntax~{cite"Herbelin08"}. (* The latter name comes from *)
+(* proof-theoretical investigations, this article has more a programming *)
+(* language feel, and will not feature a {tilde mu}. Hence simply {muname}. *)
 
 The {foreign "tour de force"} of {muname}, in my opinion, is to provide
 a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
@@ -64,12 +64,12 @@ stone to understand mathematics in presence of computational effects (as
 linear logic can be used, to some extent, to model effects~{cite"Benton1996"}).
 I also hope to use dependent linear {muname} as a new lense through which
 usual dependently typed language could be further analysed.
-The choice of linear logic rather than some flavour of intuitionist linear
-logic might be a matter of taste, I tend to favour symmetry when I can; it
-was originally a challenge as well, as dependent types are somewhat antagonistic
-to the kind of commutation sequent calculus allow. In retrospect, though,
-it may very well be that linear dependent types are easier -- at least using
-{muname} as a framework -- than intuitionist linear dependent types.
+(* The choice of linear logic rather than some flavour of intuitionist linear *)
+(* logic might be a matter of taste, I tend to favour symmetry when I can; it *)
+(* was originally a challenge as well, as dependent types are somewhat antagonistic *)
+(* to the kind of commutation sequent calculus allow. In retrospect, though, *)
+(* it may very well be that linear dependent types are easier -- at least using *)
+(* {muname} as a framework -- than intuitionist linear dependent types. *)
 "
 
 let coremu = "{section "Core {muname}" ~label:s_core}
