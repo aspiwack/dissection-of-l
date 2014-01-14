@@ -427,7 +427,7 @@ let examples = "{section"Using {muname}"}
   end}
 
   We can also give meaning to <%lambda p,t%>. It is defined as
-  <%mu(alpha,beta), <mu p,<t|beta>|alpha>%>. It is straitforward to check
+  <%mu(alpha,beta), <mu p,<t|beta>|alpha>%>. It is straigtforward to check
   that the derived typing rule, for <%vec x:A; vec y:B|-p:P%> is
   {displaymath begin
      Infer.rule ~label:(lambdap "<%p%>")
