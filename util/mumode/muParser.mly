@@ -92,7 +92,7 @@ expr:
 | FIELD2 u=expr { concat [text"2 = "; u] }
 | LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
 | LLCORNER LRCORNER { concat [left `Floor;phantom(text"x");right `Floor] }
-| VAL u=expr { just_left (`Double `Down) u }
+| VAL u=expr { just_left (`Double `Up) u }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP
@@ -104,8 +104,8 @@ expr:
 | a=expr PAR b=expr  { concat[a;parr;b] }
 | BANG a=expr { concat [text"\\,!";a] }
 | WHYNOT a=expr { concat [text"\\,?\\!";a] }
-| SHIFTP a = expr { concat [text"\\,";downarrow;text"\\!";a] }
-| SHIFTN a = expr { concat [text"\\,";uparrow;text"\\!";a] }
+| SHIFTP a = expr { concat [text"\\,";uparrow;text"\\!";a] }
+| SHIFTN a = expr { concat [text"\\,";downarrow;text"\\!";a] }
 | PI p=typedpattern COMMA b=expr { concat [ index prod p ; b ] }
 | SIGMA p=typedpattern COMMA b=expr { concat [ index sum p ; b ] }
 
