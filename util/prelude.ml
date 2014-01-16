@@ -132,8 +132,8 @@ let pi1rule = index pi (mode M (text"1"))
 let pi2rule = index pi (mode M (text"2"))
 let bangrule = mode M (text"!")
 let whynotrule = mode M (text"?")
-let positiveshift = downarrow
-let negativeshift = uparrow
+let positiveshift = uparrow
+let negativeshift = downarrow
 
 let lambdap p = mode M (lambda^^p)
 let cutp p = mode M (cutrule^^text"\\,"^^p)
