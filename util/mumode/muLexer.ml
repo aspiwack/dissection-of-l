@@ -36,6 +36,7 @@ let map_ident = [
   "beta" , SYMB beta ;
   "Gamma" , SYMB gamma_;
   "Delta" , SYMB delta_;
+  "Theta" , SYMB theta_;
   "kappa" , SYMB kappa ;
   "Pi" , SYMB pi_;
   "Sigma" , SYMB sigma_;
