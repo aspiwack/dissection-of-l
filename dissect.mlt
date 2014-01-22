@@ -648,7 +648,7 @@ let dependent = "{section"Dependent types"}
 
 As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.
 
-See Figure~{ref_ f_wdll}. Can almost encode dependently typed {lambda}-calculus.
+See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
 
 {let sep = `Mm 2. in
  
@@ -699,16 +699,10 @@ See Figure~{ref_ f_wdll}. Can almost encode dependently typed {lambda}-calculus.
  ]}
 
 Typing derivation for $"<%lambda x,t%>"="<%mu(x,alpha),<t|alpha>%>"$:
-(* arnaud: B ne d'epend pas de x, du coup ? *)
 {let open Infer in displaymath begin
-  (* rule ~label:parr *)
-  (*   [rule ~label:(cutp"<%alpha%>") *)
-  (*       ["<%Xi;Gamma,x:A|-t:B^~%>"] *)
-  (*       "<%Xi;Gamma,x:A,alpha:B|- <t|alpha>%>"]  *)
-  (*   "<%Xi;Gamma |- mu(x,alpha),<t|alpha> : PI x:A,B^~%>" *)
   rule ~label:parr
     [rule ~label:cutrule
-        ["<%Xi;Gamma,x:A|-t:B^~%>" ; rule ~label:idrule [] "<%Xi; alpha:B|-_v alpha : B%>"]
+        ["<%Xi;Gamma,x:A|-t:B^~%>" ; rule ~label:idrule [] "<%Xi; Gamma; alpha:B|-_v alpha : B%>"]
         "<%Xi;Gamma,x:A,alpha:B|- <t|alpha>%>"]
     "<%Xi;Gamma |- mu(x,alpha),<t|alpha> : PI x:A,B^~%>"
 end}
@@ -728,7 +722,7 @@ Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
 {let open Infer in displaymath begin
   rule ~label:mu
     [rule ~label:cutrule
-        ["<%Xi;Gamma|-t:PI x:A,N%>" ; rule ~label:tensor ["<%Xi;Delta|-u:A%>";rule ~label:idrule [] "<%Xi;alpha:subst [u,x] N^~ |- alpha : subst [u,x] N^~%>"] "<%Xi;Delta,alpha:subst [u,x] N^~|-(u,alpha):SIGMA x:A,N^~%>"]
+        ["<%Xi;Gamma|-t:PI x:A,N%>" ; rule ~label:tensor ["<%Xi;Gamma;Delta|-u:A%>";rule ~label:idrule [] "<%Xi;Gamma;alpha:subst [u,x] N^~ |- alpha : subst [u,x] N^~%>"] "<%Xi;Gamma;Delta,alpha:subst [u,x] N^~|-(u,alpha):SIGMA x:A,N^~%>"]
         "<%Xi;Gamma,Delta,alpha:subst [u,x] N^~|- <t|(u,alpha)>%>"]
     "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
 end}
