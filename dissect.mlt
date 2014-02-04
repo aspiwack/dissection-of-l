@@ -188,10 +188,9 @@ The {mu} rule, on the other hand is left unchanged:
 Would we want to limit the {emph"exchange"} rules, like in non-commutative logic~{citation_needed}(*arnaud: presumably Paul Ruet 1&2*), we would have to tweak the {mu} rule, but we will be content with treating the comma, in contexts, as commutative.
 "
 
-        let llmu = "{section "Linear {muname}"}
-As mentioned in the previous section, core {muname} does not have all that much computing abilities.
-This has much to do with the fact that its typing rules don't involve any connectives.
-In this section we shall extend {muname} constructs to reflect the whole range of linear logic
+let llmu = "{section "Linear {muname}"}
+As mentioned in the previous section, core {muname} does not have all that much computing abilities. This is remedied by the introduction of logical connectives in types, and corresponding constructions in terms. 
+In this section we shall extend {muname} to reflect the whole range of linear logic
 connectives.
 
 {subsection "Multiplicative fragment"}
