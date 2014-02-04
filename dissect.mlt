@@ -76,7 +76,7 @@ usual dependently typed language could be further analysed.
 let coremu = "{section "Core {muname}" ~label:s_core}
 
 Stripped down to its bare minimum, {muname} appears as a very simple calculus whose
-syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>) and commands
+syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>, {ldots}) and commands
 (<%c%>)
 {displaymath begin syntax [
   syntax_line `Term Rules.Syntax.core;
@@ -94,10 +94,10 @@ Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
 the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
 <%<t|u>%> runs <%t%> with continuation <%u%> (or symmetrically, <%u%> with
 continuation <%t%>) it is read ``<%t%> against <%u%>''.
-Terms reduce to a value, whereas command just compute -- they are played only
+(*Terms reduce to a value, whereas command just compute -- they are played only
 for there effects. Though it is possible to imagine otherwise, and consider
 {textsc"io"} of sorts, the only effects available to a computation in pure {muname}
-is returning to a continuation.
+is returning to a continuation.*)
 
 The reduction rules look quite similar to {beta}-reduction,
 however this core calculus does not have nearly the power of {lambda}-calculus.
@@ -110,24 +110,41 @@ Nonetheless, we can already observe undesirable behaviours. For instance it is e
 cook up a non-terminating command <%<mu x,<x|x> | mu x,<x|x>>%>.
 Much worse: any two commands <%c_1%> and <%c_2%> are redux of a common command
 <%<mu alpha, c_1 | mu alpha, c_2>%> where <%alpha%> is fresh. (*arnaud: essayer de regarder les conflits contraction/contraction et weakening/contraction*)
+(* arnaud: redux au pluriel ? reduxes? reduces? *)
 
 {subsection "Typing as classical sequent calculus"}
 
 The original typing rules~{cite"Curien2000"} for {muname} corresponded closely to classical
-sequent calculus. We shall present, in this section, a one-sided version of the classical {muname}. Core {muname} does not
-have any connective, however as is necessary in a one-sided sequent calculus, we shall
-assume that every formula <%A%> has a dual <%A^~%>, and that <%A^~^~%> is <%A%> itself.
+sequent calculus. We shall present, in this section, a one-sided variant of the classical core {muname}.
+Therefore we shall require that every formula <%A%> has a dual <%A^~%> such that <%A^~^~%> is <%A%>.
 
-There are two kinds of sequents, one for each kind of objects: terms are typed with
-sequent of the form
-{displaymath "<%Gamma|-t:A%>"}
-and commands with sequents
+The dualisation should not be understood as a connective -- core {muname} has none -- but as an operation on
+types. Duality tracks positional information: a variable of type <%A%> on the right is the same as a variable
+of type <%A^~%> on the left. Therefore, there is no difference between either side and the variables can be
+arranged on a single side (or any convenient arrangement). In classical logic, negation, which {emph"is"} a
+connective is a reflection of dualisation, and it may be tempting -- and is indeed often done -- to forgo the
+negation altogether and keep only dualisation. In that case, the de Morgan laws are not just tautologies,
+they are {emph"definitions"} for the negation. An option which is more appealing from a programming language
+standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{citation_needed}(* arnaud: je pense que le chapitre correspondant de Bob Harper serait id'eal *). Duality, on the other
+hand, does not have introduction rules -- unless we count the identity and cut rules as introduction rules.
+
+To follow the tradition of programming languages, let us choose to leave all the variables on the left-hand
+side of the sequents. The tradition in proof theory, on the other hand, is rather to keep the variables on
+the right. The latter is better suited for interpretation in terms of proof nets~{citation_needed}(* arnaud: du Girard, sans doute*) or
+monoidal category~{citation_needed}(* arnaud: peut-^etre du Lutz?*). On the other hand, the left-handed
+variant works very well with {muname}. Duality ensures that the difference is only
+in the eye of the reader: mathematically, these are all the same objects.
+
+The typing of command is a simple assignment of types to its free variables: commands are self-contained, they don't
+have a ``return type''.
 {displaymath "<%Gamma|-c%>"}
-
-Readers familiar with one-sided sequent calculi might wonder why we used this particular
-form for sequents. It was chosen mostly for its resemblance to natural deduction sequents,
-more familiar in the realm of programming languages; also it allows variables to appear
-with the same type in terms and in the context.
+Terms, on the other hand, have an intrinsic type in addition to the type assignment of their variables. From a
+logical standpoint, we shall need a distinguished formula which, since it does not correspond to a variable,
+we shall display on the right-hand side of the sequent:
+{displaymath "<%Gamma|-t:A%>"}
+Keep in mind, though, that a term typing judgement, despite the similarity with natural deduction sequents, is still
+a one-sided sequent. Indeed, a one-sided sequent is, by definition, a sequent where formulæ can flow freely between
+left and right.
 
 The three typing rules for classical core {muname} are the identity rule, giving their type
 to variables
