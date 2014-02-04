@@ -107,6 +107,8 @@ let next k = lexer
 
   | "^~" -> DUAL
 
+  | "=" -> EQUAL
+
   | "\\_" -> WILDCARD
 
   | whitespace -> k ()

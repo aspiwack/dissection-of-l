@@ -42,6 +42,8 @@ let empty_context = Latex.cdot
 
 %token MU MUT
 
+%token EQUAL
+
 %token <Latex.t->Latex.t->Latex.t->Latex.t> FUN3
 
 %start <Latex.t> mu
@@ -122,6 +124,8 @@ expr:
     concat [e;text"[";subst;text"]"]
   }
 | e=expr REDUCES f=expr { concat [e;leadsto;f] }
+
+| e=expr EQUAL f=expr { concat [e;text"=";f] }
 
 typedpattern:
 | p = pattern COLON a=expr { concat [ p ; text"{:}" ; a ] }
