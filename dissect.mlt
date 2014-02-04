@@ -173,18 +173,19 @@ As long as there is no type <%A%> such that <%A^~ = A%>, the reduction of typed 
        Infer.rule ["<%Gamma,beta:A|- c_2%>"] "<%Gamma|-mu beta,c_2 : A^~%>"]
   "<%Gamma|-<mu alpha,c_1|mu beta, c_2>%>"
 end}
-Which we can conclude by weakening. So again, any two typed commands have a common antecedent. This is not an emergent property of {muname}: in classical sequent calculus, a cut between two weakening exhibits the non-confluence.
+Which we can conclude by weakening. So again, any two typed commands have a common antecedent. This is not an emergent property of {muname}: in classical sequent calculus, a cut between two weakening exhibits the same non-confluent behaviour.
 
 {subsection "Typing as linear sequent calculus"}
-To address the confluence issue, we move from a classical sequent calculus. In the case of core
-{mu} this simply requires simple modifications of the identity rule
-{displaymath Rules.Typing.Mall.id}
-and cut rule
-{displaymath Rules.Typing.Mall.cut}
-to prevent weakening and contraction to happen. The {mu} rules stays as above.
 
-Would we to limit the exchange of formul{ae} in the context, we could play with the {mu} rule. We shall, however,
-keep reading the comma as commutative.
+In order to address the issue of non-confluence, we move away from classical logic and favour linear logic. The effect on the core calculus is minimal. The identity and cut rules are modified to prevent implicit weakening and conversion:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Mall.id];
+  array_line [Rules.Typing.Mall.cut];
+]end}
+The {mu} rule, on the other hand is left unchanged:
+{displaymath Rules.Typing.Mall.mu}
+
+Would we want to limit the {emph"exchange"} rules, like in non-commutative logic~{citation_needed}(*arnaud: presumably Paul Ruet 1&2*), we would have to tweak the {mu} rule, but we will be content with treating the comma, in contexts, as commutative.
 "
 
         let llmu = "{section "Linear {muname}"}
