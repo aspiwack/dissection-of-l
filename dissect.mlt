@@ -216,7 +216,7 @@ The typing rules follow naturally, keeping in mind that these are linear logic c
 
 The multiplicative connectives alone bring a lot of expressiveness: linear {lambda}-calculus is macro-expressible. The intuition comes from abstract machines: in abstract machines for {lambda}-calculus, {lambda}-terms interact with a stack. The idea is to represent the stack as iterated pairs; then the application must be a {emph"push"} operation, adding its second operand on the stack, while abstraction must {emph"pop"} the first stack element and substitute it in the function body.
 
-This is an important insight, so it bears repeating: in {muname} the stack is {emph"first-class"}. Programming in {muname} is quite like programming directly an abstract machine.
+This is an important insight, so it bears repeating: in {muname} the stack is {emph"first-class"}. Programming in {muname} is quite like programming directly an abstract machine. If the idea might sound daunting, the author hopes that the reader will be convinced by this article that it is not unimaginable either.
 
 (* arnaud: on peut vouloir pr'eciser ici qu'on utilise les lettres grecques pour les variables fraiches. *)
 Following this intuition, we define the application <%t u%> to be <%mu alpha, <t|(u,alpha)>%>: the current continuation ({emph"i.e."} stack) is named <%alpha%>, a fresh name, <%t%> is then run against <%(u,alpha)%>, the current stack augmented with <%u%>.
@@ -239,10 +239,10 @@ Writing <%A-o B%> for the linear arrow connective <%A^~ `& B%>, the typing rules
                  "<%Gamma|-lambda x,t :A-oB%>"];
 ]end}
 
-<%1%> and <%bot%>: end of stack, neutral, multiplicative, Figure~{ref_ l_mall}
+To the binary multiplicative connectives <%A<*>B%> and <%A`&B%> correspond the nullary <%1%> and <%bot%> respectively. The constructor <%()%> of type <%1%> can be seen as an empty stacks, while <%mu(),c%> is essentially the command <%c%> reified as a term: it discards the (anyway empty) stack and runs <%c%>. The reader may refer to Figure~{ref_ l_mall}~--~which also contains the upcoming additive connectives~--~for the typing rules of these nullary connectives.
+
 (* arnaud: On pourrait penser à parler un peu des deux vues, quand A<*>B est le terme et A`&B le contexte
    et vice-versa *)
-(* arnaud: Il manque 1 et \bot. Mais ils sont dans la figure*)
 
 {subsection "Additive fragment"}
 
