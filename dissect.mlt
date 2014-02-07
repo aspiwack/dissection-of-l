@@ -422,8 +422,9 @@ or the more complex
 More acutely, in~{cite"Munch2009"}, the promotion rule is a computation constructor and dereliction a value constructor. Because of this, using the substitution system would be incompatible with the treatment of Section~{ref_ s_pol}.
 "
 
-let examples = "{section"Using {muname}"}
-  (* arnaud: j'écrirai le baratin plus tard *)
+let examples = "{section"Practical {muname}"}
+  Linear {muname} is a small programming language as well as a syntax for a flavour of linear sequent calculus. This section explores simple proofs and programs in linear {muname}, as concrete examples of programming in a sequent calculus language.
+
   {subsection "Patterns"}
   We shall make a liberal use of nested patterns, or at least irrefutable patterns, defined
   as
@@ -599,6 +600,10 @@ typed {lambda}-calculus in linear {muname}, see Figure {ref_ l_lambda}.
 
    A <%catch%> operation of type <%!(E-o?A) -o ?A`&?E -o ?A%> can be written as 
    (* arnaud: je finirai plus tard *)
+
+{subsection"Commutative cuts"}
+
+Commutative cuts are essential to optimisation, in sequent calculus they are just partial evaluation.
    
 "
 
