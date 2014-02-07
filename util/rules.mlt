@@ -15,7 +15,7 @@ module Syntax = struct
 
   let iota1 = "<%1.t%>"
   let iota2 = "<%2.t%>"
-  let case =  "<%{mu(1.x),c_1 , mu(2.x),c_2}%>"
+  let case =  "<%{mu(1.x),c_1 , mu(2.y),c_2}%>"
   let emptycase = "<%{}%>"
   let additive = [ iota1 ; iota2 ; case ; emptycase ]
 
@@ -91,7 +91,7 @@ module Typing = struct
 
     let iota1 = Infer.rule ~label:iota1rule ["<%Gamma|-t:A%>"] "<%Gamma|- 1.t : A<+>B%>"
     let iota2 = Infer.rule ~label:iota2rule ["<%Gamma|-u:B%>"] "<%Gamma|- 2.u : A<+>B%>"
-    let case = Infer.rule ~label:withc ["<%Gamma,x:A|-c_1%>";"<%Gamma,y:B|-c_2%>"] "<%Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let case = Infer.rule ~label:withc ["<%Gamma,x:A|-c_1%>";"<%Gamma,y:B|-c_2%>"] "<%Gamma|- {mu(1.x),c_1 , mu(2.y),c_2} : A^~&B^~%>"
     let emptycase = Infer.rule ~label:top [] "<%Gamma|-{}:top%>"
     let zero = "No rule for {zero}"
 
@@ -115,7 +115,7 @@ module Typing = struct
 
     let iota1 = Infer.rule ~label:iota1rule ["<%Xi;Gamma|-t:A%>"] "<%Xi;Gamma|- 1.t : A<+>B%>"
     let iota2 = Infer.rule ~label:iota2rule ["<%Xi;Gamma|-u:B%>"] "<%Xi;Gamma|- 2.u : A<+>B%>"
-    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.y),c_2} : A^~&B^~%>"
     let emptycase = Infer.rule ~label:top [] "<%Xi;Gamma|-{}:top%>"
     let zero = "No rule for {zero}"
 
@@ -142,7 +142,7 @@ module Typing = struct
 
     let iota1 = Infer.rule ~label:iota1rule ["<%Xi;Gamma|-_v t:A%>"] "<%Xi;Gamma|-_v 1.t : A<+>B%>"
     let iota2 = Infer.rule ~label:iota2rule ["<%Xi;Gamma|-_v u:B%>"] "<%Xi;Gamma|-_v 2.u : A<+>B%>"
-    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.y),c_2} : A^~&B^~%>"
     let emptycase = Infer.rule ~label:top [] "<%Xi;Gamma|-{}:top%>"
     let zero = "No rule for {zero}"
 
@@ -173,7 +173,7 @@ module Typing = struct
 
     let iota1 = Infer.rule ~label:iota1rule ["<%Xi;Theta;Gamma|-_v t:A%>"] "<%Xi;Theta;Gamma|-_v 1.t : A<+>B%>"
     let iota2 = Infer.rule ~label:iota2rule ["<%Xi;Theta;Gamma|-_v u:B%>"] "<%Xi;Theta;Gamma|-_v 2.u : A<+>B%>"
-    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A|-c_1%>";"<%Xi;Gamma,y:B|-c_2%>"] "<%Xi;Gamma|- {mu(1.x),c_1 , mu(2.y),c_2} : A^~&B^~%>"
     let emptycase = Infer.rule ~label:top [] "<%Xi;Gamma|-{}:top%>"
     let zero = "No rule for {zero}"
 
@@ -208,7 +208,7 @@ module Typing = struct
 
     let iota1 = Infer.rule ~label:iota1rule ["<%Xi;Theta;Gamma|-_v t:A%>"] "<%Xi;Theta;Gamma|-_v 1.t : A<+>B%>"
     let iota2 = Infer.rule ~label:iota2rule ["<%Xi;Theta;Gamma|-_v u:B%>"] "<%Xi;Theta;Gamma|-_v 2.u : A<+>B%>"
-    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A,subst [1.x,cv] Gamma_cv|-c_1%>";"<%Xi;Gamma,y:B,subst [2.y,cv] Gamma_cv |-c_2%>"] "<%Xi;Gamma;Gamma_cv|- {mu(1.x),c_1 , mu(2.x),c_2} : A^~&B^~%>"
+    let case = Infer.rule ~label:withc ["<%Xi;Gamma,x:A,subst [1.x,cv] Gamma_cv|-c_1%>";"<%Xi;Gamma,y:B,subst [2.y,cv] Gamma_cv |-c_2%>"] "<%Xi;Gamma;Gamma_cv|- {mu(1.x),c_1 , mu(2.y),c_2} : A^~&B^~%>"
     let emptycase = Infer.rule ~label:top [] "<%Xi;Gamma,Gamma_cv|-{}:top%>"
     let zero = "No rule for {zero}"
 
