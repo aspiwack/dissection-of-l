@@ -29,6 +29,7 @@ let s_core = label ~name:\"section:core\" ()
 let ss_classical = label ~name:\"subsection:classical\" ()
 let ss_mll = label ~name:\"subsection:mll\" ()
 let s_pol = label ~name:\"section:polarised\" ()
+let s_dep = label ~name:\"section:dependent\" ()
 
 let l_mall = label ~name:\"figure:mall\" ()
 let l_ll = label ~name:\"figure:ll\" ()
@@ -423,7 +424,9 @@ More acutely, in~{cite"Munch2009"}, the promotion rule is a computation construc
 "
 
 let examples = "{section"Practical {muname}"}
-  Linear {muname} is a small programming language as well as a syntax for a flavour of linear sequent calculus. This section explores simple proofs and programs in linear {muname}, as concrete examples of programming in a sequent calculus language.
+  Linear {muname} can be intimidating. It may feels verbose and impractical to write in directly. We will use this section to review syntactic short-cuts and concrete examples in linear {muname}. The author hopes to convince the reader that the idea of programming in linear {muname} is not too far fetched. In fact, linear {muname} makes a decent programming language, and an useful intermediate language. The reason why such a claim can be confidently made, is that standard programming constructs are {emph"macro-expressible"} in linear {mu}.
+
+In Sections~{ref_ s_pol}~and~{ref_ s_dep}, we will refine linear {muname} further. Each refinement has this same property that we can recover a usual programming language by simple macro expansion.
 
   {subsection "Patterns"}
   We shall make a liberal use of nested patterns, or at least irrefutable patterns, defined
@@ -694,7 +697,7 @@ We can embed both cbv and cbn linear simply typed {lambda}-calculus:
 ]}
 "
 
-let dependent = "{section"Dependent types"}
+let dependent = "{section"Dependent types" ~label:s_dep}
 
 {subsection"Weakly dependent types"}
 
