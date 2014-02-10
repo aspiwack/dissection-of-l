@@ -88,7 +88,7 @@ let next k = lexer
 
   | "\\(" -> METAPARENL | "\\)" -> METAPARENR
 
-  | "|-" -> TURNSTYLE | "|-_v" -> TURNSTYLEV
+  | "|-" -> TURNSTYLE | "|-_v" -> TURNSTYLEV | "|-_p" -> TURNSTYLEP
 
   | "," -> COMMA | ";" -> SEMICOLON
   | ":" -> COLON

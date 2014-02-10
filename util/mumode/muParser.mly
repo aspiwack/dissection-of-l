@@ -19,7 +19,7 @@ let empty_context = Latex.cdot
 %token METAPARENL METAPARENR 
 %token PARENL PARENR BRACKETL BRACKETR BRACEL BRACER BRACEBR
 %token WILDCARD
-%token TURNSTYLE TURNSTYLEV VEC
+%token TURNSTYLE TURNSTYLEV TURNSTYLEP VEC
 
 %token POINTYL POINTYR BAR
 %token DUAL
@@ -163,4 +163,6 @@ sequent:
   concat [ l ; vdash ; r ] }
 | l=sequent_left_hand TURNSTYLEV r=sequent_right_hand {
   concat [ l ; vdash ; text"_" ; text"v" ; r ] }
+| l=sequent_left_hand TURNSTYLEP r=sequent_right_hand {
+  concat [ l ; vdash ; text"_" ; text"p" ; r ] }
 

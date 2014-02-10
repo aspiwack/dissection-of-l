@@ -127,6 +127,15 @@ module Typing = struct
     let record = Infer.rule ~label:recordrule ["<%Xi;Gamma|-t:A%>";"<%Xi;Gamma|-u:B%>"] "<%Xi;Gamma|-{1=t,2=u} : A&B%>"
     let pi1 = Infer.rule ~label:pi1rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.1:A%>"
     let pi2 = Infer.rule ~label:pi2rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.2:B%>"
+
+    module Patterns = struct
+
+      let id = Infer.rule ~label:idrule [] "<%;x:A |-_p x:A%>"
+      let iddup = Infer.rule ~label:Prelude.iddup [] "<%x:A;|-_p |_x_|:!A%>"
+      let one = Infer.rule ~label:one [] "<%|-_p ():1%>"
+      let pair = Infer.rule ~label:tensor ["<%Xi;Gamma|-_p p:A%>";"<%Theta;Delta|-_p q:B%>"] "<%Xi,Theta;Gamma,Delta|-_p (p,q):A<*>B%>"
+
+    end
   end
 
   module Fll = struct
