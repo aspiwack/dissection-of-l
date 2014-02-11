@@ -29,6 +29,7 @@ let s_core = label ~name:\"section:core\" ()
 let ss_classical = label ~name:\"subsection:classical\" ()
 let ss_mll = label ~name:\"subsection:mll\" ()
 let ss_exponentials = label ~name:\"subsection:exponentials\" ()
+let ss_patterns = label ~name:\"subsection:patterns\" ()
 let s_pol = label ~name:\"section:polarised\" ()
 let s_dep = label ~name:\"section:dependent\" ()
 
@@ -429,11 +430,12 @@ let examples = "{section"Practical {muname}"}
 
 In Sections~{ref_ s_pol}~and~{ref_ s_dep}, we will refine linear {muname} further. Each refinement has this same property that we can recover a usual programming language by simple macro expansion.
 
-  {subsection "Patterns"}
+  {subsection "Patterns" ~label:ss_patterns}
 
+(* arnaud: on peut vouloir d'eplacer la remarque sur le focusing vers le bas de la section. On peut expliquer, comme ,ca que le focusing (fort) correspond au cas o`u toutes les variables ont un type atomique *)
   A most useful concept in linear {mu} is {emph"nested patterns"}, where we extend the atomic patterns into a full-blown pattern-matching rule. It is actually possible to take nested patterns as the definition of introduction rules in {mu}~{cite"Curien2010"}, such a definition allows for a definition of {emph"focused"} proofs~{cite"Andreoli1992"}. Using the whole range of patterns is a bit involved, and unnecessary for this article, so we shall restrict ourselves to the irrefutable patterns
   {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%|_x_|%>";"<%()%>";"<%(p,q)%>";]])}
-Note how the <%|_x_|%> pattern is not recursive. This is not entirely necessary, but it would be a significant complication: notice how in the following typing rules, the rule for <%|_x_|%> would not generalise easily to nested patterns.
+Note how the <%|_x_|%> pattern is not recursive. This is not entirely necessary, but it would be a significant complication: in the following typing rules, the rule for <%|_x_|%> would not generalise easily to nested patterns because in the pattern <%|_(x,y)_|%>, the variables <%x%> and <%y%> should not be duplicable (in other words, <%!(A<*>B)%> does not have projections).
 {let open Rules.Typing.Ll.Patterns in
  displaymath begin array [`C;`C] [
    array_line ~sep:(`Mm 2.) [ id ; iddup ];
@@ -449,7 +451,90 @@ The first application of patterns is a generalisation of the idiom <%<t|x>%> tha
      rule [] "<%Xi;x:A^~|-x:A^~%>"
    ] "<%Xi;Gamma,x:A^~|-<t|x>%>"
  end}
-In other words, following the intuition that the type of <%t%> is the active formula, <%<t|x>%> deactivates the type of <%t%> and give it the name <%x%>.
+In other words, using the terminology that the type of <%t%> is the active formula, <%<t|x>%> deactivates the type of <%t%> and give it the name <%x%>.
+
+It is useful to generalise this idiom to a <%<t|p>%> where <%p%> is a pattern. In this case, we may see <%t%> as a box with a number of free wires -- its inputs and outputs -- and we give a name to individual wires. This is a fairly common idiom throughout this article, sufficiently so that we give it an derived typing rule. Let <%Theta;Delta|-_p p : A%> be a pattern, whose typing derivation will be kept implicit, then we have the following derived rule:
+{displaymath begin
+  Infer.rule ~label:(cutp "<%p%>")
+    ["<%Xi,Theta;Gamma|- t : A^~%>"]
+    "<%Xi,Theta;Gamma,Delta|- <t|p>%>"
+end}
+The case of the variable-pattern is the simple version of the idiom as seen above. It is clear, in general, that if <%Theta;Delta|-_p p:A%>, then <%Xi,Theta;Delta|- p:A%>, which, with the help of the cut rule proves the derived rule. Note that this derived rule stays correct for non-linear patterns where duplicable variables are used multiple times.
+(*arnaud: c'est trivial ,ca
+ let us prove the other three cases:
+{ let open Infer in
+  let proof_one =
+    rule ~label:cutrule
+      ["<%Xi;Gamma|-t:bot%>";
+       rule ~label:one [] "<%|-():1%>"]
+      "<%Xi;Gamma|- <t|()>%>"
+  in
+  let proof_dup =
+    rule ~label:cutrule
+      ["<%Xi,x:A;Gamma|-t:?A^~%>";
+       rule ~label:bangrule
+         [rule ~label:iddup [] "<%Xi,x:A;|-x:A%>"]
+         "<%Xi,x:A;|-|_x_|:A%>"
+      ]
+      "<%Xi,x:A;Gamma |- <t||_x_|>%>"
+  in
+  let proof_pair =
+    rule ~label:cutrule
+      ["<%Xi,Theta,Psi;Gamma|-t%>";
+       (* et la r`egle de (p,q)*)]
+      "<%Xi,Theta,Psi;Gamma,Delta,Omega|-<t|(p,q)>%>"
+  in
+  let sep = `Mm 2. in
+  displaymath begin array [`C] [
+    array_line ~sep [proof_one];
+    array_line ~sep [proof_dup];
+    array_line [proof_pair]
+  ]end}
+*)
+
+The {cutp"<%p%>"} rule allows for terser proofs even in the very common variable, as we shall see immediately. Indeed, a more significant use of deep patterns is, of course, pattern matching: we define the <%mu p,c%> by induction on patterns. In the base cases, <%mu p,c%> already exists, so only <%mu(p,q),c%> is left to be defined:
+{displaymath begin
+  "<%mu(p,q),c = mu(alpha,beta), <alpha|mu p, <beta|mu q,c> >%>"
+end}
+There is a derived typing rule for <%mu p,c%>, for <%Theta;Delta|-p:A%>:
+  {displaymath begin
+    Infer.rule ~label:(mup"<%p%>")
+      ["<%Xi,Theta ; Gamma, Delta |- c%>"]
+      "<%Xi;Gamma|- mu p,c:A^~%>"
+  end}
+The base cases are already provided by the typing rules of linear {mu}, here is the proof (by induction) of the pair pattern. Let <%Theta;Delta|-_p p:A%> and <%Psi;Omega|-_p q:B%> be two patterns such that {mup"<%p%>"} and {mup"<%q%>"} are known to hold, we have <%Theta,Psi;Delta,Omega|-_p (p,q):A<*>B%> and the following derivation:
+  {displaymath begin
+    Infer.rule ~label:parr
+      [Infer.rule ~label:(cutp "<%alpha%>")
+         [Infer.rule ~label:"<%p%>"
+          [Infer.rule ~label:(cutp "<%beta%>")
+            [ Infer.rule ~label:"<%q%>"
+                ["<%Xi,Theta, Psi; Gamma,Delta, Omega |- c%>"]
+                "<%Xi,Theta;Gamma,Delta |- mu q,c:Q^~%>"]
+            "<%Xi,Theta;Gamma, Delta, beta:Q |- <beta|mu q,c>%>"]
+          "<%Xi;Gamma,beta:Q|- mu p,<beta|mu q,c>:P^~%>"]
+         "<%Xi;Gamma,alpha:P,beta:Q|-<alpha|mu p,<beta|mu q,c>>%>"]
+      "<%Xi;Gamma|-mu(p,q),c : A^~`&B^~%>"
+  end}
+
+We can use this pattern-matching syntax to give meaning to the very useful <%lambda p,t%>: we define it as <%mu(p,alpha), <t|alpha>%>. This is an extension of the definition in Section~{ref_ ss_mll}: in addition to popping the stack, <%lambda p,t%> pattern-matches against the top element. Of course, <%lambda p,t%> has a similarly concise typing rule. Let <%Theta;Delta|-_pp:A%>:
+{displaymath begin
+  Infer.rule ~label:(lambdap"<%p%>")
+    ["<%Xi,Theta;Gamma,Delta|- t:B%>"]
+    "<%Xi;Gamma|- lambda p, t:A-oB%>"
+end}
+The justification is a straightforward extension of the variable case in Section~{ref_ ss_mll}:
+{ let open Infer in
+  displaymath begin
+    rule ~label:"definition"
+      [rule ~label:"<%(p,alpha)%>"
+          [rule ~label:(cutp"<%alpha%>")
+              ["<%Xi,Theta;Gamma,Delta|- t:B%>"]
+              "<%Xi,Theta;Gamma,Delta,alpha:B^~|-<t|alpha>%>"]
+          "<%Xi;Gamma|- mu(p,alpha), <t|alpha> : A-oB%>"]
+      "<%Xi;Gamma|- lambda p, t:A-oB%>"
+  end}
+
 (* arnaud: j'en suis là *)
 
   (* arnaud: je crois que cette remarque voulait juste dire qu'on a une règle admissible pratique, par pattern. Je ne sais pas si je l'utilise autre part que pour prouver qu'on peut définir la règle de typage des patterns profonds. *)

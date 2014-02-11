@@ -58,6 +58,7 @@ val negativeshift : Latex.t
 
 val lambdap : Latex.t -> Latex.t
 val cutp : Latex.t -> Latex.t
+val mup : Latex.t -> Latex.t
 
 (*** A short module for proof.sty *)
 module Infer : sig

@@ -137,6 +137,7 @@ let negativeshift = downarrow
 
 let lambdap p = mode M (lambda^^p)
 let cutp p = mode M (cutrule^^text"\\,"^^p)
+let mup p = mode M (mu^^p)
 
 
 (*** A short module for proof.sty *)
