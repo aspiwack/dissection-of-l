@@ -41,6 +41,7 @@ let map_ident = [
   "Pi" , SYMB pi_;
   "Sigma" , SYMB sigma_;
   "phi" , SYMB varphi ;
+  "psi" , SYMB psi ;
   "Psi" , SYMB psi_;
   "Xi" , SYMB xi_;
   "Omega", SYMB omega_;

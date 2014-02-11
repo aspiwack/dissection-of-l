@@ -30,6 +30,7 @@ let ss_classical = label ~name:\"subsection:classical\" ()
 let ss_mll = label ~name:\"subsection:mll\" ()
 let ss_exponentials = label ~name:\"subsection:exponentials\" ()
 let ss_patterns = label ~name:\"subsection:patterns\" ()
+let ss_lj = label ~name:\"subsection:lj\" ()
 let s_pol = label ~name:\"section:polarised\" ()
 let s_dep = label ~name:\"section:dependent\" ()
 
@@ -432,6 +433,8 @@ In Sections~{ref_ s_pol}~and~{ref_ s_dep}, we will refine linear {muname} furthe
 
   {subsection "Patterns" ~label:ss_patterns}
 
+(* arnaud: il manque les r`egles de r'eductions des mup et de lambdap*)
+
   A most useful concept in linear {mu} is {emph"nested patterns"}, where we extend the atomic patterns into a full-blown pattern-matching rule. Using the whole range of patterns, however, is a bit involved, and unnecessary for this article, so we shall restrict ourselves to the irrefutable patterns
   {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%|_x_|%>";"<%()%>";"<%(p,q)%>";]])}
 Note how the <%|_x_|%> pattern is not recursive. This is not entirely necessary, but it would be a significant complication: in the following typing rules, the rule for <%|_x_|%> would not generalise easily to nested patterns because in the pattern <%|_(x,y)_|%>, the variables <%x%> and <%y%> should not be duplicable (in other words, <%!(A<*>B)%> does not have projections).
@@ -539,7 +542,7 @@ With this syntax, we can revisit the duplication of <%!A%> which we encountered 
 
 It is possible, if quite a bit of work, to extend patterns to all of the value constructors. In~{cite"Curien2010"}, nested patterns are even primitive and are used to define everything else. The point of taking nested patterns as the main construction of {muname} is that it allows to restrict variables to be of {emph"asynchronous"} type and recover {emph"focused"} proofs~{cite"Andreoli1992"}. For the purpose of programming, on the other hand, compiling nested patterns into simple patterns are sufficient.
 
-{subsection "Natural deduction"}
+{subsection "Natural deduction" ~label:ss_lj}
 
 Going back to Figure~{ref_ l_ll}, we can observe that the no rule modify the duplicable context except the dereliction rule. In the dereliction rule, the duplicable context, <%Xi%>, of the conclusion is adjoined an extra variable <%x%> in the premise.
 
@@ -570,7 +573,59 @@ end}*)
 
 Intuitionistic natural deduction (a.k.a. typed {lambda}-calculus) is indeed the logic of duplicable formulæ in dyadic linear {muname}. However, with extra type constructor, unusual manipulations can be made. The reader who enjoys this sort of things can have fun proving that classical logic can be encoded replacing the usual double-negation modality by the ``why-not'' modality: classical formulæ are those such that <%?A-oA%> holds. In that case, the disjunction becomes <%?(!A<+>!B)%> and the falsity <%?0%>, or, isomorphically, <%?!A`&?!B%> and <%bot%>.
 
-{subsection "Linear logic constructs"}
+{subsection "Linear logic proofs"}
+
+Let us, now, consider a few logical principles of linear logic, starting with the isomorphism between <%!(A&B)%> and <%!A<*>!B%>. Using the syntactic facilities introduced so far, the isomorphism is quite concise. We define
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%phi%>" ; "<%lambda |_x_|, (|_x.1_|,|_x.2_|)%>"];
+  array_line ["<%phi^\(-1\)%>" ; "<%lambda (|_a_|,|_b_|), |_{ 1= a , 2= b }_|%>"];
+ ]end}
+Which have the following types
+{let phi_type =
+   Infer.rule ~label:"definition" [
+   Infer.rule ~label:(lambdap "<%|_x_|%>")
+       [Infer.rule ~label:tensor
+          [ Infer.rule ~label:bangrule
+              [ Infer.rule ~label:pi1rule
+                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"] 
+                 "<%x:A&B;|- x.1 : A%>" ]
+              "<%x:A&B;|- |_x.1_| : !A%>";
+            Infer.rule ~label:bangrule
+              [ Infer.rule ~label:pi2rule
+                  [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"]
+                  "<%x:A&B;|- x.2 : B%>" ]
+              "<%x:A&B;|- |_x.2_| : !B%>"]
+         "<%x:A&B; |- (|_x.1_|,|_x.2_|) : !A<*>!B%>"]
+       "<%|- lambda |_x_|, (|_x.1_|,|_x.2_|) : !(A&B) -o !A<*>!B %>" ]
+     "<%|- phi : !(A&B) -o !A<*>!B %>"
+ in
+ let inv_type =
+   Infer.rule ~label:"definition" [
+   Infer.rule ~label:(lambdap "<%(|_a_|,|_b_|)%>")
+       [ Infer.rule ~label:bangrule
+           [ Infer.rule ~label:recordrule
+               [ Infer.rule ~label:iddup [] "<%a:A,b:B;|- a:A%>";
+                 Infer.rule ~label:iddup [] "<%a:A,b:B;|- b:B%>"]
+               "<%a:A,b:B;|- {1=a,2=b} : A&B%>" ]
+           "<%a:A,b:B; |- |_{1=a,2=b}_| : !(A&B)%>" ]
+       "<%;|- lambda (|_a_|,|_b_|), |_{1=a,2=b}_| : !A<*>!B -o !(A&B)%>" ]
+     "<%;|- phi^\(-1\) : !A<*>!B -o !(A&B)%>"
+ in
+ displaymath begin array [`C] [
+   array_line ~sep:(`Mm 6.) [phi_type];
+   array_line [inv_type];
+ ]end}
+
+We have <%<phi (\(phi^\(-1\)\) (|_a_|,|_b_|)) | alpha> ~~> <(|_a_|,|_b_|) | alpha>%> as well as <%<\(phi^\(-1\)\) (phi |_x_|) | alpha> ~~> |_{ 1 = x.1 , 2 = x.2 }_|%>. Accepting the extensionality principles that every elements of <%!A%> are of the form <%|_x_|%>, every elements of <%A<*>B%> are of the form <%(x,y)%> and for every <%x%> in <%A&B%>, <%{ 1=x.1 , 2=x.2 } = x%>, we conclude that <%phi%> and <%phi^\(-1\)%> form, indeed, an isomorphism.
+
+The dual isomorphism between <%?(A<+>B)%> and <%?A`&?B%>, which we touched upon briefly in Section~{ref_ ss_lj}, has slightly less concise proof terms, but is all the more interesting.
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%psi%>" ; "<%lambda x, mu (|_a_|,|_b_|), < x | |_{1=a,2=b}_|>%>"];
+  array_line ["<%psi^\(-1\)%>" ; "<%lambda y, mu|_x_|, < y | (|_x.1_|,|_x.2_|)>%>"];
+ ]end}
+
+{rule_ (`Mm 3.) (`Mm 3.)}
+
   Contrapositive: <%contra%> of type <%(A-o B)-o (B^~-o A^~)%>:
   <%lambda f, lambda x, mu y, <f y|x>%>. Typed as
   {displaymath begin
