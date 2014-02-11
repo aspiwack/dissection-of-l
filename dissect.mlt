@@ -21,7 +21,7 @@ let reduction l = array [`L; symbsep leadsto; `L] l
 (* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
-(* arnaud: il faut ^etre plus clair sur la dualit'e entre les types. *)
+(* arnaud: fix le kerning de ?, en particulier ?0 *)
 
 (*** labels ***)
 
@@ -35,6 +35,7 @@ let s_dep = label ~name:\"section:dependent\" ()
 
 let l_mall = label ~name:\"figure:mall\" ()
 let l_ll = label ~name:\"figure:ll\" ()
+let l_lambda = label ~name:\"figure:lambda\" ()
 let f_fll = label ~name:\"figure:fll\" ()
 let f_wdll = label ~name:\"figure:wdll\" ()
 let f_dll = label ~name:\"ffigure:dll\" ()
@@ -341,10 +342,10 @@ One way to incorporate the exponential connectives within linear {muname}, propo
 {displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-c%>"] "<%Gamma,x:!A|-subst [x,y] c%>")}
 This rule mimics accurately the traditional linear sequent calculus, however it does not follow the discipline of classical {muname}, where contraction and weakening is only a matter of using a variable several times or not at all.
 
-In order to retain this property, we choose to use of the dyadic presentation of linear logic. This presentation, due to Andreoli~{cite"Andreoli1992"}, classifies hypotheses according to whether they are {emph"duplicable"} or not, and renders the duplicable hypotheses in a separate context which behaves additively. The exponential connective <%!A%> reflects duplicable hypotheses in the non-duplicable context.
+In order to retain this property, we choose to use of the dyadic presentation of linear logic. This presentation, due to Andreoli~{cite"Andreoli1992"}, classifies hypotheses according to whether they are {emph"duplicable"} or not, and renders the duplicable hypotheses in a separate context which behaves additively. The exponential connective <%!A%> reflects duplicable hypotheses in the linear context.
 
 The typing judgement in (dyadic) linear {muname} of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
-<%Gamma%> is the non-duplicable context, and <%Xi%> is the new duplicable context. Contraction and weakening are, like in classical L in Section~{ref_ ss_classical}, are implicit as the duplicable context is copied by cut and ignored by identity (more generally, the duplicable context is distributed on each premise of inference rules):
+<%Gamma%> is the linear context, and <%Xi%> is the new duplicable context. Contraction and weakening are, like in classical L in Section~{ref_ ss_classical}, are implicit as the duplicable context is copied by cut and ignored by identity (more generally, the duplicable context is distributed on each premise of inference rules):
 {displaymath begin array [`C] [
   array_line ~sep:(`Mm 2.) [Rules.Typing.Ll.cut];
   array_line [Rules.Typing.Ll.id];
@@ -353,7 +354,7 @@ The typing judgement in (dyadic) linear {muname} of the form <%Xi;Gamma|-t:A%> a
 The addition of a new context in our sequents requires the addition of a new {emph"structural"} rule to relate the new context to the old. A common form of structural rule for the duplicable context is the {emph"copy"}, or {emph"absorbtion"}, rule:
 {let hole = phantom"<%A^~%>" in
  displaymath (Infer.rule ["<%Xi,A;Gamma|-A^~%>"] "<%Xi,A;Gamma|-%{hole}%%>")}
-By the copy rule, copies of a duplicable hypothesis <%A%> in the non-duplicable context, can be contracted into <%A%>. This rule does not follow the style of {muname} as it would create a new kind of command. The equivalent rule originally proposed by Andreoli~{cite"Andreoli1992"}, on the other hand, fits the design of {muname}:
+By the copy rule, copies of a duplicable hypothesis <%A%> in the linear context, can be contracted into <%A%>. This rule does not follow the style of {muname} as it would create a new kind of command. The equivalent rule originally proposed by Andreoli~{cite"Andreoli1992"}, on the other hand, fits the design of {muname}:
 {displaymath Rules.Typing.Ll.iddup}
 The duplicable identity rule makes it so that a duplicable hypothesis of type <%A%> can be used as a term of type <%A%>. This rule can simply be read as stating that variables in the duplicable context are duplicable variables. For example:
 {displaymath begin
@@ -363,7 +364,7 @@ The duplicable identity rule makes it so that a duplicable hypothesis of type <%
   in
   rule ~label:tensor [ idx ; idx ] "<%x:A;|- (x,x) : A<*>A%>"
 end}
-Variables in the duplicable context can, hence, be used freely, whereas variables of the non-duplicable context must be use in a linear fashion. Precisely what we expected to achieve.
+Variables in the duplicable context can, hence, be used freely, whereas variables of the linear context must be use in a linear fashion. Precisely what we expected to achieve.
 
 As a sanity check, let us consider the derivation of the copy rule from the duplicable identity:
 {displaymath begin
@@ -373,8 +374,7 @@ As a sanity check, let us consider the derivation of the copy rule from the dupl
     "<%Xi,x:A;Gamma|-< t | x >%>"
 end}
 
-For the exponential connectives themselves, <%!A%> has a value constructor, written <%|_t_|%>, which marks the term <%t%> as being duplicable ({emph"i.e."} <%t%> does not use any non-duplicable variables), and <%?A%> has a dual computation constructor:
-(* arnaud: je peux avoir envie d'utiliser "linear" au lieu de "non-duplicable" partout, parce que ce serait moins moche *)
+For the exponential connectives themselves, <%!A%> has a value constructor, written <%|_t_|%>, which marks the term <%t%> as being duplicable ({emph"i.e."} <%t%> does not use any linear variables), and <%?A%> has a dual computation constructor:
 {displaymath (syntax [
   syntax_line ~extend:true `Term Rules.Syntax.exponential
 ])}
@@ -432,8 +432,7 @@ In Sections~{ref_ s_pol}~and~{ref_ s_dep}, we will refine linear {muname} furthe
 
   {subsection "Patterns" ~label:ss_patterns}
 
-(* arnaud: on peut vouloir d'eplacer la remarque sur le focusing vers le bas de la section. On peut expliquer, comme ,ca que le focusing (fort) correspond au cas o`u toutes les variables ont un type atomique *)
-  A most useful concept in linear {mu} is {emph"nested patterns"}, where we extend the atomic patterns into a full-blown pattern-matching rule. It is actually possible to take nested patterns as the definition of introduction rules in {mu}~{cite"Curien2010"}, such a definition allows for a definition of {emph"focused"} proofs~{cite"Andreoli1992"}. Using the whole range of patterns is a bit involved, and unnecessary for this article, so we shall restrict ourselves to the irrefutable patterns
+  A most useful concept in linear {mu} is {emph"nested patterns"}, where we extend the atomic patterns into a full-blown pattern-matching rule. Using the whole range of patterns, however, is a bit involved, and unnecessary for this article, so we shall restrict ourselves to the irrefutable patterns
   {displaymath (syntax [syntax_line (`Other"<%p%>, <%q%>") ["<%x%>";"<%|_x_|%>";"<%()%>";"<%(p,q)%>";]])}
 Note how the <%|_x_|%> pattern is not recursive. This is not entirely necessary, but it would be a significant complication: in the following typing rules, the rule for <%|_x_|%> would not generalise easily to nested patterns because in the pattern <%|_(x,y)_|%>, the variables <%x%> and <%y%> should not be duplicable (in other words, <%!(A<*>B)%> does not have projections).
 {let open Rules.Typing.Ll.Patterns in
@@ -506,9 +505,9 @@ The base cases are already provided by the typing rules of linear {mu}, here is 
   {displaymath begin
     Infer.rule ~label:parr
       [Infer.rule ~label:(cutp "<%alpha%>")
-         [Infer.rule ~label:"<%p%>"
+         [Infer.rule ~label:(mup"<%p%>")
           [Infer.rule ~label:(cutp "<%beta%>")
-            [ Infer.rule ~label:"<%q%>"
+            [ Infer.rule ~label:(mup"<%q%>")
                 ["<%Xi,Theta, Psi; Gamma,Delta, Omega |- c%>"]
                 "<%Xi,Theta;Gamma,Delta |- mu q,c:Q^~%>"]
             "<%Xi,Theta;Gamma, Delta, beta:Q |- <beta|mu q,c>%>"]
@@ -527,92 +526,49 @@ The justification is a straightforward extension of the variable case in Section
 { let open Infer in
   displaymath begin
     rule ~label:"definition"
-      [rule ~label:"<%(p,alpha)%>"
+      [rule ~label:(mup"<%(p,alpha)%>")
           [rule ~label:(cutp"<%alpha%>")
               ["<%Xi,Theta;Gamma,Delta|- t:B%>"]
               "<%Xi,Theta;Gamma,Delta,alpha:B^~|-<t|alpha>%>"]
-          "<%Xi;Gamma|- mu(p,alpha), <t|alpha> : A-oB%>"]
+          "<%Xi;Gamma|- mu(p,alpha), <t|alpha> : A^~`& B%>"]
       "<%Xi;Gamma|- lambda p, t:A-oB%>"
   end}
 
-(* arnaud: j'en suis là *)
+With this syntax, we can revisit the duplication of <%!A%> which we encountered in Section~{ref_ ss_exponentials}. It is, now, quite easy to write a duplication function:
+{displaymath "<%|- lambda |_x_|,(|_x_|,|_x_|) : !A-o!A<*>!A%>"}
 
-  (* arnaud: je crois que cette remarque voulait juste dire qu'on a une règle admissible pratique, par pattern. Je ne sais pas si je l'utilise autre part que pour prouver qu'on peut définir la règle de typage des patterns profonds. *)
-  A very common use for patterns involves the cut rule. If <%p%> has type <%vec x:A ; vec y:B |- p:P%>
-  then the following rule is admissible:
-  {displaymath begin
-    Infer.rule ~label:(cutp "<%p%>")
-      ["<%Xi,vec x:A; Gamma |- t : P^~%>"]
-      "<%Xi,vec x:A; Gamma,vec y:B |- < t | p>%>"
-   end}
-   The justification is direct, by weakening in the duplicable context:
-  {displaymath begin
-    Infer.rule ~label:cutrule
-     [ "<%Xi,vec x:A; Gamma |- t : P^~%>";
-       Infer.derived [] "<%Xi, vec x:A; vec y:B |- p : P%>"]
-     "<%Xi,vec x:A; Gamma, vec y:B |- < t | p > %>"
-   end}
+It is possible, if quite a bit of work, to extend patterns to all of the value constructors. In~{cite"Curien2010"}, nested patterns are even primitive and are used to define everything else. The point of taking nested patterns as the main construction of {muname} is that it allows to restrict variables to be of {emph"asynchronous"} type and recover {emph"focused"} proofs~{cite"Andreoli1992"}. For the purpose of programming, on the other hand, compiling nested patterns into simple patterns are sufficient.
 
-  More importantly, we can use patterns to do pattern matching.
-  The syntax <%mu p,c%> is expanded as successive primitive patterns. For instance, <%mu(p,q),c%>
-  is defined as:
-  {displaymath "<%mu(alpha,beta),<mu p,<mu q,c|beta>|alpha>%>"}
-  Each patterns has a derived typing rule: if the <%p%>, seen as a term, is typed as
-  <%vec x:A ; vec y:B |- p:P%> then
-  {displaymath begin
-    Infer.rule ~label:"<%p%>"
-      ["<%Xi,vec x:A ; Gamma, vec y:B |- c%>"]
-      "<%Xi;Gamma|- mu p,c:P^~%>"
-  end}
+{subsection "Natural deduction"}
 
-  The justification is inductive. Let us prove the case of the pair pattern: <%(p,q)%> is typed as
-  <%vec x:A, vec x':A'; vec y:B, vec y':B' |- (p,q):P<*>Q%>, for <%vec x:A; vec y:B|- p:P%> and
-  <%vec x':A'; vec y':B'|- q:Q%>. We can, hence, write
-  {displaymath begin
-    Infer.rule ~label:parr
-      [Infer.rule ~label:(cutp "<%alpha%>")
-         [Infer.rule ~label:"<%p%>"
-          [Infer.rule ~label:(cutp "<%beta%>")
-            [ Infer.rule ~label:"<%q%>"
-                ["<%Xi,vec x:A, vec x':A'; Gamma,vec y:B, vec y':B' |- c%>"]
-                "<%Xi,vec x:A;Gamma,vec y:B |- mu q,c:Q^~%>"]
-            "<%Xi,vec x:A;Gamma, vec y:B, beta:Q |- <mu q,c|beta>%>"]
-          "<%Xi;Gamma,beta:Q|- mu p,<mu q,c|beta>:P^~%>"]
-         "<%Xi;Gamma,alpha:P,beta:Q|-<mu p,<mu q,c|beta>|alpha>%>"]
-      "<%Xi;Gamma|-mu(p,q),c : P^~`&Q^~%>"
-  end}
+Going back to Figure~{ref_ l_ll}, we can observe that the no rule modify the duplicable context except the dereliction rule. In the dereliction rule, the duplicable context, <%Xi%>, of the conclusion is adjoined an extra variable <%x%> in the premise.
 
-  We can also give meaning to <%lambda p,t%>. It is defined as
-  <%mu(alpha,beta), <mu p,<t|beta>|alpha>%>. It is straigtforward to check
-  that the derived typing rule, for <%vec x:A; vec y:B|-p:P%> is
-  {displaymath begin
-     Infer.rule ~label:(lambdap "<%p%>")
-       ["<%Xi, vec x:A; Gamma, vec y:B |- t :Q%>"]
-       "<%Xi;Gamma|-lambda p, t : P-oQ%>"
-   end}
+This means like that the duplicable context is more similar to a natural deduction context than a natural deduction context. In fact, if we restrict our attention to the sequents of the form <%Xi;|-t:A%>, we essentially get {emph"intuitionistic natural deduction"}. Types make brief appearances in the linear context, but this can be hidden by macros. A more concrete result along these lines is that {textsc"llp"}, a flavour of linear logic with only one non-duplicable formula, is isomorphic to intuitionistic natural deduction~{citation_needed}(* arnaud: Olivier Laurent, llp *)
 
-  General patterns are more involved, see~{cite"Curien2010"} for an in-depth discussion.
-{let l_lambda = label ~name:\"figure:lambda\" () in
-"{subsection "Natural deduction"}
-A noticeable property of the duplicable context, is that it behaves just as the context
-in natural deduction sequents. That is, typing derivation bottom up, it only grows as the
-derivation progresses, and is dropped
-at the leaves. No other manipulation are performed. As a consequence, we can embed quite literally simply
-typed {lambda}-calculus in linear {muname}, see Figure {ref_ l_lambda}.
-{let sep = `Mm 3. in
- figurerules ~label:l_lambda ~caption:"Embedding {lambda}-calculus" [
-    block "Typing" [`C;`C] [
-       block_line ~sep [ 
-          Infer.rule [] "<%Xi,x:A;|-x:A%>";
-          empty
-       ];
-       block_line ~sep [
-          Infer.rule ["<%Xi,x:A;|- t:B%>"] "<%Xi;|-lambda |_x_|, t : !A-oB%>";
-          Infer.rule ["<%Xi;|-t:!A-oB%>";"<%Xi;|-u:A%>"] "<%Xi;|-t |_u_| : B%>";
-       ];
-    ]
- ]
-}"}
+In Figure~{ref_ l_lambda}, we give the translation of simply typed {lambda}-calculus inside linear {mu}. It is probably comforting that using the duplicable context as a natural deduction context, the intuitionistic arrow is naturally interpreted, as it is most common, as <%!A-oB%>. Conjunction can be interpreted by either conjunction connectives, though the additive conjunction is simpler (because in the case of multiplicative conjunction the right encoding is <%!A<*>!B%>, instead of the more straightforward <%A&B%>). Disjunction is encoded as <%!A<+>!B%> (this time we cannot use the multiplicative connective).
+
+(* arnaud: tout ,ca c'est faux
+The case of disjunction is more interesting. Indeed there are two disjunctions: either <%?A`&?B%> (or equivalently <%?(A<+>B)%>) which is the proper dual of the conjunction and corresponds to classical disjunction, or the stronger <%A<+>B%> which corresponds to intuitionistic disjunction. The natural elimination rule for <%?A`&?B%> is the usual elimination rule for natural deduction disjunction:
+{let open Infer in
+ rule
+   [
+   ]
+   "<%Xi;|- t : C%>"
+}
+
+The same can be said about disjunction. The encoding using multiplicative disjunction is actually fairly interesting. Here is the left introduction rule:
+{ let open Infer in
+  displaymath begin
+    rule ~label:(mup"<%(alpha,|_beta_|)%>")
+      [rule ~label:(cutp"<%alpha%>")
+          [rule ~label:bangrule
+              ["<%Xi,beta:B;|-t:A%>"]
+              "<%Xi,beta:B;|-|_t_|:!A%>"]
+          "<%Xi,beta:B;alpha:?A^~|-<|_t_||alpha>%>"]
+      "<%Xi;|- mu(alpha,|_beta_|), <|_t_||alpha> : ?A`&?B%>"
+end}*)
+
+Intuitionistic natural deduction (a.k.a. typed {lambda}-calculus) is indeed the logic of duplicable formulæ in dyadic linear {muname}. However, with extra type constructor, unusual manipulations can be made. The reader who enjoys this sort of things can have fun proving that classical logic can be encoded replacing the usual double-negation modality by the ``why-not'' modality: classical formulæ are those such that <%?A-oA%> holds. In that case, the disjunction becomes <%?(!A<+>!B)%> and the falsity <%?0%>, or, isomorphically, <%?!A`&?!B%> and <%bot%>.
 
 {subsection "Linear logic constructs"}
   Contrapositive: <%contra%> of type <%(A-o B)-o (B^~-o A^~)%>:
