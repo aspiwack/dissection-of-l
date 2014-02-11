@@ -549,6 +549,20 @@ Going back to Figure~{ref_ l_ll}, we can observe that the no rule modify the dup
 This means like that the duplicable context is more similar to a natural deduction context than a natural deduction context. In fact, if we restrict our attention to the sequents of the form <%Xi;|-t:A%>, we essentially get {emph"intuitionistic natural deduction"}. Types make brief appearances in the linear context, but this can be hidden by macros. A more concrete result along these lines is that {textsc"llp"}, a flavour of linear logic with only one non-duplicable formula, is isomorphic to intuitionistic natural deduction~{citation_needed}(* arnaud: Olivier Laurent, llp *)
 
 In Figure~{ref_ l_lambda}, we give the translation of simply typed {lambda}-calculus inside linear {mu}. It is probably comforting that using the duplicable context as a natural deduction context, the intuitionistic arrow is naturally interpreted, as it is most common, as <%!A-oB%>. Conjunction can be interpreted by either conjunction connectives, though the additive conjunction is simpler (because in the case of multiplicative conjunction the right encoding is <%!A<*>!B%>, instead of the more straightforward <%A&B%>). Disjunction is encoded as <%!A<+>!B%> (this time we cannot use the multiplicative connective).
+{let sep = `Mm 3. in
+ figurerules ~label:l_lambda ~caption:"Embedding {lambda}-calculus" [
+    block "Typing" [`C;`C] [
+       block_line ~sep [
+          Infer.rule [] "<%Xi,x:A;|-x:A%>";
+          empty
+       ];
+       block_line ~sep [
+          Infer.rule ["<%Xi,x:A;|- t:B%>"] "<%Xi;|-lambda |_x_|, t : !A-oB%>";
+          Infer.rule ["<%Xi;|-t:!A-oB%>";"<%Xi;|-u:A%>"] "<%Xi;|-t |_u_| : B%>";
+       ];
+    ]
+ ]
+}
 
 (* arnaud: tout ,ca c'est faux
 The case of disjunction is more interesting. Indeed there are two disjunctions: either <%?A`&?B%> (or equivalently <%?(A<+>B)%>) which is the proper dual of the conjunction and corresponds to classical disjunction, or the stronger <%A<+>B%> which corresponds to intuitionistic disjunction. The natural elimination rule for <%?A`&?B%> is the usual elimination rule for natural deduction disjunction:
