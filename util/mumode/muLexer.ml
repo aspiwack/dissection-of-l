@@ -34,8 +34,11 @@ let map_ident = [
   (*greek letters*)
   "alpha" , SYMB alpha ;
   "beta" , SYMB beta ;
+  "gamma" , SYMB gamma ;
   "Gamma" , SYMB gamma_;
+  "delta" , SYMB delta ;
   "Delta" , SYMB delta_;
+  "epsilon" , SYMB varepsilon ;
   "Theta" , SYMB theta_;
   "kappa" , SYMB kappa ;
   "Pi" , SYMB pi_;

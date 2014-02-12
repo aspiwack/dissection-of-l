@@ -630,13 +630,85 @@ Which have the following types
    array_line [inv_type];
  ]end}
 
-We have <%<phi (\(phi^\(-1\)\) (|_a_|,|_b_|)) | alpha> ~~> <(|_a_|,|_b_|) | alpha>%> as well as <%<\(phi^\(-1\)\) (phi |_x_|) | alpha> ~~> |_{ 1 = x.1 , 2 = x.2 }_|%>. Accepting the extensionality principles that every elements of <%!A%> are of the form <%|_x_|%>, every elements of <%A<*>B%> are of the form <%(x,y)%> and for every <%x%> in <%A&B%>, <%{ 1=x.1 , 2=x.2 } = x%>, we conclude that <%phi%> and <%phi^\(-1\)%> form, indeed, an isomorphism.
+We have <%<phi (\(phi^\(-1\)\) (|_a_|,|_b_|)) | alpha> ~~> <(|_a_|,|_b_|) | alpha>%> as well as <%<\(phi^\(-1\)\) (phi |_x_|) | alpha> ~~> |_{ 1 = x.1 , 2 = x.2 }_|%>. Accepting the extensionality principles that every elements of <%!A%> is of the form <%|_x_|%>, every elements of <%A<*>B%> is of the form <%(x,y)%> and for every <%x%> in <%A&B%>, <%{ 1=x.1 , 2=x.2 } = x%>, we conclude that <%phi%> and <%phi^\(-1\)%> form, indeed, an isomorphism.
 
-The dual isomorphism between <%?(A<+>B)%> and <%?A`&?B%>, which we touched upon briefly in Section~{ref_ ss_lj}, has slightly less concise proof terms, but is all the more interesting.
+The dual isomorphism between <%?(A<+>B)%> and <%?A`&?B%>, which we touched upon briefly in Section~{ref_ ss_lj}, has slightly more advanced proof terms, but is all the more interesting.
 {displaymath begin array [`L;symbsep$=$;`L] [
   array_line ["<%psi%>" ; "<%lambda x, mu (|_a_|,|_b_|), < x | |_{1=a,2=b}_|>%>"];
   array_line ["<%psi^\(-1\)%>" ; "<%lambda y, mu|_x_|, < y | (|_x.1_|,|_x.2_|)>%>"];
  ]end}
+Notice the pattern here: <%psi%> is quite similar to <%phi^\(-1\)%> -- the {lambda} of the latter becomes a {mu} in the former -- and so is <%psi^\(-1\)%> to <%phi%>. Instead of giving a direct type derivation for <%psi%> and <%psi^\(-1\)%>, which the user can work out himself as an exercise, let us define a combinator to encode this pattern, that is a proof of <%(A-oB)-o(B^~-oA^~)%>:
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%gamma%>"; "<%lambda f, lambda x, mu y, <x|f y>%>" ]
+]end}
+With the typing derivation
+  {displaymath begin
+    Infer.rule ~label:"definition"
+      [
+     Infer.rule ~label:lambda
+       [ Infer.rule ~label:lambda
+           [Infer.rule ~label:mu
+              [Infer.rule ~label:(cutp "<%x%>")
+                 [Infer.rule ~label:apprule
+                    [Infer.rule ~label:idrule [] "<%;f:A-o B|-f:A-oB%>";
+                     Infer.rule ~label:idrule [] "<%;y:A|-y:A%>"]
+                    "<%;f:A-o B, y:A|- f y:B%>"]
+                 "<%;f:A-o B, x:B^~, y:A|- <x|f y>%>"]
+              "<%;f:A-o B, x:B^~ |- mu y, <x|f y> : A^~%>"]
+           "<%;f:A-o B|- lambda x, mu y, <x|f y> : B^~-o A^~%>"]
+       "<%|- lambda f, lambda x, mu y, <x|f y> : (A-o B)-o (B^~-o A^~)%>"
+      ]
+      "<%|- gamma : (A-o B)-o (B^~-o A^~)%>"
+   end}
+We now have the equivalent definitions of <%psi%> and <%psi^\(-1\)%>:
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%psi%>" ; "<%gamma \(phi^\(-1\)\)%>"];
+  array_line ["<%psi^\(-1\)%>" ; "<%gamma phi%>"];
+ ]end}
+Both of them reduce to the corresponding original definition, and their type is clear.
+
+The <%gamma%> combinator is quite interesting. Up to the extensionality rules <%x = mu alpha,<alpha|x>%> and <%f = lambda alpha, f alpha%>, a function <%f%> is the same as <%lambda x, mu y, <y|f x>%>. So really, <%gamma%> simply exchanges <%x%> and <%y%> in the binders. This remark makes it clear that <%gamma%> is involutive, hence that <%A-oB%> and <%B^~-oA^~%> are isomorphic. As they should be: <%A-oB = A^~`&B%> and <%B^~-oA^~ = B`&A^~%>, so <%gamma%> witnesses the commutativity of the <%%{empty}%`&%{empty}%%> connective.
+(* gamma (gamma f) = gamma (lambda x, mu y, <x|f y>)
+                   = lambda x, mu y, < x | mu z, < y | f z> >
+                   = lambda x, mu y, < y | f x >
+                   = lambda x, f x (eta-mu)
+                   = f (eta-lambda)
+*)
+
+The unsugared type of <%gamma%> -- <%(A<*>B^~)`&(B`&A^~)%> -- suggests another definition
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%gamma%>" ; "<%mu(f,(x,y)), <(y,x)|f>%>"]
+ ]end}
+Which is a reduced form of the original definition. This new form has the advantage of a very succinct type derivation:
+{ let open Infer in
+  displaymath begin
+    rule ~label:(mup"<%(f,(x,y))%>")
+      [rule ~label:(cutp"<%(y,x)%>")
+          [rule ~label:idrule
+              []
+              "<%;f:A^~`&B|-f:A^~`&B%>"]
+          "<%;f:A^~`&B, x:B^~, y: A |- <(y,x)|f>%>"]
+      "<%;|- mu(f,(x,y)), <(y,x)|f> : (A<*>B^~)`&(B`&A^~)%>"
+end}
+(* lambda f, lambda x, mu y, <x|f y> = lambda f, lambda x, mu y, <(y,x)|f>
+                                     = lambda f, mu(x,alpha), < alpha | mu y, <(y,x)|f> >
+                                     = lambda f, mu(x,y), <(y,x)|f>
+                                     = mu(x,alpha), <alpha|mu(x,y), <(y,x)|f>>
+*)
+
+We already mentioned in Sections~{ref_ ss_exponentials}~and~{ref_ ss_patterns} the duplication combinator of type <%!A-o!A<*>!A%>, corresponding to contraction of duplicating formulæ.
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%delta%>" ; "<%lambda|_x_|, (|_x_|,|_x_|)%>"]
+ ]end}
+There is also an erasure combinator, of type <%!A-o1%> corresponding to weakening. To highlight unused variables, we may simply omit them in the binders, writing <%|_ _|%> instead of <%|_alpha_|%>:
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line ["<%epsilon%>" ; "<%lambda|_ _|, ()%>"]
+ ]end}
+With <%gamma%> we obtain corresponding principles on the type <%?A%>:
+{displaymath begin array [`C] [
+  array_line ["<%;|- gamma delta : ?A`&?A-o?A%>"];
+  array_line ["<%;|- gamma epsilon : bot-o?A%>"];
+]end}
 
 {rule_ (`Mm 3.) (`Mm 3.)}
 
