@@ -78,11 +78,11 @@ expr:
 
 | MU p=pattern COMMA e=expr { concat [Latex.mu;p;text".\\,";e] } %prec MU
 | MUT p=pattern COMMA e=expr { concat [tilde Latex.mu;p;text".\\,";e] } %prec MU
-| POINTYL e=expr BAR f=expr POINTYR { concat [langle;e;mid;f;rangle] }
+| POINTYL e=expr BAR f=expr POINTYR { between `Angle (concat [e;mid;f]) }
 
-| PARENL t=expr COMMA u=expr PARENR { concat [text"(";t;text",";u;text")"] }
+| PARENL t=expr COMMA u=expr PARENR { between `Paren (concat [t;text",";u]) }
 | PARENL PARENR { text"()" }
-| BRACEL t=expr COMMA u=expr BRACER { concat [text"\\{~";t;text"\\,,\\,";u;text"~\\}"] }
+| BRACEL t=expr COMMA u=expr BRACER { between `Brace (concat [t;text"\\,,\\,";u]) }
 | BRACEBR t=expr COMMA u=expr BRACER { concat [
                                         text"\\{";newline;
                                         phantom alpha; quad;t;text",";newline;
@@ -96,8 +96,8 @@ expr:
 | u=expr PI2 { concat [u; text".2"] }
 | FIELD1 u=expr { concat [text"1 = "; u] }
 | FIELD2 u=expr { concat [text"2 = "; u] }
-| LLCORNER u=expr LRCORNER { concat [left `Floor;u;right `Floor] }
-| LLCORNER LRCORNER { concat [left `Floor;phantom(text"x");right `Floor] }
+| LLCORNER u=expr LRCORNER { between `Floor u }
+| LLCORNER LRCORNER { between `Floor (phantom(text"x")) }
 | VAL u=expr { just_left (`Double `Up) u }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
