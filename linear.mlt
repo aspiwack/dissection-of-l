@@ -1,0 +1,233 @@
+##verbatim '%' = MuPlugin.mumode
+
+open Prelude
+open Extra
+
+
+
+let d = "{section "Linear {muname}"}
+
+As mentioned in the previous section, core {muname} does not have all that much computing abilities. This is remedied by the introduction of logical connectives in types, and corresponding constructions in terms. 
+In this section we shall extend {muname} to reflect the whole range of linear logic
+connectives.
+
+{subsection "Multiplicative fragment" ~label:ss_mll}
+
+Throughout this article, the connectives' introduction rules come in two varieties: some are {emph"value"} constructors, while the introduction rules of the dual type are {emph"computation"} constructors, the syntax of which is inspired by pattern-matching.
+(* arnaud: un explication potentielle ici, c'est que les valeurs sont construits `a partir de termes, alors que les computations `a partir de commandes. *)
+
+For instance, the introduction rules of multiplicative connectives <%A<*>B%> and <%A`&B%> correspond, respectively, to a pair of two terms, and matching on a pair. They are written as follows:
+{displaymath begin syntax [
+  syntax_line `Term ~extend:true Rules.Syntax.([ pair ; copair ]);
+] end}
+A benefit of this syntax is that the reduction rules are pretty easy to figure. Here is the case of pairs:
+{displaymath begin reduction [
+  Rules.Reduction.pair
+] end}
+
+The typing rules follow naturally, keeping in mind that these are linear logic connectives in particular the pair <%(x,x)%> is ill-typed:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Mall.pair];
+  array_line [ Rules.Typing.Mall.copair];
+]end}
+
+The multiplicative connectives alone bring a lot of expressiveness: linear {lambda}-calculus is macro-expressible. The intuition comes from abstract machines: in abstract machines for {lambda}-calculus, {lambda}-terms interact with a stack. The idea is to represent the stack as iterated pairs; then the application must be a {emph"push"} operation, adding its second operand on the stack, while abstraction must {emph"pop"} the first stack element and substitute it in the function body.
+
+This is an important insight, so it bears repeating: in {muname} the stack is {emph"first-class"}. Programming in {muname} is quite like programming directly an abstract machine. If the idea might sound daunting, the author hopes that the reader will be convinced by this article that it is not unimaginable either.
+
+(* arnaud: on peut vouloir pr'eciser ici qu'on utilise les lettres grecques pour les variables fraiches. *)
+Following this intuition, we define the application <%t u%> to be <%mu alpha, <t|(u,alpha)>%>: the current continuation ({emph"i.e."} stack) is named <%alpha%>, a fresh name, <%t%> is then run against <%(u,alpha)%>, the current stack augmented with <%u%>.
+
+Similarly, the {lambda}-abstraction <%lambda x,t%> is defined as <%mu(x,alpha),<t|alpha>%>: the first element of the stack is called <%x%> and the rest <%alpha%>, for a fresh <%alpha%>, the body <%t%> of the abstraction is then run against <%alpha%>, the popped stack. Remember that <%x%> is binds a variable of <%t%>, so there is, implicitly a substitution in <%t%>. In fact, since we are in linear logic, typing will impose that <%x%> is, in some sense, used exactly once in <%t%>. These definition ensure, as they should, that the reduction rules of {muname} simulate {beta}-reduction:
+{displaymath "<%<(lambda x, t) u|v> ~~> <lambda x,t|(u,v)> ~~> <subst [u,x] t| v>%>"}
+
+Writing <%A-o B%> for the linear arrow connective <%A^~ `& B%>, the typing rules of application and abstraction are familiar:
+
+{displaymath begin array [`C] [
+
+  array_line ~sep:(`Mm 5.) [Infer.rule ~label:"definition"
+                               [Infer.rule ~label:mu [Infer.rule ~label:cutrule ["<%Gamma|-t:A-oB%>";Infer.rule ~label:tensor ["<%Delta|-u:A%>";Infer.rule ~label:idrule [] "<%alpha:B^~|-alpha:B^~%>"] "<%Delta,alpha:B^~|-(u,alpha):A<*>B^~%>"] "<%Gamma,Delta,alpha:B^~|- <t|(u,alpha)>%>"] "<%Gamma,Delta|-mu alpha, <t|(u,alpha)> : B%>"]
+                               "<%Gamma,Delta|- t u : B%>"];
+
+  array_line [Infer.rule ~label:"definition"
+                 [Infer.rule ~label:parr [Infer.rule ~label:cutrule ["<%Gamma,x:A|-t:B%>";Infer.rule ~label:idrule [] "<%alpha:B^~|-alpha:B^~%>"]
+                                           "<%Gamma,x:A,alpha:B^~|-<t|alpha>%>"]
+                 "<%Gamma|-mu(x,alpha),<t|alpha>:A-oB%>"]
+                 "<%Gamma|-lambda x,t :A-oB%>"];
+]end}
+
+To the binary multiplicative connectives <%A<*>B%> and <%A`&B%> correspond the nullary <%1%> and <%bot%> respectively. The constructor <%()%> of type <%1%> can be seen as an empty stacks, while <%mu(),c%> is essentially the command <%c%> reified as a term: it discards the (anyway empty) stack and runs <%c%>. The reader may refer to Figure~{ref_ l_mall}~--~which also contains the upcoming additive connectives~--~for the typing rules of these nullary connectives.
+
+(* arnaud: On pourrait penser à parler un peu des deux vues, quand A<*>B est le terme et A`&B le contexte
+   et vice-versa *)
+
+{subsection "Additive fragment"}
+
+The additive connectives <%A<+>B%> and <%A&B%> bring something radically new to simply typed lambda calculus: case analysis. Case analysis can be encoded in pure {lambda}-calculus, or in system F, but simply typed lambda calculus has no way of representing it. Their are two value constructors for <%A<+>B%>, <%1.t%> and <%2.t%>, respectively injective <%A%> and <%B%> into <%A<+>B%>. Terms of type <%A&B%> are made with a computation constructor which branches on whether it is run against a <%1.t%> or a <%2.t%>:
+{displaymath begin syntax [
+  syntax_line `Term ~extend:true Rules.Syntax.([iota1;iota2;case])
+] end}
+The computation constructor {Rules.Syntax.case}, is written as a set of two pattern-matching clauses, the appropriate clause is selected by the reduction rules:
+{displaymath begin reduction Rules.Reduction.([ iota1 ; iota2 ]) end}
+
+In the typing rule for {Rules.Syntax.case}, as required by linear logic, both branches share the same typing context:
+{displaymath Rules.Typing.Mall.case}
+This typing rule can be framed in terms of the computational interpretation of {muname}: linearity imposes that each variable must be used exactly once. Since one of the branches (say <%c_2%>) is dropped by the reduction rule, none of the variables of <%c_2%> are used, therefore all of the variables in the context must be used exactly once in <%c_1%>. And symmetrically, they must be used exactly once in <%c_2%>.
+
+In the dual typing rules, the missing type is materialised from thin air, since the corresponding branch is dropped by reduction:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Mall.iota1];
+  array_line [Rules.Typing.Mall.iota2];
+]end}
+
+There is a dual way to think about additive connectives, in which <%A&B%> is the type of {emph"records"} (with two fields labelled <%1%> and <%2%>), and the injections <%1.t%> and <%2.t%> play the role of {emph"projections"}. Similarly to the case of {lambda}-calculus in Section~{ref_ ss_mll}, we read <%1.k%> as a stack which begins with the first projection, and <%2.k%> with the second projection.
+
+Hence the projections <%t.1%> and <%t.2%> push the appropriate instruction on the top of the stack and then run <%t%>:
+{displaymath begin array [`L; symbsep $=$; `L] [
+  array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+  array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+ ]end}
+and <%{1=t,2=u}%> pattern-matches on the top of the stack:
+{displaymath begin array [`L; symbsep $=$; `L] [
+  array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+]end}
+
+The main difference between multiplicative pairs and additive records -- apart from the existence of projections in the latter -- is that the former are values whereas the latter are computations. The best way to think about the distinction between values and computation may be to pretend that computations can have side effects. Under that view, a record stays unevaluated, and only the effects of the selected field will happen. On the other hand, a multiplicative pair <%(t,u)%> can be evaluated further, and the effects of both <%t%> and <%u%> will occur.
+
+The binary <%A<+>B%> and <%A&B%> are accompanied by the nullary <%0%> -- the empty type -- and <%top%>, whose sole constructor is <%{}%> the empty case analysis (a.k.a {emph"ex falso quodlibet"}). The complete rules for the multiplicative and additive fragment of linear {muname} can be found in Figure~{ref_ l_mall}.
+
+{let sep = `Mm 2. in
+ figurerules ~label:l_mall ~caption:"Multiplicative and additive fragment" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@multiplicative@additive);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@multiplicative@additive)
+   end;
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end;
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ mu ; empty ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+         ]
+   end;
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+ ]}
+
+Notice how all the syntactic sugar so far defines computations. This is no coïncidence: computations, as there name suggests, is where the fun happens. In other words, we program functions, not pairs. The raw syntax of {muname} is dry, and wholly unfamiliar; however, with a few macros, familiar programming construct emerge, and {muname} looks like a normal programming language.
+
+{subsection "Exponentials" ~label:ss_exponentials}
+The typing rules presented so far are purely linear, in the sense that there is no contraction
+-- or weakening -- happening. For instance, the term <%(x,x)%> can be given a type in no context.
+Linear logic has the connective <%!A%> to represent the formulæ which can be contracted and weakened on the left-hand side of sequents, and its dual <%?A%> for the formulæ which can be contracted and weakened on the right-hand side of sequents. In short: a function of type <%!A-o?B%> can {emph"use"} any number of copies of its argument of type <%A%>, and may choose to return a <%B%> or not.
+
+One way to incorporate the exponential connectives within linear {muname}, proposed in~{cite"Munch2009"}, is the following rule:
+{displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-c%>"] "<%Gamma,x:!A|-subst [x,y] c%>")}
+This rule mimics accurately the traditional linear sequent calculus, however it does not follow the discipline of classical {muname}, where contraction and weakening is only a matter of using a variable several times or not at all.
+
+In order to retain this property, we choose to use of the dyadic presentation of linear logic. This presentation, due to Andreoli~{cite"Andreoli1992"}, classifies hypotheses according to whether they are {emph"duplicable"} or not, and renders the duplicable hypotheses in a separate context which behaves additively. The exponential connective <%!A%> reflects duplicable hypotheses in the linear context.
+
+The typing judgement in (dyadic) linear {muname} of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
+<%Gamma%> is the linear context, and <%Xi%> is the new duplicable context. Contraction and weakening are, like in classical L in Section~{ref_ ss_classical}, are implicit as the duplicable context is copied by cut and ignored by identity (more generally, the duplicable context is distributed on each premise of inference rules):
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Ll.cut];
+  array_line [Rules.Typing.Ll.id];
+]end}
+
+The addition of a new context in our sequents requires the addition of a new {emph"structural"} rule to relate the new context to the old. A common form of structural rule for the duplicable context is the {emph"copy"}, or {emph"absorbtion"}, rule:
+{let hole = phantom"<%A^~%>" in
+ displaymath (Infer.rule ["<%Xi,A;Gamma|-A^~%>"] "<%Xi,A;Gamma|-%{hole}%%>")}
+By the copy rule, copies of a duplicable hypothesis <%A%> in the linear context, can be contracted into <%A%>. This rule does not follow the style of {muname} as it would create a new kind of command. The equivalent rule originally proposed by Andreoli~{cite"Andreoli1992"}, on the other hand, fits the design of {muname}:
+{displaymath Rules.Typing.Ll.iddup}
+The duplicable identity rule makes it so that a duplicable hypothesis of type <%A%> can be used as a term of type <%A%>. This rule can simply be read as stating that variables in the duplicable context are duplicable variables. For example:
+{displaymath begin
+  let open Infer in
+  let idx =
+    rule ~label:iddup [] "<%x:A;|-x:A%>"
+  in
+  rule ~label:tensor [ idx ; idx ] "<%x:A;|- (x,x) : A<*>A%>"
+end}
+Variables in the duplicable context can, hence, be used freely, whereas variables of the linear context must be use in a linear fashion. Precisely what we expected to achieve.
+
+As a sanity check, let us consider the derivation of the copy rule from the duplicable identity:
+{displaymath begin
+  Infer.rule ~label:cutrule
+    ["<%Xi,x:A;Gamma|-t:A^~%>";
+     Infer.rule ~label:iddup [] "<%Xi,x:A; |- x:A%>"]
+    "<%Xi,x:A;Gamma|-< t | x >%>"
+end}
+
+For the exponential connectives themselves, <%!A%> has a value constructor, written <%|_t_|%>, which marks the term <%t%> as being duplicable ({emph"i.e."} <%t%> does not use any linear variables), and <%?A%> has a dual computation constructor:
+{displaymath (syntax [
+  syntax_line ~extend:true `Term Rules.Syntax.exponential
+])}
+The typing rules correspond, respectively, to the {emph"promotion"} and {emph"dereliction"} rules of linear logic:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Ll.bang];
+  array_line [Rules.Typing.Ll.whynot];
+ ]end}
+
+The rest of the rules for linear {muname} can be found in Figure~{ref_ l_ll}. They are almost identical to the rules of the multiplicative and additive fragment.
+
+{let sep = `Mm 3. in
+ figurerules ~label:l_ll ~caption:"Linear {muname}" [
+   simple_block "Syntax" begin
+     syntax [
+       (* arnaud: on va probablement avoir besoin d'aller à la ligne ici pour
+          éviter l'overfull box *)
+       syntax_line `Term Rules.Syntax.(core@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@multiplicative@additive@exponential)
+   end;
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Ll in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ iddup ; mu ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ]
+         ]
+   end;
+ ]
+}
+
+The choice of using substitution to embody contractions like in~{cite"Munch2009"} or the dyadic system has non-trivial implications: if they are logically equivalent, they do not have the same computational behaviour. In the substitution system, for instance, the sequent
+{displaymath"<%x:!A|-mu alpha,<(x,x)|alpha>:!A<*>!A%>"}
+is derivable. In the dyadic system, it is replaced, depending on the context, by either
+{displaymath"<%x:A;|-(|_x_|,|_x_|):!A<*>!A%>"}
+or the more complex
+{displaymath"<%;x:!A|-mu beta, <x|mu |_alpha_|,<(|_alpha_|,|_alpha_|)|beta>> : !A<*>!A%>"}
+
+More acutely, in~{cite"Munch2009"}, the promotion rule is a computation constructor and dereliction a value constructor. Because of this, using the substitution system would be incompatible with the treatment of Section~{ref_ s_pol}.
+"

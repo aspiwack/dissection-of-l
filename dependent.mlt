@@ -1,0 +1,144 @@
+##verbatim '%' = MuPlugin.mumode
+
+open Prelude
+open Extra
+
+
+
+
+let d = "{section"Dependent types" ~label:s_dep}
+
+{subsection"Weakly dependent types"}
+
+As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.
+
+See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
+
+{let sep = `Mm 2. in
+ 
+ figurerules ~label:f_wdll ~caption:"Dependent {muname}" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
+   end;
+(*
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end; *)
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Dll0 in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ iddup ; mu ];
+           block_line ~sep [ shiftn ; shiftp ; ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ];
+         ]
+   end;
+(*
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+*)
+ ]}
+
+Typing derivation for $"<%lambda x,t%>"="<%mu(x,alpha),<t|alpha>%>"$:
+{let open Infer in displaymath begin
+  rule ~label:parr
+    [rule ~label:cutrule
+        ["<%Xi;Gamma,x:A|-t:B^~%>" ; rule ~label:idrule [] "<%Xi; Gamma; alpha:B|-_v alpha : B%>"]
+        "<%Xi;Gamma,x:A,alpha:B|- <t|alpha>%>"]
+    "<%Xi;Gamma |- mu(x,alpha),<t|alpha> : PI x:A,B^~%>"
+end}
+
+(* Typing derivation for $"<%lambda |_x_|,t%>"="<%mu(|_x_|,alpha),<t|alpha>%>"$: *)
+(* arnaud: 'ecrire proprement les r`egles des patterns dans le cas d'ependant *)
+(* arnaud: does the type even work? I'm pretty sure it's silly*)
+(* {let open Infer in displaymath begin *)
+(*   rule ~label:parr *)
+(*     [rule ~label:(cutp"<%(|_x_|,alpha)%>") *)
+(*         ["<%Xi,x:A;Gamma|-t:B^~%>" ; rule ~label:idrule [] "<%Xi,x:A; alpha:B|-_v alpha : B%>"] *)
+(*         "<%Xi,x:A;Gamma;alpha:B|- <t|alpha>%>"] *)
+(*     "<%Xi;Gamma |- mu(|_x_|,alpha),<t|alpha> : PI x:!A,B^~%>" *)
+(* end} *)
+
+Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
+{let open Infer in displaymath begin
+  rule ~label:mu
+    [rule ~label:cutrule
+        ["<%Xi;Gamma|-t:PI x:A,N%>" ; rule ~label:tensor ["<%Xi;Gamma;Delta|-u:A%>";rule ~label:idrule [] "<%Xi;Gamma;alpha:subst [u,x] N^~ |- alpha : subst [u,x] N^~%>"] "<%Xi;Gamma;Delta,alpha:subst [u,x] N^~|-(u,alpha):SIGMA x:A,N^~%>"]
+        "<%Xi;Gamma,Delta,alpha:subst [u,x] N^~|- <t|(u,alpha)>%>"]
+    "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
+end}
+
+{subsection"Dependent elimination"}
+
+See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
+{let sep = `Mm 2. in
+ figurerules ~label:f_dll ~caption:"Dependent {muname} with dependent elimination" [
+   simple_block "Syntax" begin
+     syntax [
+       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
+       commands
+     ]
+   end;
+   simple_block "Reduction" begin
+     reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
+   end;
+(*
+   simple_block "Derived syntax" begin
+     array [`L; symbsep $=$; `L] [
+       array_line ["<%lambda x,t%>";"<%mu(x,alpha),<t|alpha>%>"];
+       array_line ["<%t u%>"; "<%mu alpha, <t|(u,alpha)>%>"];
+       array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
+       array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
+       array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
+     ]
+   end; *)
+   block "Typing" [`C;`C] begin
+     let open Rules.Typing.Dll1 in
+         [
+           block_line ~sep [ id ; cut ];
+           block_line ~sep [ iddup ; mu ];
+           block_line ~sep [ shiftn ; shiftp ; ];
+           block_line ~sep [ pair ; copair ];
+           block_line ~sep [ unit ; counit ];
+           block_line ~sep [ iota1 ; case ];
+           block_line ~sep [ iota2 ; empty];
+           block_line ~sep [ zero ; emptycase ];
+           block_line ~sep [ bang ; whynot ];
+         ]
+   end;
+(*
+   block "Derived typing rules" [`C;`C] begin
+     let open Rules.Typing.Mall in
+         [
+           block_line ~sep [ lambda ; app ];
+           block_line ~sep [ record ; pi1 ];
+           block_line ~sep [ empty  ; pi2 ];
+         ]
+   end;
+*)
+ ]}
+
+"

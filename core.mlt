@@ -1,0 +1,121 @@
+##verbatim '%' = MuPlugin.mumode
+
+open Prelude
+open Extra
+
+
+
+let d = "{section "Core {muname}" ~label:s_core}
+
+Stripped down to its bare minimum, {muname} appears as a very simple calculus whose
+syntax is made of two kinds of objects, terms (<%t%>, <%u%>, <%v%>, {ldots}) and commands
+(<%c%>)
+{displaymath begin syntax [
+  syntax_line `Term Rules.Syntax.core;
+  commands
+] end}
+Together with reduction rules
+{displaymath begin reduction [
+  Rules.Reduction.mu;
+  array_line [ "<%<mu x,c|t>%>" ; "<%subst [t,x] c%>" ];
+] end}
+The intent being that the vertical bar be read as commutative. We shall use it
+as such from now on.
+
+Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
+the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
+<%<t|u>%> runs <%t%> with continuation <%u%> (or symmetrically, <%u%> with
+continuation <%t%>) it is read ``<%t%> against <%u%>''.
+(*Terms reduce to a value, whereas command just compute -- they are played only
+for there effects. Though it is possible to imagine otherwise, and consider
+{textsc"io"} of sorts, the only effects available to a computation in pure {muname}
+is returning to a continuation.*)
+
+The reduction rules look quite similar to {beta}-reduction,
+however this core calculus does not nearly have the power of {lambda}-calculus.
+Indeed the fact that there are two kinds of object is crucial here: from a
+functional programming perspective, it is like if the only construct was
+{textsf"let{ldots}in"}. Contrary to {lambda}-calculus we have practically no
+computation power without additional constructs.
+
+Nonetheless, we can already observe undesirable behaviours. For instance it is easy to
+cook up a non-terminating command <%<mu x,<x|x> | mu x,<x|x>>%>.
+Much worse: any two commands <%c_1%> and <%c_2%> have a common antecedent
+<%<mu alpha, c_1 | mu alpha, c_2>%> where <%alpha%> is fresh. (*arnaud: essayer de regarder les conflits contraction/contraction et weakening/contraction*)
+
+{subsection "Typing as classical sequent calculus" ~label:ss_classical}
+
+The original typing rules~{cite"Curien2000"} for {muname} corresponded closely to classical
+sequent calculus. We shall present, in this section, a one-sided variant of the classical core {muname}.
+Therefore we shall require that every formula <%A%> has a dual <%A^~%> such that <%A^~^~=A%>.
+
+The dualisation should not be understood as a connective -- core {muname} has none -- but as an operation on
+types. Duality tracks positional information: a variable of type <%A%> on the right is the same as a variable
+of type <%A^~%> on the left. Therefore, there is no difference between either side and the variables can be
+arranged on a single side (or any convenient arrangement). In classical logic, negation, which {emph"is"} a
+connective is a reflection of dualisation, and it may be tempting -- and is indeed often done -- to forgo the
+negation altogether and keep only dualisation. In that case, the de Morgan laws are not just tautologies,
+they are {emph"definitions"} for the negation. An option which is more appealing from a programming language
+standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{citation_needed}(* arnaud: je pense que le chapitre correspondant de Bob Harper serait id'eal *). Duality, on the other
+hand, does not have introduction rules -- unless we count the identity and cut rules as introduction rules.
+
+To follow the tradition of programming languages, let us choose to leave all the variables on the left-hand
+side of the sequents. The tradition in proof theory, on the other hand, is rather to keep the variables on
+the right. The latter is better suited for interpretation in terms of proof nets~{citation_needed}(* arnaud: du Girard, sans doute*) or
+monoidal category~{citation_needed}(* arnaud: peut-^etre du Lutz?*). On the other hand, the left-handed
+variant works very well with {muname}. Duality ensures that the difference is only
+in the eye of the reader: mathematically, these are all the same objects.
+
+The typing of command is a simple assignment of types to its free variables: commands are self-contained, they don't
+have a ``return type''.
+{displaymath "<%Gamma|-c%>"}
+Terms, on the other hand, have an intrinsic type in addition to the type assignment of their variables. From a
+logical standpoint, we shall need a distinguished formula which, since it does not correspond to a variable,
+we shall display it on the right-hand side of the sequent:
+{displaymath "<%Gamma|-t:A%>"}
+Keep in mind, though, that a term typing judgement, despite the similarity with natural deduction sequents, is still
+a one-sided sequent. Indeed, a one-sided sequent is, by definition, a sequent where formulæ can flow freely between
+left and right.
+
+The typing rules for variables and interaction correspond, on the logical side, to identity and cut respectively:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Classical.id];
+  array_line [Rules.Typing.Classical.cut];
+]end}
+The cut rule emphasises the rôle of of the dual type <%A^~%> in the programming point of view: <%A^~%> is the type of the continuations of <%A%>. Also, as <%A^~^~=A%>, <%A%> is, conversely, the type of continuation of <%A^~%>: the idempotence of the duality operator goes hand to hand with the commutativity of the interaction.
+
+The typing rule for {mu} abstraction does not correspond to a logical rule: from the point of view of sequent calculus, it corresponds to choosing a formula, and placing it to the right-hand side of the sequent to make it {emph"active"}.
+{displaymath Rules.Typing.Classical.mu}
+From a programming point of view, <%mu x,c%> expects a value for <%x%> and {emph"continues"} with <%c%>. In other words, <%mu x,c%> interacts with values of type <%A%>: it has type <%A^~%>.
+
+What makes is so that these typing rules correspond to classical logic is that {emph"weakening"} and {emph"contraction"} are admissible. In fact contraction is even derivable:
+{displaymath begin
+  let open Infer in
+  rule [
+    rule [ "<%Gamma,x:A,y:A|-c%>" ] "<%Gamma,x:A |- mu y,c:A^~%>";
+    rule [] "<%Gamma,x:A |- x:A%>";]
+    "<%Gamma,x:A|- <mu y,c|x>%>"
+end}
+Weakening cannot be defined as such a macro, as the context only grows upwards. However, it is not difficult to check that any unused variable will be absorbed by the identity rules. Just like in natural deduction, this implicit weakening is what allows to give type to terms of the form <%mu alpha,c%> for a fresh <%alpha%>.
+
+As long as there is no type <%A%> such that <%A^~ = A%>, the reduction of typed terms is terminating. In particular the aforementioned <%<mu x,<x|x> | mu x,<x|x>>%> cannot be typed. On the other hand, non-confluence is still as acute as in the untyped calculus: the untyped example translates to a cut between to weakenings. Let <%Gamma|-c_1%> and <%Gamma|-c_2%> be two commands typed in the same context, and <%alpha%> and <%beta%> two fresh variable then we have the following derivation:
+{displaymath begin
+  Infer.rule [
+       Infer.rule ["<%Gamma,alpha:A^~|- c_1%>"] "<%Gamma|-mu alpha,c_1 : A%>";
+       Infer.rule ["<%Gamma,beta:A|- c_2%>"] "<%Gamma|-mu beta,c_2 : A^~%>"]
+  "<%Gamma|-<mu alpha,c_1|mu beta, c_2>%>"
+end}
+Which we can conclude by weakening. So again, any two typed commands have a common antecedent. This is not an emergent property of {muname}: in classical sequent calculus, a cut between two weakening exhibits the same non-confluent behaviour.
+
+{subsection "Typing as linear sequent calculus"}
+
+In order to address the issue of non-confluence, we move away from classical logic and favour linear logic. The effect on the core calculus is minimal. The identity and cut rules are modified to prevent implicit weakening and conversion:
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Mall.id];
+  array_line [Rules.Typing.Mall.cut];
+]end}
+The {mu} rule, on the other hand is left unchanged:
+{displaymath Rules.Typing.Mall.mu}
+
+Would we want to limit the {emph"exchange"} rules, like in non-commutative logic~{citation_needed}(*arnaud: presumably Paul Ruet 1&2*), we would have to tweak the {mu} rule, but we will be content with treating the comma, in contexts, as commutative.
+"

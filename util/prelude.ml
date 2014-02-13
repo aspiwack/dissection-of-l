@@ -153,7 +153,6 @@ module Infer = struct
 
 end
 
-
 (*** Holes ***)
 
 let citation_needed = small (text"[citation]")

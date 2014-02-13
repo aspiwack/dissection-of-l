@@ -1,0 +1,37 @@
+##verbatim '%' = MuPlugin.mumode
+
+open Prelude
+
+
+let muname = "L"
+
+let symbsep s = `Sep ${quad}{s}{quad}$
+let syntax_line k ?(extend=false) l =
+  let k = match k with
+    | `Term -> "<%t%>, <%u%>"
+    | `Command -> "<%c%>"
+    | `Other x -> x
+  in
+  let l = if extend then ldots::l else l in
+  array_line [ k ; concat_with_sep l mid ]
+let commands = syntax_line `Command ["<%<t|u>%>"]
+let syntax l = array [`L;symbsep grammardef; `L] l
+let reduction l = array [`L; symbsep leadsto; `L] l
+
+(*** labels ***)
+
+let s_core = label ~name:\"section:core\" ()
+let ss_classical = label ~name:\"subsection:classical\" ()
+let ss_mll = label ~name:\"subsection:mll\" ()
+let ss_exponentials = label ~name:\"subsection:exponentials\" ()
+let ss_patterns = label ~name:\"subsection:patterns\" ()
+let ss_lj = label ~name:\"subsection:lj\" ()
+let s_pol = label ~name:\"section:polarised\" ()
+let s_dep = label ~name:\"section:dependent\" ()
+
+let l_mall = label ~name:\"figure:mall\" ()
+let l_ll = label ~name:\"figure:ll\" ()
+let l_lambda = label ~name:\"figure:lambda\" ()
+let f_fll = label ~name:\"figure:fll\" ()
+let f_wdll = label ~name:\"figure:wdll\" ()
+let f_dll = label ~name:\"ffigure:dll\" ()
