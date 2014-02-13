@@ -679,7 +679,7 @@ The unsugared type of <%gamma%> -- <%(A<*>B^~)`&(B`&A^~)%> -- suggests another d
 {displaymath begin array [`L;symbsep$=$;`L] [
   array_line ["<%gamma%>" ; "<%mu(f,(x,y)), <(y,x)|f>%>"]
  ]end}
-Which is a reduced form of the original definition. This new form has the advantage of a very succinct type derivation:
+Which, fortunately, is a reduced form of the original definition. This new form has the advantage of a very succinct type derivation:
 { let open Infer in
   displaymath begin
     rule ~label:(mup"<%(f,(x,y))%>")
@@ -696,7 +696,7 @@ end}
                                      = mu(x,alpha), <alpha|mu(x,y), <(y,x)|f>>
 *)
 
-We already mentioned in Sections~{ref_ ss_exponentials}~and~{ref_ ss_patterns} the duplication combinator of type <%!A-o!A<*>!A%>, corresponding to contraction of duplicating formulæ.
+To conclude this section, let us consider principles corresponding to contraction and weakening. We already mentioned in Sections~{ref_ ss_exponentials}~and~{ref_ ss_patterns} the duplication combinator of type <%!A-o!A<*>!A%>, corresponding to contraction of duplicating formulæ.
 {displaymath begin array [`L;symbsep$=$;`L] [
   array_line ["<%delta%>" ; "<%lambda|_x_|, (|_x_|,|_x_|)%>"]
  ]end}
@@ -710,67 +710,11 @@ With <%gamma%> we obtain corresponding principles on the type <%?A%>:
   array_line ["<%;|- gamma epsilon : bot-o?A%>"];
 ]end}
 
-{rule_ (`Mm 3.) (`Mm 3.)}
-
-  Contrapositive: <%contra%> of type <%(A-o B)-o (B^~-o A^~)%>:
-  <%lambda f, lambda x, mu y, <f y|x>%>. Typed as
-  {displaymath begin
-     Infer.rule ~label:lambda
-       [ Infer.rule ~label:lambda
-           [Infer.rule ~label:mu
-              [Infer.rule ~label:(cutp "<%x%>")
-                 [Infer.rule ~label:apprule
-                    [Infer.rule ~label:idrule [] "<%;f:A-o B|-f:A-oB%>";
-                     Infer.rule ~label:idrule [] "<%;y:A|-y:A%>"]
-                    "<%;f:A-o B, y:A|- f y:B%>"]
-                 "<%;f:A-o B, x:B^~, y:A|- <f y|x>%>"]
-              "<%;f:A-o B, x:B^~ |- mu y, <f y|x> : A^~%>"]
-           "<%;f:A-o B|- lambda x, mu y, <f y|x> : B^~-o A^~%>"]
-       "<%|- contra : (A-o B)-o (B^~-o A^~)%>"
-   end}
-   An alternative definition of contra can be read off another way to write its type
-   <%(A<*>B^~)`&(B`&A^~)%>: <%mu(x,(y,z)), <x|(z,y)>%>.
-
-  Duplication <%dup%> of type <%!A-o !A<*>!A%>: <%lambda|_x_|, (|_x_|,|_x_|)%>. Using the duality,
-  <%codup%>, defined as <%contra dup%> has type <%?A`&?A-o?A%>.
-
-  Isomorphism between <%!(A&B)%> and <%!A<*>!B%>:
-  {displaymath $"<%phi%>"="<%lambda |_x_|, (|_x.1_|,|_x.2_|)%>"$}
-  typed as
-  {displaymath begin
-    Infer.rule ~label:(lambdap "<%|_x_|%>")
-       [Infer.rule ~label:tensor
-          [ Infer.rule ~label:bangrule
-              [ Infer.rule ~label:pi1rule
-                 [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"] 
-                 "<%x:A&B;|- x.1 : A%>" ]
-              "<%x:A&B;|- |_x.1_| : !A%>";
-            Infer.rule ~label:bangrule
-              [ Infer.rule ~label:pi2rule
-                  [ Infer.rule ~label:iddup [] "<%x:A&B;|-x:A&B%>"]
-                  "<%x:A&B;|- x.2 : B%>" ]
-              "<%x:A&B;|- |_x.2_| : !B%>"]
-         "<%x:A&B; |- (|_x.1_|,|_x.2_|) : !A<*>!B%>"]
-       "<%|- lambda |_x_|, (|_x.1_|,|_x.2_|) : !(A&B) -o !A<*>!B %>"
-  end}
-  and
-  {displaymath $"<%phi^\(-1\)%>"="<%lambda (|_a_|,|_b_|), |_{ 1= a , 2= b }_|%>"$}
-  typed as
-  {displaymath begin
-    Infer.rule ~label:(lambdap "<%(|_a_|,|_b_|)%>")
-       [ Infer.rule ~label:bangrule
-           [ Infer.rule ~label:recordrule
-               [ Infer.rule ~label:iddup [] "<%a:A,b:B;|- a:A%>";
-                 Infer.rule ~label:iddup [] "<%a:A,b:B;|- b:B%>"]
-               "<%a:A,b:B;|- {1=a,2=b} : A&B%>" ]
-           "<%a:A,b:B; |- |_{1=a,2=b}_| : !(A&B)%>" ]
-       "<%;|- lambda (|_a_|,|_b_|), |_{1=a,2=b}_| : !A<*>!B -o !(A&B)%>"
-   end}
-
-   Thanks to duality, <%contra phi%> and <%contra phi^\(-1\)%> form an isomorphism
-   between <%?(A<+>B)%> and <%?A`&?B%>.
-
    {subsection "Programming constructs"}
+
+
+
+{rule_ (`Mm 3.) (`Mm 3.)}
 
    There are several variants of callcc, we shall consider that corresponding to Peirce's law as
    it is more constrained type-wise. To be true to the standard definition, the first thing to do
