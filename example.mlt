@@ -320,49 +320,65 @@ The relative verbosity is not an issue, as it can be hidden behind (monadic) com
 
 The inspections themselves can be costly, but more importantly, it is not always possible to avoid the slow composition order. An extreme, yet not uncommon, example would be combinators like Ocaml's <@List.fold_left@>: even if <@List.fold_left f s l@> fails quickly on <@f@>, the whole list needs to be traversed before returning an error. With actual exceptions, on the other hand, the execution of <@List.fold_left f s l@> is interrupted as soon as an exception is raised.
 
-The behaviour of exceptions can be modelled in linear {muname}. Instead of the type <%A<+>E%>, we may use the weaker type <%?E`&?A%> to represent computation which may raise exceptions. For simplicity, we use the fact that it also reads <%!E^~-o?A%>:
+The behaviour of exceptions can be modelled in linear {muname}. Instead of the type <%A<+>E%>, we may use the weaker type <%?E`&?A%> to represent computation which may raise exceptions. For simplicity, we use the fact that it also reads <%!E^~-o?A%>. Let <%|-f:A-o?E`&?B%>, <%|-g:B-o?E`&?C%>, and <%|-h:C-o?E`&D%>, their composite can be written as:
 {displaymath begin array [`L;symbsep$=$;`L] [
   array_line [ "<%g 'o' f%>"; "<%lambda x,mu(|_theta_|,|_rho_|), <f x |_theta_| | |_mu y, <g y |_theta_| | |_rho_|> _| >%>"];
-  array_line [ "<%h 'o'(g 'o' f)%>"; "<%lambda x, mu(|_theta_|,|_rho_|), <(g 'o' f) x |_theta_| | |_mu(1.z),<h z |_theta_| | |_rho_| >_| >%>" ]
+  array_line [ "<%h 'o'(g 'o' f)%>"; "<%lambda x, mu(|_theta_|,|_rho_|), <(g 'o' f) x |_theta_| | |_mu z,<h z |_theta_| | |_rho_| >_| >%>" ]
 ]end}
-Where <%<e|theta>%> should be understood as raising the exception <%e%> and <%<a|rho>%> as returning value <%a%>. The composition still threads functions in a monadic style, however, when an exception is raised, the continuation is simply not executed as there is no value of type <%B%> to go on with.
+Where <%<e|theta>%> should be understood as {emph"throwing"} the exception <%e%> and <%<a|rho>%> as {emph"returning"} value <%a%>. The composition still threads functions in a monadic style to use values of type <%?B%> and <%?C%>, however, when an exception is raised, the continuation is simply not executed as there is no value of type <%B%> or <%C%> to go on with. Indeed, <%f x |_theta_|%> has type <%?B%>: if an exception is raised no value is returned. With the type <%A<+>E%>, on the other hand, a value of type <%E%> is returned.
 
-{rule_ (`Mm 3.) (`Mm 3.)}
+This representation of exceptions is often called the two-continuation encoding of exception. Where <%rho%> is called the success continuation, and <%theta%> the failure continuation. Because continuations are lexically bound, the <%theta%> operation behaves differently from Ocaml's <@raise@>: instead of {emph"dynamically"} looking for the enclosing <@try@>,
+(* arnaud: attention `a ce try si on utilise un mode ocaml, ,ca peut etre moche *)
+<%theta%> jumps to a {emph"statically"} determined continuation. Much like with callcc, it means that <%theta%> can be captured and escape its scope, in which case executing <%<e|theta>%> would still resume at <%theta%>.
 
-   There are several variants of callcc, we shall consider that corresponding to Peirce's law as
-   it is more constrained type-wise. To be true to the standard definition, the first thing to do
-   is, given a continuation of <%A%>, to package it into a function <%A-o X%>, as the continuation
-   of <%X%> will never be called (a continuation never returns), it needs to be duplicable, hence
-   <%X%> must be of the form <%?B%>. We define <%throw%> of type <%A^~ -o A -o ?B%>
-   by <%lambda k, lambda x, mu|_  _|, <x|k>%>. In the definition of <%callcc%>,
-   the continuation will be duplicated, and we shall allow the body to duplicate the continuation
-   as well, hence its type is <%(!(A-o?B)-o A)-o A%>. It is defined as
-   <%lambda f, mu |_k_|, < f |_ throw k _| | k >%>. Its typing derivation is
+It should be no surprise that, actually, callcc itself can be implemented in linear {muname}. In fact, we have already claimed in Section~{ref_ ss_lj} that classical logic can be embedded in linear {muname}; but we can give a more direct implementation with a more precise type than what would be achieved through such an embedding.
+
+There are several flavours of callcc, we choose to write the variant which can be typed as (a linear version) of Peirce's law. The first ingredient is to take a continuation of type <%A^~%> and reify it as a function <%A-oX%> for some <%X%>. As, by definition, no value of type <%X%> will be produced, <%X%> must be of the form <%?B%>. In particular, <%X%> can be <%bot%>, which is isomorphic to <%?0%>. We define trow, of type <%A^~ -o A -o ?B%>:
+{displaymath begin
+  "<%throw = lambda k, lambda x, mu|_  _|, <x|k>%>"
+end}
+It takes the continuation <%k%> to the function which, given an element <%x%>, drops the current continuation, and runs <%x%> against <%k%>. The typing derivation is:
+{let open Infer in
+ displaymath begin
+   rule ~label:"definition"
+     [rule ~label:lambda
+         [rule ~label:lambda
+             [rule ~label:whynotrule
+                 [rule ~label:(cutp"<%k%>")
+                     [rule ~label:idrule
+                         []
+                         "<%alpha:B^~;x:A|-x:A%>"]
+                     "<%alpha:B^~;k:A^~,x:A|-<x|k>%>"]
+                 "<%;k:A^~,x:A|-mu|_  _|, <x|k> : ?B%>"]
+             "<%;k:A^~|-lambda x, mu|_  _|, <x|k> : A-o?B%>"]
+         "<%;|-lambda k, lambda x, mu|_  _|, <x|k> : A^~-oA-o?B%>"]
+     "<%;|-throw : A^~-oA-o?B%>"
+end}
+
+To complete callcc, let us consider Peirce's law: $(({alpha}{rightarrow}{beta}){rightarrow}{alpha}){rightarrow}{alpha}$. From a computational point of view, there are two ways an {alpha} is produced: either the body returns an {alpha}, and the current continuation is restored, or the body explicitely calls the continuation via the function ${alpha}{rightarrow}{beta}$. Returning to linear {muname}, it means that the current continuation  must be duplicable, so callcc has a type of the form <%X-o?A%>. Since the current continuation is duplicable, we are free to make its functional reification duplicable as well. Which gives us the final type <%(!(A-o?B)-o?A)-o?A%>.
+{displaymath begin
+  "<%callcc = lambda f, mu |_k_|, < f |_ throw k _| | |_k_| >%>"
+end}
+Notice how <%k%> is indeed duplicated, hence forces the return type to be <%?A%>. The full type derivation is as follows:
+(* arnaud: il y a probablement un overful hbox here*)
    {displaymath begin
        Infer.rule ~label:lambda
          [ Infer.rule ~label:whynotrule
-             [Infer.rule ~label:(cutp "<%k%>")
+             [Infer.rule ~label:(cutp "<%|_k_|%>")
                 [Infer.rule ~label:apprule
-                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(A-o?B)-oA |- f:!(A-o?B)-oA%>";
+                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(A-o?B)-o?A |- f:!(A-o?B)-o?A%>";
                      Infer.derived [] "<%k:A^~; |- |_throw k_| : !(A-o?B)%>"]
-                   "<%k:A^~;f:!(A-o?B)-oA |- f |_ throw k _| : A%>"]
-                "<%k:A^~;f:!(A-o?B)-oA |- < f |_ throw k _| | k >%>"]
-             "<%;f:!(A-o?B)-oA |- mu|_k_|,< f |_ throw k _| | k > : A%>" ]
-         "<%|- callcc : (!(A-o?B)-o A)-o A%>"
+                   "<%k:A^~;f:!(A-o?B)-o?A |- f |_ throw k _| : ?A%>"]
+                "<%k:A^~;f:!(A-o?B)-o?A |- < f |_ throw k _| | |_k_| >%>"]
+             "<%;f:!(A-o?B)-o?A |- mu|_k_|,< f |_ throw k _| | |_k_| > : ?A%>" ]
+         "<%|- callcc : (!(A-o?B)-o ?A)-o ?A%>"
     end}
 
-   Similarly, we can model exception quite directly: the type of expressions of type <%A%> which
-   may raise an exception of type <%E%> is represented as <%?A`&?E%>. The programming style is
-   then reminiscent of that of imperative programming language: we write <%mu(|_return_|,|_raise_|),c%>,
-   then <%c%> can use <%<return|v>%> to return the value <%v%>, and <%<raise|e>%> to raise the exception
-   <%e%>. The type <%?A`&?E%> is less precise, yet more akin to the usual practice of programming with exception, than
-   using the type <%A<+>E%>. Indeed, in the latter case, we need to thread throughout the program whether
-   we raised an exception or not, where in the former, <%<raise|x>%> is truly a non-local operation.
-
-   A <%catch%> operation of type <%!(E-o?A) -o ?A`&?E -o ?A%> can be written as 
-   (* arnaud: je finirai plus tard *)
+The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of linear logic may be resolved by favouring one way or another. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
 
 {subsection"Commutative cuts"}
+
+{rule_ (`Mm 3.) (`Mm 3.)}
 
 Commutative cuts are essential to optimisation, in sequent calculus they are just partial evaluation.
 
