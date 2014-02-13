@@ -78,7 +78,7 @@ expr:
 
 | MU p=pattern COMMA e=expr { concat [Latex.mu;p;text".\\,";e] } %prec MU
 | MUT p=pattern COMMA e=expr { concat [tilde Latex.mu;p;text".\\,";e] } %prec MU
-| POINTYL e=expr BAR f=expr POINTYR { between `Angle (concat [e;mid;f]) }
+| POINTYL e=expr BAR f=expr POINTYR { between `Angle (concat [e;middle `Vert;f]) }
 
 | PARENL t=expr COMMA u=expr PARENR { between `Paren (concat [t;text",";u]) }
 | PARENL PARENR { text"()" }
