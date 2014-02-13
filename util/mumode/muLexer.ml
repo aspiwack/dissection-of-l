@@ -83,6 +83,8 @@ let next k = lexer
 	longvar id
     end
 
+  | "'o'" -> COMP
+
   | "~~>" -> REDUCES
 
   | "<" -> POINTYL | ">" -> POINTYR

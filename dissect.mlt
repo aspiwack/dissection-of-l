@@ -722,7 +722,24 @@ With <%gamma%> we obtain corresponding principles on the type <%?A%>:
 
    {subsection "Programming constructs"}
 
+We have seen many construction, so far, which allow to program in the style of pure programming languages. Linear {muname}, however, goes beyond pure languages. To illustrate this, let us consider exceptions.
 
+Following the tradition in pure languages, we can decide to represent computations of type <%A%> which may raise an exception <%E%> by the type <%A<+>E%>. The well known limit of this representation is that exception-raising expressions must be threaded explicitly. Consider three exception-raising functions <%|-f:A-oB<+>E%>, <%|-g:B-oC<+>E%>, and <%|-h:C-oD<+>E%>, their composite, in the worst order, can be defined as:
+{displaymath begin array [`L;symbsep$=$;`L] [
+  array_line [ "<%g 'o' f%>"; "<%lambda x,mu r, <f x | { mu(1.y), < g y | r > , mu(2.e), <e|r.2>}>%>"];
+  array_line [ "<%h 'o'(g 'o' f)%>"; "<%lambda x, mu r, <(g 'o' f) x| {mu(1.z), <h z| r> , mu(2.e), <e|r.2>} >%>" ]
+]end}
+(* la composition dans le bon sens
+{displaymath begin
+  "<%lambda x, mu r, <f x| { mu(1.y), <g y | {mu(1.z), <h z| r> , mu(2.e), <e|r.2>} > , mu(2.e), <e|r.2> }>%>"
+end}
+*)
+(* arnaud: une citation vers Wadler pour le monades ? *)
+The relative verbosity is not an issue, as it can be hidden behind (monadic) combinators. What can be, on the other hand, is that each step of the program has to inspect whether the previous expression returns a value or an exception. In the worst case, as above, even when the innermost function -- <%f%> -- fails, there is a linear number of inspections before the total function finally fails (on the other hand <%(h 'o' g) 'o' f%> would fail immediately if <%f%> fails).
+
+The inspections themselves can be costly, but more importantly, it is not always possible to avoid the slow composition order. An extreme, yet common, example would be combinators like Ocaml's <@List.fold_left@>: even if <@List.fold_left f s l@> fails quickly on <@f@>, the whole list needs to be traversed before returning an error. With actual exceptions, on the other hand, the execution of <@List.fold_left f s l@> is interrupted as soon as an exception is raised.
+
+This behaviour can be modelled in linear {muname}.
 
 {rule_ (`Mm 3.) (`Mm 3.)}
 

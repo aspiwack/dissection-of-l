@@ -21,6 +21,8 @@ let empty_context = Latex.cdot
 %token WILDCARD
 %token TURNSTYLE TURNSTYLEV TURNSTYLEP VEC
 
+%token COMP
+
 %token POINTYL POINTYR BAR
 %token DUAL
 %token OPLUS OTIMES WITH PAR
@@ -71,6 +73,8 @@ expr:
 | e=expr SUP s=expr {exponent e s} %prec SUBSUP
 | e=expr SUB s1=expr SUP s2=expr {index_exponent e s1 s2} %prec SUBSUP
 | e=expr SUP s1=expr SUB s2=expr {index_exponent e s2 s1} %prec SUBSUP
+
+| f=expr COMP g=expr { concat[f;circ;g] }
 
 | MU p=pattern COMMA e=expr { concat [Latex.mu;p;text".\\,";e] } %prec MU
 | MUT p=pattern COMMA e=expr { concat [tilde Latex.mu;p;text".\\,";e] } %prec MU
