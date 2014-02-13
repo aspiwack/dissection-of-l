@@ -105,7 +105,7 @@ let next k = lexer
   | "(" -> PARENL | ")" -> PARENR
   | "[" -> BRACKETL | "]" -> BRACKETR
   | "{" -> BRACEL | "}" -> BRACER
-  | "{\n" -> BRACEBR
+  | "{\\\\" -> BRACEBR
   | "_" -> SUB | "^" -> SUP
 
   | "1" -> SYMB one | "0" -> SYMB zero

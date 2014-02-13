@@ -307,8 +307,8 @@ We have seen many construction, so far, which allow to program in the style of p
 Following the tradition in pure languages, we can decide to represent computations of type <%A%> which may raise an exception <%E%> by the type <%A<+>E%>. The well known limit of this representation is that exception-raising expressions must be threaded explicitly. Consider three exception-raising functions <%|-f:A-oB<+>E%>, <%|-g:B-oC<+>E%>, and <%|-h:C-oD<+>E%>, their composite, in the worst order, can be defined as:
 (* arnaud: ,ca vaudrait le coup de displayer les pattern maching sur deux lignes *)
 {displaymath begin array [`L;symbsep$=$;`L] [
-  array_line [ "<%g 'o' f%>"; "<%lambda x,mu r, <f x | { mu(1.y), < g y | r > , mu(2.e), <e|r.2>}>%>"];
-  array_line [ "<%h 'o'(g 'o' f)%>"; "<%lambda x, mu r, <(g 'o' f) x| {mu(1.z), <h z| r> , mu(2.e), <e|r.2>} >%>" ]
+  array_line [ "<%g 'o' f%>"; "<%lambda x,mu r, <f x | {\\ mu(1.y), < g y | r > , mu(2.e), <e|r.2>}>%>"];
+  array_line [ "<%h 'o'(g 'o' f)%>"; "<%lambda x, mu r, <(g 'o' f) x| {\\ mu(1.z), <h z| r> , mu(2.e), <e|r.2>} >%>" ]
 ]end}
 (* la composition dans le bon sens
 {displaymath begin

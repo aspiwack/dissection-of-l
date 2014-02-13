@@ -83,12 +83,10 @@ expr:
 | PARENL t=expr COMMA u=expr PARENR { between `Paren (concat [t;text",";u]) }
 | PARENL PARENR { text"()" }
 | BRACEL t=expr COMMA u=expr BRACER { between `Brace (concat [t;text"\\,,\\,";u]) }
-| BRACEBR t=expr COMMA u=expr BRACER { concat [
-                                        text"\\{";newline;
-                                        phantom alpha; quad;t;text",";newline;
-					phantom alpha; quad;u;newline;
-                                        text"\\}"
-                                      ]}
+| BRACEBR t=expr COMMA u=expr BRACER { between `Brace begin array [`L] [
+                                         array_line [t];
+                                         array_line [u]
+                                       ] end}
 | BRACEL BRACER { text"\\{\\}" }
 | IOTA1 u=expr { concat [text "1." ; u] }
 | IOTA2 u=expr { concat [text "2." ; u] }
