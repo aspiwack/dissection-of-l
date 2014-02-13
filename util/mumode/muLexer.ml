@@ -39,9 +39,11 @@ let map_ident = [
   "delta" , SYMB delta ;
   "Delta" , SYMB delta_;
   "epsilon" , SYMB varepsilon ;
+  "theta" , SYMB theta ;
   "Theta" , SYMB theta_;
   "kappa" , SYMB kappa ;
   "Pi" , SYMB pi_;
+  "rho" , SYMB rho ;
   "Sigma" , SYMB sigma_;
   "phi" , SYMB varphi ;
   "psi" , SYMB psi ;
