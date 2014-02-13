@@ -563,6 +563,16 @@ In Figure~{ref_ l_lambda}, we give the translation of simply typed {lambda}-calc
     ]
  ]
 }
+(* elimination rule for disjunction:
+             x:A;|-u:C                          y:B;|-v:C
+       ------------------------
+       x:A;alpha:C^~|-<u|alpha>
+   ---------------------------------  ---------------------------------
+   ;alpha:C^~|-mu x,<u|alpha> : ?A^~  ;alpha:C^~|-mu y,<v|alpha> : ?B^~
+
+etc...
+
+*)
 
 (* arnaud: tout ,ca c'est faux
 The case of disjunction is more interesting. Indeed there are two disjunctions: either <%?A`&?B%> (or equivalently <%?(A<+>B)%>) which is the proper dual of the conjunction and corresponds to classical disjunction, or the stronger <%A<+>B%> which corresponds to intuitionistic disjunction. The natural elimination rule for <%?A`&?B%> is the usual elimination rule for natural deduction disjunction:
