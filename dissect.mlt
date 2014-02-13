@@ -808,6 +808,10 @@ With <%gamma%> we obtain corresponding principles on the type <%?A%>:
 {subsection"Commutative cuts"}
 
 Commutative cuts are essential to optimisation, in sequent calculus they are just partial evaluation.
+
+Linear arrows for inlining.
+
+No need to allocate linear values to the garbage collector.
    
 "
 
