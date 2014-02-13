@@ -46,7 +46,8 @@ let title = "Dissecting {muname}"
 let authors = [
   { name = "Arnaud Spiwack";
     email = Some "arnaud@spiwack.net";
-    address = "Inria -- {textsc "pps"} -- Université Paris Diderot, France"
+    address = "Inria -- {textsc"Ens"} -- Paris, France"
+      (* arnaud: v'erifier le style des affiliations dans lmcs *)
   };
 ]
 
