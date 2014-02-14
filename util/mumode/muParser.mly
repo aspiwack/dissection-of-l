@@ -62,7 +62,7 @@ mu:
 | s=sequent EOL {mode M s }
 
 expr:
-| PARENL e=expr PARENR { concat [text"(";e;text")"] }
+| PARENL e=expr PARENR { between `Paren e }
 | METAPARENL e=expr METAPARENR { e }
 | s=SYMB { s }
 | WILDCARD { text"\\_" }
