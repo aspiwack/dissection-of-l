@@ -380,9 +380,22 @@ The type of <%callcc%> illustrates how embedding classical principles in linear 
 
 {rule_ (`Mm 3.) (`Mm 3.)}
 
+<@let (x,y) = let (z,i) = u in v in t@> {leadsto} <@let(z,i) = u in let(x,y) = v in t@> (*arnaud: Peyton-Jones & Santos, Section 5 *)
+<@let (x,y) = u in v@> is implemented as <%mu alpha, < u | mu(x,y), <v|alpha>>%>.
+
+So <@let (x,y) = let (z,i) = u in v in t@> is
+<%mu alpha, < mu beta, <u|mu(z,i),<v|beta>> | mu(x,y), <t|alpha> >
+~~> mu alpha, < u | mu (z,i), <v| mu(x,y), <t|alpha>>>%>
+which is the expected form.
+
+Another commutative cut <@(let (x,y) = u in v) t@>{leadsto}<@let(x,y) = u in v t@>
+
+In {muname} <%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>
+~~> mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>.
+
 Commutative cuts are essential to optimisation, in sequent calculus they are just partial evaluation.
 
-Linear arrows for inlining.
+Linear arrows for inlining. (*arnaud: Peyton-Jones & Santos propose ,ca, section 4.2 *)
 
 No need to allocate linear values to the garbage collector.
    
