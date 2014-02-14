@@ -42,7 +42,7 @@ let _test = "{Infer.rule ~label:(mathrm $Dummy$) ["<%<mu x, c|y>%>"] "<%A<*>B%>"
       
 (*** boilerplate ***)
 
-let title = "Dissecting {muname}"
+let title = "A dissection of {muname}"
 let authors = [
   { name = "Arnaud Spiwack";
     email = Some "arnaud@spiwack.net";
