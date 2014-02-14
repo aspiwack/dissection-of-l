@@ -73,6 +73,7 @@ let packages = [
 ]
 
 let prelude = concat_with_sep [
+  text\"\\\\setlength\\\\delimitershortfall{-1pt}\";
   (* command \"bibliographystyle\" [A,"alpha"] A; *)
 ] par
 
