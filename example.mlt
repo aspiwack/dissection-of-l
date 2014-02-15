@@ -219,8 +219,11 @@ Which have the following types
    array_line ~sep:(`Mm 6.) [phi_type];
    array_line [inv_type];
  ]end}
-
-We have <%<phi (\(phi^\(-1\)\) (|_a_|,|_b_|)) | alpha> ~~> <(|_a_|,|_b_|) | alpha>%> as well as <%<\(phi^\(-1\)\) (phi |_x_|) | alpha> ~~> |_{ 1 = x.1 , 2 = x.2 }_|%>. Accepting the extensionality principles that every elements of <%!A%> is of the form <%|_x_|%>, every elements of <%A<*>B%> is of the form <%(x,y)%> and for every <%x%> in <%A&B%>, <%{ 1=x.1 , 2=x.2 } = x%>, we conclude that <%phi%> and <%phi^\(-1\)%> form, indeed, an isomorphism.
+We have
+{displaymath"<%<phi (\(phi^\(-1\)\) (|_a_|,|_b_|)) | alpha> ~~> <(|_a_|,|_b_|) | alpha>%>"}
+as well as
+{displaymath"<%<\(phi^\(-1\)\) (phi |_x_|) | alpha> ~~> |_{ 1 = x.1 , 2 = x.2 }_|%>"}
+Accepting the extensionality principles that every elements of <%!A%> is of the form <%|_x_|%>, every elements of <%A<*>B%> is of the form <%(x,y)%> and for every <%x%> in <%A&B%>, <%{ 1=x.1 , 2=x.2 } = x%>, we conclude that <%phi%> and <%phi^\(-1\)%> form, indeed, an isomorphism.
 
 The dual isomorphism between <%?(A<+>B)%> and <%?A`&?B%>, which we touched upon briefly in Section~{ref_ ss_lj}, has slightly more advanced proof terms, but is all the more interesting.
 {displaymath begin array [`L;symbsep$=$;`L] [
