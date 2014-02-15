@@ -406,7 +406,7 @@ The commutative cuts, in linear {muname}, are not actual conversions, because ex
 
 While we are on the subject of program optimisation by reduction, linear {muname} contributes to the subject in another way. Indeed, reductions should not modify the complexity of the program, so they should not duplicate or drop computations. In linear {muname}, there is only one reduction rule which may duplicate or drop computation:
 {displaymath (reduction Rules.Reduction.exponential)}
-All the other reduction may be applied safely. Though, they should probably not be applied blindly, as {emph"code"} duplication can still occur, if several branches refer to the same variable.
+All the other reduction may be applied safely. Though, they should probably not be applied blindly, as {emph"code"} duplication can still occur, if several branches refer to the same variable. Note that, for non-linear languages, this requires a significantly finer translation than just marking every variable as duplicable to be actually useful.
 
 Using linearity to guide reductions in the {textsc"ghc"} compiler was actually proposed in~{cite"PeytonJones1998" ~extra:"Section 4.2"}. Their intermediate language does not have syntactic markers for duplication, so they rely purely on types to guide the reduction. The main difference, though, is that Haskell being a lazy language, {textsc"ghc"} can safely drop computations, so their typing system is actually {emph"affine"}.
 
