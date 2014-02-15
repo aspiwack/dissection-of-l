@@ -377,28 +377,53 @@ Notice how <%k%> is indeed duplicated, hence forces the return type to be <%?A%>
          "<%|- callcc : (!(A-o?B)-o ?A)-o ?A%>"
     end}
 
-The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of linear logic may be resolved by favouring one way or another. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
+The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of classical logic may be resolved by favouring one way or another. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
 
 {subsection"Commutative cuts"}
 
+For those developing a programming language which is not based on linear {muname}, it can still be quite serviceable as an intermediate language. In the spirit of the Glasgow Haskell Compiler ({textsc"ghc"})~{cite"PeytonJones1998"}, the syntax of a programming language can be {emph"desugared"} into linear {muname} which is quite amenable to program transformations. Desugaring is a simple transformation, which should consist of interpreting syntactic construction of the language as macros, which is the case of every definition we demonstrate in this article. The reader wishing to make the meaning of macros more formal may refer to~{cite"Felleisen1990"}.
+
+One of the roles of intermediate language optimisation is to eliminate unnecessary computations introduces by modularly written programs: a common slogan is {emph"writing the programs we want to write, and producing the code we want to produce"}. The strategy, in~{cite"PeytonJones1998"} is to express optimisations as {emph"program transformations"} on the intermediate language. For instance -- in Ocaml syntax -- <@let(x,y)=(u,v) in t x y@>, provided <%u%> and <%v%> are values, can be rewritten to <@t u v@>: it does not affect the complexity of the program, but avoids unnecessary allocations which can be inefficient.
+
+In languages based on {lambda}-calculus, however, there are missed opportunity for reduction. Consider the term <@let(x,y) = let (z,i) = u in (i,z) in t@>. In that expression, <@(i,z)@> is built and immediately destructed. However, this unnecessary allocation cannot be eliminated by {beta}-reduction. To handle this missed opportunity for reduction {cite"PeytonJones1998" ~extra:"Section 5"} introduces an extra transformation (we give the transformation for pair patterns, but it can be defined, in general, for any atomic pattern matching):
+{displaymath$"<@let (x,y) = let (z,i) = u in v in t@>"{leadsto}"<@let(z,i) = u in let(x,y) = v in t@>"$}
+
+This reduction is an example of what is called, in proof theory, a {emph"commutative cut"}, or commuting conversion. That is, proofs which are distinguished by the cut elimination of natural deduction, but are identified by the cut elimination of sequent calculus. They can, hence, be seen as hidden cuts. Commutative cuts always involve a pattern matching another elimination rule. Here is a commutative cut with application:
+{displaymath$"<@(let (x,y) = u in v) t@>"{leadsto}"<@let(x,y) = u in v t@>"$}
+
+Transforming programs according to such commutative cut is crucial to the optimisation strategy of {textsc"ghc"}. Going even further, the {textsc"mlj"} compiler~{cite"Benton1999"} transformed programs according to every commutative cut.
+
+In linear {muname}, commutative cuts are, as in any sequent calculus, mere reductions. Indeed, the pattern matching of linear {muname} do not return terms, but commands. Hence the term-returning flavour of pattern matching from natural deduction must be encoded, by capturing the current continuation: <@let(x,y) = u in v@> is encoded as <%mu alpha, < u | mu(x,y), <v|alpha>>%>. We then have that <@(let (x,y) = u in v) t@> is as follows:
+{displaymath"<%mu alpha, < mu beta, <u|mu(z,i),<v|beta>> | mu(x,y), <t|alpha> >
+~~> mu alpha, < u | mu (z,i), <v| mu(x,y), <t|alpha>>>%>"}
+Which is almost the encoding of <@let(z,i) = u in let(x,y) = v in t@>. In fact, it is one innocuous reduction better than the actual one:
+{displaymath"<%mu alpha, <u | mu(z,i), < mu beta, < v | mu(x,y),<t|beta>> | alpha >>%>"}
+The case of <@(let (x,y) = u in v) t@> works just as well:
+{displaymath"<%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>
+~~> mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>"}
+
+The commutative cuts, in linear {muname}, are not actual conversions, because extra {mu} binder are introduced by the macro-encoding of the language constructs. However, they are indeed conversions. From an intermediate language perspective, anyway, these extra binders should be eliminated as much as possible, so these reduction produce the appropriate terms.
+
+While we are on the subject of program optimisation by reduction, linear {muname} contributes to the subject in another way. Indeed, reductions should not modify the complexity of the program, so they should not duplicate or drop computations. In linear {muname}, there is only one reduction rule which may duplicate or drop computation:
+{displaymath (reduction Rules.Reduction.exponential)}
+All the other reduction may be applied safely. Though, they should probably not be applied blindly, as {emph"code"} duplication can still occur, if several branches refer to the same variable.
+
+Using linearity to guide reductions in the {textsc"ghc"} compiler was actually proposed in~{cite"PeytonJones1998" ~extra:"Section 4.2"}. Their intermediate language does not have syntactic markers for duplication, so they rely purely on types to guide the reduction. The main difference, though, is that Haskell being a lazy language, {textsc"ghc"} can safely drop computations, so their typing system is actually {emph"affine"}.
+
+An affine flavour {muname} can be defined by changing the linear context of linear {muname} into an affine context which can be dropped at leaves. Effectively, affine {muname} differs from linear {muname} by three rules: the two identity rules and the introduction rule for <%1%>, which now can have an arbitrary affine context. Affine {muname} can be translated into linear {muname} by translating every hypothesis <%x%> of type <%A%> in the affine context into an hypothesis <%x%> of type <%A&1%> in the linear context. This translation, however, {emph"is not"} a simple macro translation, at least not on untyped terms, as unused variables must be explicitly dropped. So the translation of the three modified rules depend on the affine variables in the context.
+(* dropping x:A&1
+                       |- t : A
+                   ------------------------
+                    alpha:A^~ |- <t|alpha>
+--------------     -----------------------------------
+x:A&1 |- x.2:1      alpha:A^~ |- mu(), <t|alpha> : bot
+-----------------------------------------------
+x:A&1, alpha:A^~ |- < x.2 | mu(), <t|alpha> >
+------------------------------------------------
+x:A&1|- mu alpha, < x.2 | mu(), <t|alpha> > : A
+*)
+
 {rule_ (`Mm 3.) (`Mm 3.)}
-
-<@let (x,y) = let (z,i) = u in v in t@> {leadsto} <@let(z,i) = u in let(x,y) = v in t@> (*arnaud: Peyton-Jones & Santos, Section 5 *)
-<@let (x,y) = u in v@> is implemented as <%mu alpha, < u | mu(x,y), <v|alpha>>%>.
-
-So <@let (x,y) = let (z,i) = u in v in t@> is
-<%mu alpha, < mu beta, <u|mu(z,i),<v|beta>> | mu(x,y), <t|alpha> >
-~~> mu alpha, < u | mu (z,i), <v| mu(x,y), <t|alpha>>>%>
-which is the expected form.
-
-Another commutative cut <@(let (x,y) = u in v) t@>{leadsto}<@let(x,y) = u in v t@>
-
-In {muname} <%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>
-~~> mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>.
-
-Commutative cuts are essential to optimisation, in sequent calculus they are just partial evaluation.
-
-Linear arrows for inlining. (*arnaud: Peyton-Jones & Santos propose ,ca, section 4.2 *)
 
 No need to allocate linear values to the garbage collector.
    
