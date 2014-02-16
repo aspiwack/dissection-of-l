@@ -89,7 +89,7 @@ The justification is a straightforward extension of the variable case in Section
 With this syntax, we can revisit the duplication of <%!A%> which we encountered in Section~{ref_ ss_exponentials}. It is, now, quite easy to write a duplication function:
 {displaymath "<%|- lambda |_x_|,(|_x_|,|_x_|) : !A-o!A<*>!A%>"}
 
-It is possible, if quite a bit of work, to extend patterns to all of the value constructors. In~{cite"Curien2010"}, nested patterns are even primitive and are used to define everything else. The point of taking nested patterns as the main construction of {muname} is that it allows to restrict variables to be of {emph"asynchronous"} type and recover {emph"focused"} proofs~{cite"Andreoli1992"}. For the purpose of programming, on the other hand, compiling nested patterns into simple patterns are sufficient.
+It is possible, if quite a bit of work, to extend patterns to all of the value constructors. In~{cite"Curien2010"}, nested patterns are even primitive and are used to define everything else. Primitive patterns can be used to as a syntax for the synthetic connectives of focusing~{cite"Andreoli1992"}.
 
 {subsection "Natural deduction" ~label:ss_lj}
 
