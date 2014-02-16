@@ -42,37 +42,6 @@ It is useful to generalise this idiom to a <%<t|p>%> where <%p%> is a pattern. I
     "<%Xi,Theta;Gamma,Delta|- <t|p>%>"
 end}
 The case of the variable-pattern is the simple version of the idiom as seen above. It is clear, in general, that if <%Theta;Delta|-_p p:A%>, then <%Xi,Theta;Delta|- p:A%>, which, with the help of the cut rule proves the derived rule. Note that this derived rule stays correct for non-linear patterns where duplicable variables are used multiple times.
-(*arnaud: c'est trivial ,ca
- let us prove the other three cases:
-{ let open Infer in
-  let proof_one =
-    rule ~label:cutrule
-      ["<%Xi;Gamma|-t:bot%>";
-       rule ~label:one [] "<%|-():1%>"]
-      "<%Xi;Gamma|- <t|()>%>"
-  in
-  let proof_dup =
-    rule ~label:cutrule
-      ["<%Xi,x:A;Gamma|-t:?A^~%>";
-       rule ~label:bangrule
-         [rule ~label:iddup [] "<%Xi,x:A;|-x:A%>"]
-         "<%Xi,x:A;|-|_x_|:A%>"
-      ]
-      "<%Xi,x:A;Gamma |- <t||_x_|>%>"
-  in
-  let proof_pair =
-    rule ~label:cutrule
-      ["<%Xi,Theta,Psi;Gamma|-t%>";
-       (* et la r`egle de (p,q)*)]
-      "<%Xi,Theta,Psi;Gamma,Delta,Omega|-<t|(p,q)>%>"
-  in
-  let sep = `Mm 2. in
-  displaymath begin array [`C] [
-    array_line ~sep [proof_one];
-    array_line ~sep [proof_dup];
-    array_line [proof_pair]
-  ]end}
-*)
 
 The {cutp"<%p%>"} rule allows for terser proofs even in the very common variable, as we shall see immediately. Indeed, a more significant use of deep patterns is, of course, pattern matching: we define the <%mu p,c%> by induction on patterns. In the base cases, <%mu p,c%> already exists, so only <%mu(p,q),c%> is left to be defined:
 {displaymath begin
