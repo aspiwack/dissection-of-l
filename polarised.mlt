@@ -7,6 +7,8 @@ open Extra
 
 let d = "{section "Polarised {muname}" ~label:s_pol}
 
+{rule_ (`Mm 3.) (`Mm 3.)}
+
 Linear {muname} solves the non-confluence example of Section {ref_ s_core}: to erase a variable, one must introduce a binder <%mu|_x_|,c%> which has no critical pair. However, there are still critical pairs of the form <%<mu x,c|mu y,c'>%> which can be typed in linear {muname}. It is conceivable that the reduction of linearly typed {muname} term is still non-confluent. And indeed, here is a counter-example.
 {displaymath "<%<mu x,<(x,z)|v> | mu y,<(t,y)|w>>%>"}
 which reduces both to

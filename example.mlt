@@ -423,8 +423,6 @@ x:A&1, alpha:A^~ |- < x.2 | mu(), <t|alpha> >
 x:A&1|- mu alpha, < x.2 | mu(), <t|alpha> > : A
 *)
 
-{rule_ (`Mm 3.) (`Mm 3.)}
-
-No need to allocate linear values to the garbage collector.
+(* I originally planned to talk about how |_t_| could be taken as allocating t to the garbage collector, and that purely linear values could, in principle, be only stack allocated. But I'm not confident enough about these issues. I don't fully understand yet how it compares to logics of ownership like the uniqueness typing of Clean or the separation-logic like permissions of Mezzo. Instead of a poorly argued paragraph, I'll leave this conversation to someone else. *)
    
 "
