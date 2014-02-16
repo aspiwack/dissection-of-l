@@ -56,13 +56,13 @@ arranged on a single side (or any convenient arrangement). In classical logic, n
 connective is a reflection of dualisation, and it may be tempting -- and is indeed often done -- to forgo the
 negation altogether and keep only dualisation. In that case, the de Morgan laws are not just tautologies,
 they are {emph"definitions"} for the negation. An option which is more appealing from a programming language
-standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{citation_needed}(* arnaud: je pense que le chapitre correspondant de Bob Harper serait id'eal *). Duality, on the other
+standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{cite"Harper2012"~extra:"Chapter 31"}. Duality, on the other
 hand, does not have introduction rules -- unless we count the identity and cut rules as introduction rules.
 
 To follow the tradition of programming languages, let us choose to leave all the variables on the left-hand
 side of the sequents. The tradition in proof theory, on the other hand, is rather to keep the variables on
-the right. The latter is better suited for interpretation in terms of proof nets~{citation_needed}(* arnaud: du Girard, sans doute*) or
-monoidal category~{citation_needed}(* arnaud: peut-^etre du Lutz?*). On the other hand, the left-handed
+the right. The latter is better suited for interpretation in terms of proof nets~{cite"Girard1996"} or
+monoidal category~{cite"Seely1989"}. On the other hand, the left-handed
 variant works very well with {muname}. Duality ensures that the difference is only
 in the eye of the reader: mathematically, these are all the same objects.
 
@@ -117,5 +117,5 @@ In order to address the issue of non-confluence, we move away from classical log
 The {mu} rule, on the other hand is left unchanged:
 {displaymath Rules.Typing.Mall.mu}
 
-Would we want to limit the {emph"exchange"} rules, like in non-commutative logic~{citation_needed}(*arnaud: presumably Paul Ruet 1&2*), we would have to tweak the {mu} rule, but we will be content with treating the comma, in contexts, as commutative.
+Would we want to limit the {emph"exchange"} rules, like in non-commutative logic~{cite"Abrusci1999"}, we would have to tweak the {mu} rule, but we will be content with treating the comma, in contexts, as commutative.
 "
