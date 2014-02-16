@@ -370,6 +370,7 @@ Which is almost the encoding of <@let(z,i) = u in let(x,y) = v in t@>. In fact, 
 The case of <@(let (x,y) = u in v) t@> works just as well:
 {displaymath"<%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>
 ~~> mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>"}
+Going further, Marlow~{cite"Marlow1995"~extra:"Chapter 3"} studies precisely how cut elimination for sequent calculus can model deforestation, {emph"i.e."} elimination of unnecessary intermediate data in presence of recursive types.
 
 The commutative cuts, in linear {muname}, are not actual reductions, because extra {mu} binder are introduced by the macro-encoding of the language constructs. However, they are indeed conversions. From an intermediate language perspective, anyway, these extra binders should be eliminated as much as possible, so these reduction produce the appropriate terms.
 
