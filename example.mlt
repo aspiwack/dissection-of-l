@@ -371,7 +371,7 @@ The case of <@(let (x,y) = u in v) t@> works just as well:
 {displaymath"<%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>
 ~~> mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>"}
 
-The commutative cuts, in linear {muname}, are not actual conversions, because extra {mu} binder are introduced by the macro-encoding of the language constructs. However, they are indeed conversions. From an intermediate language perspective, anyway, these extra binders should be eliminated as much as possible, so these reduction produce the appropriate terms.
+The commutative cuts, in linear {muname}, are not actual reductions, because extra {mu} binder are introduced by the macro-encoding of the language constructs. However, they are indeed conversions. From an intermediate language perspective, anyway, these extra binders should be eliminated as much as possible, so these reduction produce the appropriate terms.
 
 While we are on the subject of program optimisation by reduction, linear {muname} contributes to the subject in another way. Indeed, reductions should not modify the complexity of the program, so they should not duplicate or drop computations. In linear {muname}, there is only one reduction rule which may duplicate or drop computation:
 {displaymath (reduction Rules.Reduction.exponential)}
