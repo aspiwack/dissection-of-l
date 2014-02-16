@@ -10,6 +10,7 @@ open Extra
 (* arnaud: fix le kerning de ?, en particulier ?0 *)
 (* arnaud: un mode ocaml pour <@@> *)
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
+(* arnaud: Wadler's writeup and Harper's natural deduction classical logic should be mentionned in intro *)
 
 (*** doc ***)
 (* arnaud: ne pas oublier l'abstract *)
