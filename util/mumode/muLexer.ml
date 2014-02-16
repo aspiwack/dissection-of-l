@@ -24,8 +24,10 @@ let map_ident = [
   "top" , SYMB top;
 
   "val" , VAL ;
+  "thunk" , THUNK ;
   "shiftn" , SHIFTN ;
   "shiftp" , SHIFTP ;
+  "chain" , FUN3 (fun m x n -> concat[m;mathrm (text"\\,to\\,");x;text".\\,";n]) ;
 
   "subst", SUBST;
 

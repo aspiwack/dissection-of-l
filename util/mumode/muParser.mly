@@ -35,7 +35,7 @@ let empty_context = Latex.cdot
 %token PI1 PI2 FIELD1 FIELD2
 %token LLCORNER LRCORNER
 %token LAMBDA
-%token VAL
+%token VAL THUNK
 
 %token REDUCES
 %token SUBST
@@ -98,6 +98,7 @@ expr:
 | LLCORNER u=expr LRCORNER { between `Floor u }
 | LLCORNER LRCORNER { between `Floor (phantom(text"x")) }
 | VAL u=expr { just_left (`Double `Up) u }
+| THUNK u=expr { just_left (`Double `Down) u }
 
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP

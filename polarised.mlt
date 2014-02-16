@@ -22,16 +22,39 @@ The solution suggested by the latter view is to take more seriously the distinct
 
 To offer a counter-point we will account for this restriction purely by typing. This is merely a difference in presentation, though, as the syntactic restriction can be read off directly from the typing rules. This idea leads to a {emph"polarised"} logic, where type are classified on whether their introduction rules are value constructors ({emph"positive"} types) or computation constructors ({emph"negative"} types). The restriction that variables can only be substituted with values then translates to the restriction that {emph"variables all are of positive type"}.
 
-This rule has strong consequences: in <%mu(x,y),c%>, <%x%> and <%y%> must be of positive type, hence the two component of a pair must be values. In particular terms of the form <%(mu x,c,u)%>, like above, are no longer permissible. It is now well understood~{cite"Dyckhoff2006,Zeilberger2008,Munch2009,Curien2010"}, that this call-by-value restriction of sequent calculus is akin to focusing~{cite"Andreoli1992"}, though, on the details, it need not correspond to closely.
+This rule has strong consequences: in <%mu(x,y),c%>, <%x%> and <%y%> must be of positive type, hence the two component of a pair must be values. In particular terms of the form <%(mu x,c,u)%>, like above, are no longer permissible. It is now well understood~{cite"Dyckhoff2006,Zeilberger2008,Munch2009,Curien2010"}, that this call-by-value restriction of sequent calculus is akin to focusing~{cite"Andreoli1992"}, though, on the details, it need not correspond too closely.
 
 The classification of types is, hence, a strong restriction which we sum up with the following grammar, where <%A%> and <%B%> denote positive types and <%N%> and <%M%> denote negative types:
 {displaymath begin syntax [
   syntax_line (`Other "<%A%>, <%B%>") Rules.Types.Polarised.positive;
   syntax_line (`Other "<%N%>, <%M%>") Rules.Types.Polarised.negative;
 ] end}
-This grammar introduces two new dual connectives <%shiftn N%> and <%shiftp P%> both read ``shift'', to mediate between the two polarities.
+This grammar introduces two new dual connectives <%shiftn N%> and <%shiftp P%> -- both read ``shift'' -- to mediate between the two polarities.
 (* This is not as interesting as I first thought
-   Notice the two new types <%shiftn N%> and <%shiftp P%> which permit to embed positive and negative types into negative and positive types respectively. They both read ``shift''. Here again there was some amount of choice available: in Andreoli's treatment of focusing~{cite"Andreoli1992"}, every linear logic type is a valid type, the polarity only depends on the head connective and shifts are completely implicit (this approach is followed for {muname} in~{cite"Munch2009"}). In early {textsc"llp"} works~{citation_needed}(* Olivier Laurent *), shifts were explicit, but conflated with the exponential connective <%!N%> was positive and <%?A%> was negative, it does not seem, however, easily amenable to the style of this article. In any case, the shift connectives have useful interpretations from a programming language perspective, which makes them interesting to study, hence their inclusion. *)
+   Notice the two new types <%shiftn N%> and <%shiftp P%> which permit to embed positive and negative types into negative and positive types respectively. They both read ``shift''. Here again there was some amount of choice available: in Andreoli's treatment of focusing~{cite"Andreoli1992"}, every linear logic type is a valid type, the polarity only depends on the head connective and shifts are completely implicit (this approach is followed for {muname} in~{cite"Munch2009"}). In early {textsc"llp"} works~{citation}(* Olivier Laurent *), shifts were explicit, but conflated with the exponential connective <%!N%> was positive and <%?A%> was negative, it does not seem, however, easily amenable to the style of this article. In any case, the shift connectives have useful interpretations from a programming language perspective, which makes them interesting to study, hence their inclusion. *)
+The shift connectives have reversed introduction rules, as <%shiftp P%> is introduced by the construction <%val v%> (read ``return'' <%v%>), and <%shiftn N%> by <%mu\(val x\),c%>, despite the former being negative and the latter positive. Indeed <%val v%> is a computation and <%mu\(val x\),c%> a value. Sequents for values are written <%Xi;Gamma|-_v t:A%>, this is purely cosmetic in this section, but the typing judgement of values and computations will be distinct in Section~{ref_ s_dep}.
+{displaymath begin array [`C] [
+  array_line ~sep:(`Mm 2.) [Rules.Typing.Fll.shiftn];
+  array_line [ Rules.Typing.Fll.shiftp];
+]end}
+With the obvious reduction rule:
+{displaymath (reduction Rules.Reduction.shift)}
+
+As often, it is usually possible to define an alternative syntax to replace the {mu} pattern: <%shiftn N%> can alternatively be introduced by <%thunk t%> -- read ``thunk <%t%>'' -- defined as:
+{displaymath "<%\(thunk t\) = mu\(val alpha\),<t|alpha> %>"}
+The typing of which is given by:
+{let open Infer in
+ displaymath begin
+   rule ~label:"definition"
+     [rule ~label:negativeshift
+         [rule ~label:(cutp"<%alpha%>")
+             ["<%Xi;Gamma |- t:N%>"]
+             "<%Xi;Gamma,alpha:N^~|-<t|alpha>%>"]
+         "<%Xi;Gamma |-_v mu\(val alpha\),<t|alpha> : shiftn N%>"]
+     "<%Xi;Gamma |-_v thunk t : shiftn N%>"
+end}
+And has as a reduction rule:
+{displaymath "<%<thunk t | val u> ~~> <u|t>%>"}
 
 {let sep = `Mm 2. in
  figurerules ~label:f_fll ~caption:"Polarised {muname}" [
@@ -39,6 +62,12 @@ This grammar introduces two new dual connectives <%shiftn N%> and <%shiftp P%> b
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
        commands
+     ]
+   end;
+   simple_block "Types" begin
+     syntax [
+       syntax_line (`Other "<%A%>, <%B%>") Rules.Types.Polarised.positive;
+       syntax_line (`Other "<%N%>, <%M%>") Rules.Types.Polarised.negative;
      ]
    end;
    simple_block "Reduction" begin
@@ -80,7 +109,40 @@ This grammar introduces two new dual connectives <%shiftn N%> and <%shiftp P%> b
 *)
  ]}
 
+The other typing rules for polarised {muname} are given in Figure~{ref_ f_fll}. They are, actually, textually identical to the rules of linear {muname}, except that now <%A%> and <%B%> stand for positive types. Polarised {muname} is really only a matter of constraining the variables to have positive types.
+
+The shift are not simple coercions between negative and positive types: they have a real computational significance. Indeed <%shiftp A%> is a bigger type than <%A%>: if <%A%> contains only values <%v%>, <%shiftp A%> contains any computation which {emph"evaluates to <%v%>"}. For instance, <%1%> only contains the value <%()%>, but <%shiftp 1%> contains computations like <%(lambda(),val ()) ()%>. In fact, polarised {muname} is a linear variant of Levy's call-by-push-value language~{cite"Levy2001"} ({textsc"cbpv"}. With <%shiftp A%> and <%shiftn N%> playing the role, respectively, of $F A$ and $U N$.
+
+Like in {textsc"cbpv"}, computations can be chained, with the expression <%chain t x u%>, so that the value computed by <%t%> is bound to <%x%> in <%u%>, in a manner reminiscent of monadic composition.
+{displaymath"<%chain t x u = mu alpha, < t | mu\(val x\), <u|alpha>>%>"}
+with the same typing rule as in~{cite"Levy2001"} (up to linearity):
+{let open Infer in
+ displaymath begin
+   rule ~label:"definition"
+     [rule ~label:mu
+         [rule ~label:cutrule
+             ["<%Xi;Gamma|-t: shiftp A%>";
+              rule ~label:negativeshift
+                [rule ~label:(cutp"<%alpha%>")
+                    ["<%Xi;Delta,x:A|- u : N%>"]
+                    "<%Xi;Delta,alpha:N^~,x:A|- <u|alpha>%>"]
+                "<%Xi;Delta,alpha:N^~|- mu\(val x\), <u|alpha>: shiftn A^~%>";]
+             "<%Xi;Gamma,Delta,alpha:N^~|-< t | mu\(val x\), <u|alpha>>%>"]
+         "<%Xi;Gamma,Delta|- mu alpha, < t | mu\(val x\), <u|alpha>> : N%>"]
+     "<%Xi;Gamma,Delta|- chain t x u : N%>"
+end}
+Together with the reduction rule:
+{displaymath"<%<chain \(val v\) x u | alpha> ~~> <subst[v,x] u| alpha>%>"}
+
+Dually, the type <%shiftn N%> represents the type of suspended computations. A suspended computation differs from regular computation in that they can be stored in a value. Suspending a computation corresponds to an operation well-known to the functional programmer: building a closure. Indeed, a closure is nothing but packing a computation (typically in form of a code pointer) together with the environment necessary for the computation to be resumed later. That is, turning a computation into a value.
+
+A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are computations <%A-oN%>. They are not made into closure unless they are suspended into the type <%shiftn(A-oN)%>. If closures are considered expensive to make, which they often are, this property can be useful as functions of multiple arguments <%A-oB-oC-oN%> do not need intermediary closures.
+
 {rule_ (`Mm 3.) (`Mm 3.)}
+
+Force.
+
+Rust has stack closures.
 
 The complete polarised system is given in Figure~{ref_ f_fll}. The typing rules are not very different from the rules of linear {muname}
 
@@ -91,4 +153,6 @@ We can embed both cbv and cbn linear simply typed {lambda}-calculus:
   "cbv (monadic): <%A -o shiftp B%>";
   "cbn (comonadic?): <%\(shiftn N\) -o M%>"
 ]}
+
+Linear logic also has two encodings.
 "
