@@ -18,6 +18,8 @@ two distinct normal forms, yet has the following type:
 
 There are several ways to think about this example. On the first hand, it could be said that the syntax is inadequate and we should move to a syntax which identifies both terms, like proof nets(*arnaud:citation?*). On the other hand, we can also point out that <%mu x,c%> does not really make sense by itself: it is an active term which expects a counterpart. In that view, it does not really make sense to capture such a term in a pair <%(mu x,c,u)%> where the {mu} cannot be resolved.
 
+{subsection"Restricting substitution"}
+
 The solution suggested by the latter view is to take more seriously the distinction between {emph"values"} and {emph"computations"}. That is <%mu x,c%> is a computation, yet we take the point of view that variables should only be substituted with values. This is a form of {emph"call by value"}, even though, as we will see below, this does not preclude call by name functions. Such a restriction can be achieved by a syntactic criterion: identifying a syntactic class of values, and restricting reduction rules to only substitute values. This is the strategy used in the setting of {lambda}-calculus~{cite"Plotkin1975"} or in the original {muname} paper~{cite"Curien2000"}.
 
 To offer a counter-point we will account for this restriction purely by typing. This is merely a difference in presentation, though, as the syntactic restriction can be read off directly from the typing rules. This idea leads to a {emph"polarised"} logic, where type are classified on whether their introduction rules are value constructors ({emph"positive"} types) or computation constructors ({emph"negative"} types). The restriction that variables can only be substituted with values then translates to the restriction that {emph"variables all are of positive type"}.
@@ -136,15 +138,35 @@ Together with the reduction rule:
 
 Dually, the type <%shiftn N%> represents the type of suspended computations. A suspended computation differs from regular computation in that they can be stored in a value. Suspending a computation corresponds to an operation well-known to the functional programmer: building a closure. Indeed, a closure is nothing but packing a computation (typically in form of a code pointer) together with the environment necessary for the computation to be resumed later. That is, turning a computation into a value.
 
+(* arnaud: ce paragraphe est trop bref, il faudra probablement y retourner *)
 A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are computations <%A-oN%>. They are not made into closure unless they are suspended into the type <%shiftn(A-oN)%>. If closures are considered expensive to make, which they often are, this property can be useful as functions of multiple arguments <%A-oB-oC-oN%> do not need intermediary closures.
 
+As a matter of fact, the Rust programming language~{citation_needed} has, for efficiency purposes, so-called {emph"stack closures"}, which are, in fact, not closures. Stack closures are functions which can be used only as argument of another function, and be called, but {emph"not"} be stored in a value. From the point of view of polarised {muname}, this would correspond to having variables of negative type, with restricted usage.
+
+Suspended values, again inspired by {textsc"cbpv"}, can be turned back into computation with a <%force%> combinator:
+{displaymath"<%force t = mu alpha, < t | val alpha>%>"}
+Typed as
+{let open Infer in
+ displaymath begin
+   rule ~label:"definition"
+     [rule ~label:mu
+         [rule ~label:cutrule
+             ["<%Xi;Gamma|-_v t : shiftn N%>";
+              rule ~label:positiveshift
+                [rule ~label:idrule
+                    []
+                    "<%Xi;alpha:N^~ |-_v alpha:N^~%>"]
+                "<%Xi;alpha:N^~ |- val alpha : shiftp N^~%>"]
+             "<%Xi;Gamma,alpha:N^~ |- < t | val alpha >%>"]
+         "<%Xi;Gamma |- mu alpha, < t | val alpha> : N%>"]
+     "<%Xi; Gamma |- force t : N%>"
+ end}
+And with reduction rule:
+{displaymath"<%<force \(thunk t\) | alpha> ~~> <t| alpha>%>"}
+
+{subsection"Translations"}
+
 {rule_ (`Mm 3.) (`Mm 3.)}
-
-Force.
-
-Rust has stack closures.
-
-The complete polarised system is given in Figure~{ref_ f_fll}. The typing rules are not very different from the rules of linear {muname}
 
 (* arnaud: just a sketch*)
 (* arnaud: je ne suis même pas sûr de ces types *)
