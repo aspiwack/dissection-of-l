@@ -166,15 +166,128 @@ And with reduction rule:
 
 {subsection"Translations"}
 
+Despite the call-by-value slant of polarised {muname}, both call-by-value and call-by-name {lambda}-calculus can be embedded in polarised {muname}. Again, all of the definitions are macros. For simplicity we will only give encoding of linear {lambda}-calculus, but the intuitionistic version is not very different. We use the definitions of <%lambda x,t%> and <%t u%> defined in Figure~{ref_ l_mall}, like the other connectives they have only changed inasmuch as the polarisation of the operands of the arrow type: the arrow <%A-oN = A^~`&N%> has positive domain and negative codomain. (* arnaud: ce dernier passage pourrait ^etre racont'e quand je parle de cl^otures plus haut *)
+
+Call-by-name {lambda}-calculus is obtained by interpreting all type as being negative. As a consequence, all variables in the context must be shifted which modifies the variable rule, and the arrow is encoded as <%shiftn N -o M%>:
+{let sep = `Mm 3. in
+ let open Infer in
+ let idenc =
+   rule ~label:"force"
+     [rule ~label:idrule [] "<%;Gamma,x:shiftn N |- x:shiftn N%>"]
+     "<%;Gamma,x:shiftn N|-force x : N%>"
+ in
+ let appenc =
+   rule ~label:apprule
+     ["<%;Gamma|-t : shiftn N -o M%>";
+      rule ~label:negativeshift
+        ["<%;Delta|-u:N%>"]
+        "<%;Delta |- thunk u : shiftn N%>"]
+     "<%;Gamma,Delta|- t \(thunk u\) : M%>"
+ in
+ let absenc =
+   rule ~label:lambda
+     ["<%;Gamma,x:shiftn N |- t : M%>"]
+     "<%;Gamma|- lambda x, t : shiftn N -o M%>"
+ in
+ displaymath begin array [`C] [
+   array_line ~sep [idenc];
+   array_line ~sep [appenc];
+   array_line [absenc];
+ ]end}
+
+In call-by-name {lambda}-calculus, the arguments of functions are suspended so that their computation happens at use point: when the variables are used and forced. This translation, which is mostly forced by the choice that all types are interpreted as negative, happens to correspond closely to simple implementations, for instance Krivine's abstract machine~{citation_needed}.
+
+Dually, in call-by-name {lambda}-calculus all of the types are interpreted as positive. Since a {lambda}-term is a computation, not a value, the type of the terms -- rather than the hypotheses as in call by name -- must be shifted. Also, the encoding of functions is a little more involved: <%shiftn(A-oshiftp B)%>. Again, this translation follows straightforwardly from the choice that every type is positive.
+{let sep = `Mm 3. in
+ let open Infer in
+ let idenc =
+   rule ~label:positiveshift
+     [rule ~label:idrule [] "<%;Gamma,x:A|-x:A%>"]
+     "<%;Gamma,x:A|-val x : shiftp A%>"
+ in
+ let appenc =
+   rule ~label:"chain"
+     ["<%;Delta|-u:shiftp A%>";
+      rule ~label:"chain"
+        ["<%;Gamma|-t : shiftp shiftn (A -o shiftp B)%>";
+         rule ~label:"app"
+            [rule ~label:"force"
+                [rule ~label:idrule [] "<%;f:shiftn (A-oshiftp B)|- f: shiftn (A-oshiftp B)%>"]
+                "<%;f:shiftn (A-oshiftp B)|- force f: A-oshiftp B%>";
+             rule ~label:idrule
+               []
+               "<%;x:A |- x:A%>"]
+            "<%;x:A,f:shiftn (A-oshiftp B)|- force f x : shiftp B%>"]
+        "<%;Gamma,x:A|-chain t f \(force f x\) : shiftp B%>";]
+     "<%;Gamma,Delta|- chain u x \(chain t f \(force f x\)\) : shiftp B%>"
+ in
+ let absenc =
+   rule ~label:positiveshift
+     [rule ~label:"thunk"
+         [rule ~label:lambda
+             ["<%;Gamma,x:A |- t : shiftp B%>"]
+             "<%;Gamma|- lambda x, t : A -o shiftp B%>"]
+         "<%;Gamma|- thunk lambda x, t : shiftn (A -o shiftp B)%>"]
+     "<%;Gamma|- val thunk lambda x, t : shiftp shiftn (A -o shiftp B)%>"
+ in
+ displaymath begin array [`C] [
+   array_line ~sep [idenc];
+   array_line ~sep [appenc];
+   array_line [absenc];
+ ]end}
+
+As in any call-by-value calculus, there is a non-canonical choice in the order of evaluation. We observe it in the translation of application: we chose to evaluate the argument before the function, but the reverse works just as well and behaves differently in presence of effects.
+
 {rule_ (`Mm 3.) (`Mm 3.)}
 
-(* arnaud: just a sketch*)
-(* arnaud: je ne suis même pas sûr de ces types *)
-We can embed both cbv and cbn linear simply typed {lambda}-calculus:
-{itemize [
-  "cbv (monadic): <%A -o shiftp B%>";
-  "cbn (comonadic?): <%\(shiftn N\) -o M%>"
-]}
+<%< chain (chain t x u) y v | alpha >%>
 
-Linear logic also has two encodings.
+<%< chain t x u | mu\(val y\), <v|alpha> >%>
+
+<%< t | mu\(val x\), < u | mu\(val y\), <v|alpha> >>%>
+
+{rule_ (`Mm 2.) (`Mm 2.)}
+
+<%< chain t x \(chain u y v\) | alpha >%>
+
+<%< t | mu\(val x\), < chain u y v | alpha >>%>
+
+<%< t | mu\(val x\), < u | mu\(val y\), < v | alpha >>>%>
+
+{rule_ (`Mm 2.) (`Mm 2.)}
+
+<%< chain v x \(chain (chain u y \(chain t f \(force f y\)\)) g \(force g x\)\) | alpha >%>
+
+<%< chain v x \(chain u y \(chain t f \(chain (force f y) g \(force g x\)\)\)\) | alpha>%>
+
+{rule_ (`Mm 2.) (`Mm 2.)}
+
+<% < chain (force (thunk lambda z, val thunk lambda w, t ) y) g \(force g x\) | alpha > %>
+
+<% < chain ((lambda z, val thunk lambda w, t) y) g \(force g x\) | alpha > %>
+
+<% < chain (val thunk lambda w, subst [y,z] t) g \(force g x\) | alpha > %>
+
+<% < force (thunk lambda w, subst [y,z] t) x | alpha > %>
+
+<% < (lambda w, subst [y,z] t) x | alpha > %>
+
+<% < subst [y,z;x,w] t | alpha > %>
+
+{rule_ (`Mm 2.) (`Mm 2.)}
+
+In a similar fashion to {lambda}-calculus, linear {muname} has two encodings into polarised {muname}, one where types are interpreted as negative and the other as positive, with very different computational behaviour.
+
+When interpreting types of linear {muname} as negative types, the type <%N<*>M%> of pairs is interpreted as <%shiftp(shiftn N <*> shiftn M)%>. And the pair constructor <%(u,v)%> as <%val (thunk u, thunk v)%>. The dual type <%N`&M%> is interpreted as <%\(shiftp shiftn N\)`&\(shiftp shiftn M\)%> and the decomposition <%mu(x,y),c%> is also unchanged. Like in call-by-name {lambda}-calculus, variable in the context have their type shifted, and the variables (whether duplicable or linear) are interpreted as <%force x%>.
+
+The cut rule is interesting
+
+In other word, decomposition forces only the head constructor which is necessary to continue the computation. This is the same behaviour as Haskell (except that Haskell is call-by-need, hence must share suspended computations rather than duplicating them). This translation deserves to be called {emph"call by name"}.
+
+The dual translation where the types are interpreted as positive works like a call-by-value language. The pair type <%A<*>B%> is simply interpreted as <%A<*>B%>, but like in call-by-value {lambda}-calculus, the translation of a linear {muname} term need to be a computation, hence the type of terms is shifted. So the pair <%(u,v)%> is interpreted as <%chain v x \(chain u y (y,x)\)%> of type <%shiftp (A<*>B)%> (again, the order of evaluation is non-canonical).
+
+The dual type <%A`&B%> is interpreted as <%shiftn(shiftp A `& shiftp B)%>. Decomposition <%mu(x,y),c%> is implemented as <%val thunk mu(x,y),c%>of type <%shiftp shiftn(shiftp A `& shiftp B)%>.
+
+{rule_ (`Mm 2.) (`Mm 2.)}
+
 "

@@ -8,6 +8,7 @@ open Extra
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
 (* arnaud: fix le kerning de ?, en particulier ?0 *)
+(* arnaud: kerning du shift negatif dans les hypoth`eses *)
 (* arnaud: un mode ocaml pour <@@> *)
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
 (* arnaud: Wadler's writeup and Harper's natural deduction classical logic should be mentionned in intro *)
