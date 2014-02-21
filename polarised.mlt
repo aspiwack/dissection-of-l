@@ -139,7 +139,7 @@ Together with the reduction rule:
 Dually, the type <%shiftn N%> represents the type of suspended computations. A suspended computation differs from regular computation in that they can be stored in a value. Suspending a computation corresponds to an operation well-known to the functional programmer: building a closure. Indeed, a closure is nothing but packing a computation (typically in form of a code pointer) together with the environment necessary for the computation to be resumed later. That is, turning a computation into a value.
 
 (* arnaud: ce paragraphe est trop bref, il faudra probablement y retourner *)
-A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are computations <%A-oN%>. They are not made into closure unless they are suspended into the type <%shiftn(A-oN)%>. If closures are considered expensive to make, which they often are, this property can be useful as functions of multiple arguments <%A-oB-oC-oN%> do not need intermediary closures.
+A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are computations <%A-oN%>. They are not made into closure unless they are suspended into the type <%shiftn(A-oN)%>. If closures are considered expensive to make, which they often are, this property can be useful as functions of multiple arguments <%A-oB-oC-oN%> do not need intermediate closures.
 
 As a matter of fact, the Rust programming language~{citation_needed} has, for efficiency purposes, so-called {emph"stack closures"}, which are, in fact, not closures. Stack closures are functions which can be used only as argument of another function, and be called, but {emph"not"} be stored in a value. From the point of view of polarised {muname}, this would correspond to having variables of negative type, with restricted usage.
 
@@ -173,21 +173,21 @@ Call-by-name {lambda}-calculus is obtained by interpreting all type as being neg
  let open Infer in
  let idenc =
    rule ~label:"force"
-     [rule ~label:idrule [] "<%;Gamma,x:shiftn N |- x:shiftn N%>"]
-     "<%;Gamma,x:shiftn N|-force x : N%>"
+     [rule ~label:idrule [] "<%Gamma,x:shiftn N |-_v x:shiftn N%>"]
+     "<%Gamma,x:shiftn N|-force x : N%>"
  in
  let appenc =
    rule ~label:apprule
-     ["<%;Gamma|-t : shiftn N -o M%>";
+     ["<%Gamma|-t : shiftn N -o M%>";
       rule ~label:negativeshift
-        ["<%;Delta|-u:N%>"]
-        "<%;Delta |- thunk u : shiftn N%>"]
-     "<%;Gamma,Delta|- t \(thunk u\) : M%>"
+        ["<%Delta|-u:N%>"]
+        "<%Delta |-_v thunk u : shiftn N%>"]
+     "<%Gamma,Delta|- t \(thunk u\) : M%>"
  in
  let absenc =
    rule ~label:lambda
-     ["<%;Gamma,x:shiftn N |- t : M%>"]
-     "<%;Gamma|- lambda x, t : shiftn N -o M%>"
+     ["<%Gamma,x:shiftn N |- t : M%>"]
+     "<%Gamma|- lambda x, t : shiftn N -o M%>"
  in
  displaymath begin array [`C] [
    array_line ~sep [idenc];
@@ -202,33 +202,33 @@ Dually, in call-by-name {lambda}-calculus all of the types are interpreted as po
  let open Infer in
  let idenc =
    rule ~label:positiveshift
-     [rule ~label:idrule [] "<%;Gamma,x:A|-x:A%>"]
-     "<%;Gamma,x:A|-val x : shiftp A%>"
+     [rule ~label:idrule [] "<%Gamma,x:A|-_v x:A%>"]
+     "<%Gamma,x:A|-val x : shiftp A%>"
  in
  let appenc =
    rule ~label:"chain"
-     ["<%;Delta|-u:shiftp A%>";
+     ["<%Delta|-u:shiftp A%>";
       rule ~label:"chain"
-        ["<%;Gamma|-t : shiftp shiftn (A -o shiftp B)%>";
+        ["<%Gamma|-t : shiftp shiftn (A -o shiftp B)%>";
          rule ~label:"app"
             [rule ~label:"force"
-                [rule ~label:idrule [] "<%;f:shiftn (A-oshiftp B)|- f: shiftn (A-oshiftp B)%>"]
-                "<%;f:shiftn (A-oshiftp B)|- force f: A-oshiftp B%>";
+                [rule ~label:idrule [] "<%f:shiftn (A-oshiftp B)|-_v f: shiftn (A-oshiftp B)%>"]
+                "<%f:shiftn (A-oshiftp B)|- force f: A-oshiftp B%>";
              rule ~label:idrule
                []
-               "<%;x:A |- x:A%>"]
-            "<%;x:A,f:shiftn (A-oshiftp B)|- force f x : shiftp B%>"]
-        "<%;Gamma,x:A|-chain t f \(force f x\) : shiftp B%>";]
-     "<%;Gamma,Delta|- chain u x \(chain t f \(force f x\)\) : shiftp B%>"
+               "<%x:A |-_v x:A%>"]
+            "<%x:A,f:shiftn (A-oshiftp B)|- force f x : shiftp B%>"]
+        "<%Gamma,x:A|-chain t f \(force f x\) : shiftp B%>";]
+     "<%Gamma,Delta|- chain u x \(chain t f \(force f x\)\) : shiftp B%>"
  in
  let absenc =
    rule ~label:positiveshift
      [rule ~label:"thunk"
          [rule ~label:lambda
-             ["<%;Gamma,x:A |- t : shiftp B%>"]
-             "<%;Gamma|- lambda x, t : A -o shiftp B%>"]
-         "<%;Gamma|- thunk lambda x, t : shiftn (A -o shiftp B)%>"]
-     "<%;Gamma|- val thunk lambda x, t : shiftp shiftn (A -o shiftp B)%>"
+             ["<%Gamma,x:A |- t : shiftp B%>"]
+             "<%Gamma|- lambda x, t : A -o shiftp B%>"]
+         "<%Gamma|-_v thunk lambda x, t : shiftn (A -o shiftp B)%>"]
+     "<%Gamma|- val thunk lambda x, t : shiftp shiftn (A -o shiftp B)%>"
  in
  displaymath begin array [`C] [
    array_line ~sep [idenc];
@@ -238,7 +238,16 @@ Dually, in call-by-name {lambda}-calculus all of the types are interpreted as po
 
 As in any call-by-value calculus, there is a non-canonical choice in the order of evaluation. We observe it in the translation of application: we chose to evaluate the argument before the function, but the reverse works just as well and behaves differently in presence of effects.
 
-{rule_ (`Mm 3.) (`Mm 3.)}
+Notice that, contrary to the call-by-name {lambda}-calculus, the encoding of call-by-value {lambda}-calculus introduces a closure around every abstraction. This aspect is discussed, in the context of abstract machines, in~{cite"Leroy1990"~extra:"Chapter 3"}. Closures are usually expensive, hence we may want to eliminate intermediate closures in expressions of the form
+{displaymath "<%val thunk lambda x,val thunk lambda y,t%>"}
+(* arnaud: on veut probablement remettre ,ca sur une seule ligne *)
+When it is applied to two arguments. It can be done by partial evaluation like in Section~{ref_ ss_optim}, because the application to two arguments <%u%> and <%v%>:
+{displaymath"<%< chain v y \(chain (chain u x \(chain (val thunk lambda x,val thunk lambda y,t) f \(force f y\)\)) g \(force g x\)\) | alpha >%>"}
+Is convertible to
+{displaymath"<%< chain v y \(chain u x t\) | alpha >%>"}
+It requires some care to avoid code duplication, however. Compared to the solution of the {textsc"zinc"} abstract machine~{cite"Leroy1990"~extra:"Chapter 3"}, this optimisation only applies to statistically detectable situation, whereas the {textsc"zinc"} tries dynamically to avoid intermediate closures. So partial evaluation of polarised {muname} is more efficient (as it forgoes dynamic tests), but does not apply as often.
+
+(* proofs
 
 <%< chain (chain t x u) y v | alpha >%>
 
@@ -274,7 +283,127 @@ As in any call-by-value calculus, there is a non-canonical choice in the order o
 
 <% < subst [y,z;x,w] t | alpha > %>
 
-{rule_ (`Mm 2.) (`Mm 2.)}
+*)
+
+Like {lambda}-calculus, linear {muname} can be translated into polarised {muname}. There is the same dichotomy as for {lambda}-calculus with one translation interpreting each type as positive and another as negative.
+
+Unlike {lambda}-calculus, types having all the same polarity causes difficulty because of the cut rule, and the {mu} rule. So, sadly, these are not macro-translations. To be fair, apart from the cut and {mu} rules, the terms are macro-translated, although their types are not. We will focus on the multiplicative fragment. We write <%[[A]]%> for the translation of type <%A%>.
+
+In the encoding where all types are positive, the product <%A<*>B%> can be simply interpreted as <%[[A]]<*>[[B]]%>, and <%1%> as <%1%>. We can see, already, that this calculus will have a call-by-value feel. Like in call-by-value {lambda}-calculus, hypotheses have their bare type, but the type of the active term is shifted. Here is the identity rule
+{let open Infer in
+displaymath begin
+  rule ~label:positiveshift
+    [rule ~label:idrule [] "<%x:[[A]]|-_v x:[[A]]%>"]
+    "<%x:[[A]]|-val x: shiftp [[A]]%>"
+end}
+
+When translating the type <%A^~`&B^~%>, we must construct a continuation of <%[[A<*>B]] = [[A]]<*>[[B]]%>, so basically we have no alternative but to choose <%[[A]]^~`&[[B]]^~%>, but since it's not a positive type, it needs to be shifted: <%[[A^~`&B^~]] = shiftn ([[A]]^~`&[[B]]^~)%>. Likewise, <%[[bot]] = shiftn bot%>.
+
+Since cut and {mu} involve dualisation, they need to relate <%[[A]]%> and <%[[A^~]]%>. The property we deduce from the definition is: <%[[A^~]] = shiftn [[A]]^~%> or <%shiftn [[A^~]] = [[A]]^~%>. The cut rule must be oriented to recognise which of its operand has an extra shift.
+{let open Infer in
+displaymath begin
+  rule ~label:cutrule
+    [rule ~label:"thunk"
+        ["<%Gamma|- t : shiftp [[A]]%>";]
+        "<%Gamma|-_v thunk t : shiftn shiftp [[A]]%>";
+     "<%Delta|- u : shiftp shiftn [[A]]^~%>"]
+    "<%Gamma,Delta |- < thunk t | u >%>"
+end}
+The {mu} rule is worse, as it must be duplicated depending on whether it must add a shift or not to the selected hypothesis.
+{let open Infer in
+ let addshift =
+   rule ~label:"definition"
+     [rule ~label:positiveshift
+         [rule ~label:negativeshift
+             ["<%Gamma,x:[[A]]|- c%>"]
+             "<%Gamma|-_v mu\(val x\), c : shiftn [[A]]^~%>"]
+         "<%Gamma|- val mu\(val x\), c : shiftp shiftn [[A]]^~%>"]
+     "<%Gamma|- val mu\(val x\), c : shiftp [[A^~]]%>"
+ in
+ let noshift =
+   rule ~label:mu
+     [rule ~label:"definition"
+         ["<%Gamma,x:[[A]]^~ |- c%>"]
+         "<%Gamma,x:shiftn [[A^~]] |- c%>"]
+     "<%Gamma|- mu x,c : shiftp [[A]]%>"
+ in
+ displaymath begin array [`C;`Sep (qquad^^qquad) ;`C] [
+   array_line [ addshift ; noshift ]
+ ]end}
+
+The rules for introduction rules, on the other hand, are quite unproblematic. Pairing is obtained by first computing the values of the two components and then returning the pair of the obtained values. Like for call-by-value {lambda}-calculus, the order of evaluation is non-canonical.
+{let open Infer in
+ displaymath begin
+   rule ~label:"chain"
+     ["<%Delta|-v:shiftp [[B]]%>";
+      rule ~label:"chain"
+        ["<%Gamma|-u:shiftp [[A]]%>";
+         rule ~label:positiveshift
+           [rule ~label:tensor
+               [rule ~label:idrule[]"<%y:[[A]]|-_v y:[[A]]%>";
+                rule ~label:idrule[]"<%x:[[B]]|-_v x:[[B]]%>";]
+               "<%x:[[B]],y:[[A]]|-_v (y,x) : [[A]]<*>[[B]]%>"]
+           "<%x:[[B]],y:[[A]]|- val (y,x) : shiftp ([[A]]<*>[[B]])%>"]
+        "<%Gamma,x:[[B]]|-chain u y \(val (y,x)\) : shiftp ([[A]]<*>[[B]])%>"]
+     "<%Gamma,Delta|- chain v x \(chain u y \(val (y,x)\)\) : shiftp ([[A]]<*>[[B]])%>"
+end}
+A product continuation waits for the computation to be finished and continues with the two components
+{let open Infer in
+ displaymath begin
+   rule ~label:positiveshift
+     [rule ~label:"thunk"
+         [rule ~label:parr
+             ["<%Gamma,x:[[A]],y:[[A]] |- c %>"]
+             "<%Gamma|- mu(x,y),c : [[A]]^~`&[[B]]^~%>"]
+         "<%Gamma|-_v thunk mu(x,y),c : shiftn ([[A]]^~`&[[B]]^~)%>"]
+     "<%Gamma|- val thunk mu(x,y),c : shiftp shiftn ([[A]]^~`&[[B]]^~)%>"
+ end}
+The introduction rules of nullary connectives <%1%> and <%bot%> are translated directly.
+
+The negative translation of linear {muname} follows along the same lines. It has a call-by-name flavour, as witnessed by the identity rule
+{let open Infer in
+ displaymath begin
+   rule ~label:"force"
+     [rule ~label:idrule[]"<%x:shiftn N |-_v x:shiftn N%>"]
+     "<%x:shiftn N|- force x : N%>"
+end}
+Hypotheses are shifted, and forced at use point. A product <%N<*>M%> is encoded as <%shiftp (shiftn [[N]] <*> shiftn [[M]])%>, so that a pair contains suspended computations:
+{let open Infer in
+ displaymath begin
+   rule ~label:positiveshift
+     [rule ~label:tensor
+         [rule ~label:"thunk"
+             ["<%Gamma|- u : [[N]]%>";]
+             "<%Gamma|-_v thunk u : shiftn [[N]]%>";
+          rule ~label:"thunk"
+            ["<%Delta|- v : [[M]]%>";]
+            "<%Delta|-_v thunk v : shiftn [[M]]%>";]
+         "<%Gamma,Delta|-_v ( thunk u , thunk v ) : shiftn [[N]] <*> shiftn [[M]]%>"]
+     "<%Gamma,Delta|- val ( thunk u , thunk v ) : shiftp (shiftn [[N]] <*> shiftn [[M]])%>"
+end}
+While a pair continuation, whose type is <%[[N^~`&M^~]] = shiftp[[N]]^~ `& shiftp[[M]]^~%>, binds the two (suspended) components of a product:
+{let open Infer in
+ displaymath begin
+   rule ~label:parr
+     ["<%Gamma,x:shiftn[[N]], y:shiftn[[M]]|-c%>"]
+     "<%Gamma|-mu(x,y),c :  shiftp[[N]]^~ `& shiftp[[M]]^~%>"
+ end}
+
+(* arnaud: peut-^etre des notations plus coh'erentes dans la r`egle de cut, j'ai plus ou moins l'inverse de la d'efinition de la traduction ou N et M forment des paires alors que N^~ et M^~ forment des validations *)
+For the cut rule, we proceed like in the call-by-value case: we have either <%[[N^~]]=shiftp [[N]]^~%> or <%shiftp [[N^~]] = [[N]]^~%>. The cut rule is oriented such that cutting with a pair continuation amounts to forcing the outermost pair constructor.
+{let open Infer in
+ displaymath begin
+   rule ~label:cutrule
+     ["<%Gamma|- u : shiftp [[N^~]]%>";
+      rule ~label:"thunk"
+        ["<%Delta|- v : [[N]]%>"]
+        "<%Delta|-_v thunk v : shiftn [[N]]%>"]
+     "<%Gamma,Delta|- < u | thunk v >%>"
+end}
+(* arnaud: v'erifier que je n'ai pas 'ecrit de connerie, parce que je m'y perds un peu dans cette r`egle de coupure. *)
+
+(* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
+{rule_ (`Mm 3.) (`Mm 3.)}
 
 In a similar fashion to {lambda}-calculus, linear {muname} has two encodings into polarised {muname}, one where types are interpreted as negative and the other as positive, with very different computational behaviour.
 

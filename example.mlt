@@ -348,7 +348,7 @@ Notice how <%k%> is indeed duplicated, hence forces the return type to be <%?A%>
 
 The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of classical logic may be resolved by favouring one way or another. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
 
-{subsection"Commutative cuts"}
+{subsection"Commutative cuts"~label:ss_optim}
 
 For those developing a programming language which is not based on linear {muname}, it can still be quite serviceable as an intermediate language. In the spirit of the Glasgow Haskell Compiler ({textsc"ghc"})~{cite"PeytonJones1998"}, the syntax of a programming language can be {emph"desugared"} into linear {muname} which is quite amenable to program transformations. Desugaring is a simple transformation, which should consist of interpreting syntactic construction of the language as macros, which is the case of every definition we demonstrate in this article. The reader wishing to make the meaning of macros more formal may refer to~{cite"Felleisen1990"}.
 

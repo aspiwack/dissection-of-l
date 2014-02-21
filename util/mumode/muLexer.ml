@@ -106,6 +106,7 @@ let next k = lexer
   | ":" -> COLON
   | "(" -> PARENL | ")" -> PARENR
   | "[" -> BRACKETL | "]" -> BRACKETR
+  | "[[" -> DOUBLEBRACKETL | "]]" -> DOUBLEBRACKETR
   | "{" -> BRACEL | "}" -> BRACER
   | "{\\\\" -> BRACEBR
   | "_" -> SUB | "^" -> SUP

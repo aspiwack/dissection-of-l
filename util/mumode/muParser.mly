@@ -18,6 +18,7 @@ let empty_context = Latex.cdot
 %token COMMA SEMICOLON COLON
 %token METAPARENL METAPARENR 
 %token PARENL PARENR BRACKETL BRACKETR BRACEL BRACER BRACEBR
+%token DOUBLEBRACKETL DOUBLEBRACKETR
 %token WILDCARD
 %token TURNSTYLE TURNSTYLEV TURNSTYLEP VEC
 
@@ -116,6 +117,8 @@ expr:
 | SIGMA p=typedpattern COMMA b=expr { concat [ index sum p ; b ] }
 
 | a=expr LARROW b=expr { concat [a;larrow;b] }
+
+| DOUBLEBRACKETL a=expr DOUBLEBRACKETR { concat [llbracket;a;rrbracket] }
 
 | SUBST l=delimited(BRACKETL, separated_nonempty_list(SEMICOLON,separated_pair(expr,COMMA,expr)) ,BRACKETR) e=expr
   { let single (t,x) = concat[x;setminus;t] in
