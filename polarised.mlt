@@ -35,9 +35,8 @@ This grammar introduces two new dual connectives <%shiftn N%> and <%shiftp P%> -
 (* This is not as interesting as I first thought
    Notice the two new types <%shiftn N%> and <%shiftp P%> which permit to embed positive and negative types into negative and positive types respectively. They both read ``shift''. Here again there was some amount of choice available: in Andreoli's treatment of focusing~{cite"Andreoli1992"}, every linear logic type is a valid type, the polarity only depends on the head connective and shifts are completely implicit (this approach is followed for {muname} in~{cite"Munch2009"}). In early {textsc"llp"} works~{citation}(* Olivier Laurent *), shifts were explicit, but conflated with the exponential connective <%!N%> was positive and <%?A%> was negative, it does not seem, however, easily amenable to the style of this article. In any case, the shift connectives have useful interpretations from a programming language perspective, which makes them interesting to study, hence their inclusion. *)
 The shift connectives have reversed introduction rules, as <%shiftp P%> is introduced by the construction <%val v%> (read ``return'' <%v%>), and <%shiftn N%> by <%mu\(val x\),c%>, despite the former being negative and the latter positive. Indeed <%val v%> is a computation and <%mu\(val x\),c%> a value. Sequents for values are written <%Xi;Gamma|-_v t:A%>, this is purely cosmetic in this section, but the typing judgement of values and computations will be distinct in Section~{ref_ s_dep}.
-{displaymath begin array [`C] [
-  array_line ~sep:(`Mm 2.) [Rules.Typing.Fll.shiftn];
-  array_line [ Rules.Typing.Fll.shiftp];
+{displaymath begin array [`C ; `Sep (qquad ^^ qquad) ; `C] [
+  array_line [Rules.Typing.Fll.shiftn ; Rules.Typing.Fll.shiftp];
 ]end}
 With the obvious reduction rule:
 {displaymath (reduction Rules.Reduction.shift)}
