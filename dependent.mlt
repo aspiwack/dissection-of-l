@@ -8,6 +8,9 @@ open Extra
 
 let d = "{section"Dependent types" ~label:s_dep}
 
+
+{rule_ (`Mm 3.) (`Mm 3.)}
+
 {subsection"Weakly dependent types"}
 
 As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.

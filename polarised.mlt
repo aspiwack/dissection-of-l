@@ -167,7 +167,7 @@ And with reduction rule:
 
 Despite the call-by-value slant of polarised {muname}, both call-by-value and call-by-name {lambda}-calculus can be embedded in polarised {muname}. Again, all of the definitions are macros. For simplicity we will only give encoding of linear {lambda}-calculus, but the intuitionistic version is not very different. We use the definitions of <%lambda x,t%> and <%t u%> defined in Figure~{ref_ l_mall}, like the other connectives they have only changed inasmuch as the polarisation of the operands of the arrow type: the arrow <%A-oN = A^~`&N%> has positive domain and negative codomain. (* arnaud: ce dernier passage pourrait ^etre racont'e quand je parle de cl^otures plus haut *)
 
-Call-by-name {lambda}-calculus is obtained by interpreting all type as being negative. As a consequence, all variables in the context must be shifted which modifies the variable rule, and the arrow is encoded as <%shiftn N -o M%>:
+{subsubsection"Call-by-name {lambda}-calculus"} Call-by-name {lambda}-calculus is obtained by interpreting all type as being negative. As a consequence, all variables in the context must be shifted which modifies the variable rule, and the arrow is encoded as <%shiftn N -o M%>:
 {let sep = `Mm 3. in
  let open Infer in
  let idenc =
@@ -196,7 +196,7 @@ Call-by-name {lambda}-calculus is obtained by interpreting all type as being neg
 
 In call-by-name {lambda}-calculus, the arguments of functions are suspended so that their computation happens at use point: when the variables are used and forced. This translation, which is mostly forced by the choice that all types are interpreted as negative, happens to correspond closely to simple implementations, for instance Krivine's abstract machine~{citation_needed}.
 
-Dually, in call-by-name {lambda}-calculus all of the types are interpreted as positive. Since a {lambda}-term is a computation, not a value, the type of the terms -- rather than the hypotheses as in call by name -- must be shifted. Also, the encoding of functions is a little more involved: <%shiftn(A-oshiftp B)%>. Again, this translation follows straightforwardly from the choice that every type is positive.
+{subsubsection"Call-by-value {lambda}-calculus"} Dually, in call-by-value {lambda}-calculus all of the types are interpreted as positive. Since a {lambda}-term is a computation, not a value, the type of the terms -- rather than the hypotheses as in call by name -- must be shifted. Also, the encoding of functions is a little more involved: <%shiftn(A-oshiftp B)%>. Again, this translation follows straightforwardly from the choice that every type is positive.
 {let sep = `Mm 3. in
  let open Infer in
  let idenc =
@@ -284,9 +284,9 @@ It requires some care to avoid code duplication, however. Compared to the soluti
 
 *)
 
-Like {lambda}-calculus, linear {muname} can be translated into polarised {muname}. There is the same dichotomy as for {lambda}-calculus with one translation interpreting each type as positive and another as negative.
+{subsubsection"Call-by-value linear {muname}"} Like {lambda}-calculus, linear {muname} can be translated into polarised {muname}. There is the same dichotomy as for {lambda}-calculus with one translation interpreting each type as positive and another as negative.
 
-Unlike {lambda}-calculus, types having all the same polarity causes difficulty because of the cut rule, and the {mu} rule. So, sadly, these are not macro-translations. To be fair, apart from the cut and {mu} rules, the terms are macro-translated, although their types are not. We will focus on the multiplicative fragment. We write <%[[A]]%> for the translation of type <%A%>.
+Unlike {lambda}-calculus, types having all the same polarity causes difficulty because of the cut rule, and the {mu} rule. So, sadly, these are not macro-translations. To be fair, apart from the cut and {mu} rules, the terms are macro-translated, although their types are not. We will focus on the multiplicative fragment, the rest follows straightforwardly. We write <%[[A]]%> for the translation of type <%A%>.
 
 In the encoding where all types are positive, the product <%A<*>B%> can be simply interpreted as <%[[A]]<*>[[B]]%>, and <%1%> as <%1%>. We can see, already, that this calculus will have a call-by-value feel. Like in call-by-value {lambda}-calculus, hypotheses have their bare type, but the type of the active term is shifted. Here is the identity rule
 {let open Infer in
@@ -298,7 +298,7 @@ end}
 
 When translating the type <%A^~`&B^~%>, we must construct a continuation of <%[[A<*>B]] = [[A]]<*>[[B]]%>, so basically we have no alternative but to choose <%[[A]]^~`&[[B]]^~%>, but since it's not a positive type, it needs to be shifted: <%[[A^~`&B^~]] = shiftn ([[A]]^~`&[[B]]^~)%>. Likewise, <%[[bot]] = shiftn bot%>.
 
-Since cut and {mu} involve dualisation, they need to relate <%[[A]]%> and <%[[A^~]]%>. The property we deduce from the definition is: <%[[A^~]] = shiftn [[A]]^~%> or <%shiftn [[A^~]] = [[A]]^~%>. The cut rule must be oriented to recognise which of its operand has an extra shift.
+Since cut and {mu} involve dualisation, they need to relate <%[[A]]%> and <%[[A^~]]%>. The property we deduce from the definition is: <%[[A^~]] = shiftn [[A]]^~%> or <%shiftp [[A^~]] = [[A]]^~%>. The cut rule must be oriented to recognise which of its operand has an extra shift.
 {let open Infer in
 displaymath begin
   rule ~label:cutrule
@@ -320,17 +320,17 @@ The {mu} rule is worse, as it must be duplicated depending on whether it must ad
      "<%Gamma|- val mu\(val x\), c : shiftp [[A^~]]%>"
  in
  let noshift =
-   rule ~label:mu
-     [rule ~label:"definition"
-         ["<%Gamma,x:[[A]]^~ |- c%>"]
-         "<%Gamma,x:shiftn [[A^~]] |- c%>"]
-     "<%Gamma|- mu x,c : shiftp [[A]]%>"
+   rule ~label:"definition"
+     [rule ~label:mu
+         ["<%Gamma,x:[[A]] |- c%>"]
+         "<%Gamma |- mu x,c : [[A]]^~%>"]
+     "<%Gamma|- mu x,c : shiftp [[A^~]]%>"
  in
  displaymath begin array [`C;`Sep (qquad^^qquad) ;`C] [
    array_line [ addshift ; noshift ]
  ]end}
 
-The rules for introduction rules, on the other hand, are quite unproblematic. Pairing is obtained by first computing the values of the two components and then returning the pair of the obtained values. Like for call-by-value {lambda}-calculus, the order of evaluation is non-canonical.
+The translation of introduction rules, on the other hand, are quite unproblematic. Pairing is obtained by first computing the values of the two components and then returning the pair of the obtained values. Like for call-by-value {lambda}-calculus, the order of evaluation is non-canonical.
 {let open Infer in
  displaymath begin
    rule ~label:"chain"
@@ -357,9 +357,9 @@ A product continuation waits for the computation to be finished and continues wi
          "<%Gamma|-_v thunk mu(x,y),c : shiftn ([[A]]^~`&[[B]]^~)%>"]
      "<%Gamma|- val thunk mu(x,y),c : shiftp shiftn ([[A]]^~`&[[B]]^~)%>"
  end}
-The introduction rules of nullary connectives <%1%> and <%bot%> are translated directly.
+The introduction rules of nullary connectives <%1%> and <%bot%> are straightforward.
 
-The negative translation of linear {muname} follows along the same lines. It has a call-by-name flavour, as witnessed by the identity rule
+{subsubsection"Call-by-name linear {muname}"} The negative translation of linear {muname} follows along the same lines. It has a call-by-name flavour, as witnessed by the identity rule
 {let open Infer in
  displaymath begin
    rule ~label:"force"
@@ -389,33 +389,43 @@ While a pair continuation, whose type is <%[[N^~`&M^~]] = shiftp[[N]]^~ `& shift
  end}
 
 (* arnaud: peut-^etre des notations plus coh'erentes dans la r`egle de cut, j'ai plus ou moins l'inverse de la d'efinition de la traduction ou N et M forment des paires alors que N^~ et M^~ forment des validations *)
-For the cut rule, we proceed like in the call-by-value case: we have either <%[[N^~]]=shiftp [[N]]^~%> or <%shiftp [[N^~]] = [[N]]^~%>. The cut rule is oriented such that cutting with a pair continuation amounts to forcing the outermost pair constructor.
+For the cut rule, we proceed like in the call-by-value case: we have either <%[[N^~]]=shiftp [[N]]^~%> or <%shiftn [[N^~]] = [[N]]^~%>. The cut rule is oriented such that cutting with a pair continuation amounts to forcing the outermost pair constructor.
 {let open Infer in
  displaymath begin
    rule ~label:cutrule
-     ["<%Gamma|- u : shiftp [[N^~]]%>";
+     ["<%Gamma|- u : shiftp [[N]]^~%>";
       rule ~label:"thunk"
         ["<%Delta|- v : [[N]]%>"]
         "<%Delta|-_v thunk v : shiftn [[N]]%>"]
      "<%Gamma,Delta|- < u | thunk v >%>"
 end}
-(* arnaud: v'erifier que je n'ai pas 'ecrit de connerie, parce que je m'y perds un peu dans cette r`egle de coupure. *)
+Like in the call-by-value translation, the {mu} rule is duplicated:
+{let open Infer in
+ let direct =
+   rule ~label:"definition"
+     [rule ~label:negativeshift
+         ["<%Gamma,x:shiftn [[N]]|- c%>"]
+         "<%Gamma|-_v mu  x, c : shiftp [[N]]^~%>"]
+     "<%Gamma|- mu x, c : [[N^~]]%>"
+ in
+ let chain =
+   rule ~label:"chain"
+     [rule ~label:"force"
+         [rule ~label:idrule[]"<%y:shiftn [[N^~]]|- y : shiftn [[N^~]]%>"]
+         "<%y:shiftn [[N^~]]|- force y : [[N^~]]%>";
+      rule ~label:"definition"
+        [rule ~label:mu
+            ["<%Gamma,x:shiftn [[N]] |- c%>"]
+            "<%Gamma |- mu x,c : shiftp [[N]]^~%>"]
+        "<%Gamma|- mu x,c : shiftp shiftn [[N^~]]%>";]
+     "<%Gamma|- chain \(mu x,c\) y \(force y\) : [[N^~]]%>"
+ in
+ displaymath begin array [`C;`Sep (qquad^^qquad) ;`C] [
+   array_line [ direct ; chain ]
+ ]end}
+
+The evaluation strategy of the negative translation of linear {muname}, evaluating the outermost constructor on demand, is essentially the same behaviour as lazy programming language such as Haskells (except that lazy programming languages have a call-by-need strategy, hence suspended computations must be shared rather than duplicated).
 
 (* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
-{rule_ (`Mm 3.) (`Mm 3.)}
-
-In a similar fashion to {lambda}-calculus, linear {muname} has two encodings into polarised {muname}, one where types are interpreted as negative and the other as positive, with very different computational behaviour.
-
-When interpreting types of linear {muname} as negative types, the type <%N<*>M%> of pairs is interpreted as <%shiftp(shiftn N <*> shiftn M)%>. And the pair constructor <%(u,v)%> as <%val (thunk u, thunk v)%>. The dual type <%N`&M%> is interpreted as <%\(shiftp shiftn N\)`&\(shiftp shiftn M\)%> and the decomposition <%mu(x,y),c%> is also unchanged. Like in call-by-name {lambda}-calculus, variable in the context have their type shifted, and the variables (whether duplicable or linear) are interpreted as <%force x%>.
-
-The cut rule is interesting
-
-In other word, decomposition forces only the head constructor which is necessary to continue the computation. This is the same behaviour as Haskell (except that Haskell is call-by-need, hence must share suspended computations rather than duplicating them). This translation deserves to be called {emph"call by name"}.
-
-The dual translation where the types are interpreted as positive works like a call-by-value language. The pair type <%A<*>B%> is simply interpreted as <%A<*>B%>, but like in call-by-value {lambda}-calculus, the translation of a linear {muname} term need to be a computation, hence the type of terms is shifted. So the pair <%(u,v)%> is interpreted as <%chain v x \(chain u y (y,x)\)%> of type <%shiftp (A<*>B)%> (again, the order of evaluation is non-canonical).
-
-The dual type <%A`&B%> is interpreted as <%shiftn(shiftp A `& shiftp B)%>. Decomposition <%mu(x,y),c%> is implemented as <%val thunk mu(x,y),c%>of type <%shiftp shiftn(shiftp A `& shiftp B)%>.
-
-{rule_ (`Mm 2.) (`Mm 2.)}
 
 "
