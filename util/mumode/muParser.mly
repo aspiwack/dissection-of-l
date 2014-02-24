@@ -104,7 +104,7 @@ expr:
 | LAMBDA p=pattern COMMA e=expr {concat [lambda;p;text".\\,";e] } %prec MU
 | t=expr u=expr { concat[t;text"~";u] } %prec APP
 
-| e=expr DUAL { exponent e bot }
+| e=expr DUAL { exponent e (raisebox ~shift:(`Pt 0.) ~fakeheight:(`Pt 4.,`Pt 0.) (mode M (text"\\scriptstyle" ^^ bot))) }
 | a=expr OTIMES b=expr { concat[a;tensor;b] }
 | a=expr OPLUS b=expr  { concat[a;plus;b] }
 | a=expr WITH b=expr  { concat[a;withc;b] }
