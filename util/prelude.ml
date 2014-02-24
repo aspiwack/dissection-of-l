@@ -139,6 +139,36 @@ let lambdap p = mode M (lambda^^p)
 let cutp p = mode M (cutrule^^text"\\,"^^p)
 let mup p = mode M (mu^^p)
 
+(*** Wrapper around existing commands ***)
+
+let bigdelim = text"\\setlength\\delimitershortfall{-0.1pt}"
+let smalldelim = text"\\setlength\\delimitershortfall{2pt}"
+
+type delimsize =
+| Small
+| Big
+let set_delimsize = function
+| Small -> smalldelim
+| Big -> bigdelim
+
+let ambiantdelim = Latex.variable Small
+let scope_delim s x =
+  get ambiantdelim (fun init ->
+   set ambiantdelim s ^^
+   x
+   ^^ set ambiantdelim init)
+
+let declareambiantdelim =
+  get ambiantdelim set_delimsize
+
+(* let displaymath x = Latex.displaymath (scope_delim Big x) *)
+let displaymath x = Latex.displaymath (scope_delim Big (declareambiantdelim ^^ x))
+
+let just_left d x =
+  get ambiantdelim begin function
+    | Small -> just_left d x
+    | _ -> mode T (smalldelim ^^ mode M (just_left d (mode T (declareambiantdelim^^(mode M x)))))
+  end
 
 (*** A short module for proof.sty *)
 module Infer = struct
@@ -156,4 +186,5 @@ end
 (*** Holes ***)
 
 let citation_needed = small (text"[citation]")
+
 

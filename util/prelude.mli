@@ -60,6 +60,14 @@ val lambdap : Latex.t -> Latex.t
 val cutp : Latex.t -> Latex.t
 val mup : Latex.t -> Latex.t
 
+(*** Wrapper around existing commands ***)
+
+val displaymath : Latex.t -> Latex.t
+
+val just_left : Latex.delimiter -> Latex.t -> Latex.t
+(* val just_right : Latex.delimiter -> Latex.t -> Latex.t *)
+(* val between : Latex.delimiter -> Latex.t -> Latex.t *)
+
 (*** A short module for proof.sty *)
 module Infer : sig
 
