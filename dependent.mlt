@@ -9,9 +9,10 @@ open Extra
 let d = "{section"Dependent types" ~label:s_dep}
 
 
+
 {rule_ (`Mm 3.) (`Mm 3.)}
 
-{subsection"Weakly dependent types"}
+{subsection"Weak dependent types"}
 
 As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.
 
@@ -19,7 +20,7 @@ See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
 
 {let sep = `Mm 2. in
  
- figurerules ~label:f_wdll ~caption:"Dependent {muname}" [
+ figurerules ~label:f_wdll ~caption:"Weak dependent {muname}" [
    simple_block "Syntax" begin
      syntax [
        syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
@@ -95,6 +96,16 @@ Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
 end}
 
 {subsection"Dependent elimination"}
+
+{let open Infer in
+displaymath begin
+  rule ~label:parr
+    [rule ~label:cutrule
+        ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)^~%>";
+         rule ~label:idrule[]"<%Xi;alpha:subst [(x,y),cv] N_cv|- alpha : subst [(x,y),cv] N_cv%>"]
+        "<%Xi;Gamma,x:A,y:B,alpha:subst [(x,y),cv] N_cv|- < v | alpha >%>"]
+    "<%Xi;Gamma,alpha:N_cv |- mu(x,y), < v | alpha > : A^~`& B^~%>"
+end}
 
 See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
 {let sep = `Mm 2. in

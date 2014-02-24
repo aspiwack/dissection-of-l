@@ -205,8 +205,8 @@ module Typing = struct
 
 
 
-    let id = Infer.rule ~label:idrule ["<%Xi;Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
-    let iddup = Infer.rule ~label:iddup ["<%Xi;|-A:Type%>"] "<%Xi,x:A;Theta;|-_v x:A%>"
+    let id = Infer.rule ~label:idrule ["<%Xi,Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
+    let iddup = Infer.rule ~label:iddup ["<%Xi|-A:Type%>"] "<%Xi,x:A;Theta;|-_v x:A%>"
     let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A,subst [x,cv] Gamma_cv|-c%>"] "<%Xi;Gamma,Gamma_cv|- mu x,c : A^~%>"
     let cut = Infer.rule ~label:cutrule ["<%Xi;Theta;Gamma|-_v t:A%>";"<%Xi;Theta,Delta_cv|-u:A^~%>"] "<%Xi;Theta,Gamma,subst [t,cv] Delta_cv|-<t|u>%>"
 
@@ -225,7 +225,7 @@ module Typing = struct
     let whynot = Infer.rule ~label:whynotrule ["<%Xi,x:A;subst [|_x_|,cv] Gamma_cv|-c%>"] "<%Xi;Gamma_cv|-mu|_x_|,c:?A^~%>"
 
     let shiftp = Infer.rule ~label:positiveshift ["<%Xi;Gamma|-_v t : A%>"] "<%Xi;Gamma|- val t : shiftp A%>"
-    let shiftn = Infer.rule ~label:negativeshift ["<%Xi;Theta;Gamma,x:A|-c%>"] "<%Xi;Theta;Gamma|-_v mu\(val x\), c : shiftn A^~%>"
+    let shiftn = Infer.rule ~label:negativeshift ["<%Xi;Gamma,x:A|-c%>"] "<%Xi;Theta;Gamma|-_v mu\(val x\), c : shiftn A^~%>"
 
     (* arnaud: règles dérivées: todo *)
     let lambda = Infer.rule ~label:lambda ["<%Xi;Gamma,x:A|-t:B%>"] "<%Xi;Gamma|-lambda x,t: A-oB%>"
