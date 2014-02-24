@@ -111,8 +111,8 @@ expr:
 | a=expr PAR b=expr  { concat[a;parr;b] }
 | BANG a=expr { concat [text"\\,!";a] }
 | WHYNOT a=expr { concat [text"\\,?\\!";a] }
-| SHIFTP a = expr { concat [text"\\,";uparrow;text"\\!";a] }
-| SHIFTN a = expr { concat [text"\\,";downarrow;text"\\!";a] }
+| SHIFTP a = expr { just_left `Up a }
+| SHIFTN a = expr { just_left `Down a }
 | PI p=typedpattern COMMA b=expr { concat [ index prod p ; b ] }
 | SIGMA p=typedpattern COMMA b=expr { concat [ index sum p ; b ] }
 
