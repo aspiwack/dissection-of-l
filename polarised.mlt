@@ -424,7 +424,7 @@ Like in the call-by-value translation, the {mu} rule is duplicated:
    array_line [ direct ; chain ]
  ]end}
 
-The evaluation strategy of the negative translation of linear {muname}, evaluating the outermost constructor on demand, is essentially the same behaviour as lazy programming language such as Haskells (except that lazy programming languages have a call-by-need strategy, hence suspended computations must be shared rather than duplicated).
+The evaluation strategy of the negative translation of linear {muname}, evaluating the outermost constructor on demand, is essentially the same behaviour as lazy programming language such as Haskell (except that lazy programming languages have a call-by-need strategy, hence suspended computations must be shared rather than duplicated).
 
 (* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
 
