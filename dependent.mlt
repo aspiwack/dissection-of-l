@@ -74,7 +74,7 @@ Typing derivation for $"<%lambda x,t%>"="<%mu(x,alpha),<t|alpha>%>"$:
 {let open Infer in displaymath begin
   rule ~label:parr
     [rule ~label:cutrule
-        ["<%Xi;Gamma,x:A|-t:B^~%>" ; rule ~label:idrule [] "<%Xi; Gamma; alpha:B|-_v alpha : B%>"]
+        ["<%Xi;Gamma,x:A|-t:B^~%>" ; rule ~label:idrule [] "<%Xi; Gamma,x:A; alpha:B|-_v alpha : B%>"]
         "<%Xi;Gamma,x:A,alpha:B|- <t|alpha>%>"]
     "<%Xi;Gamma |- mu(x,alpha),<t|alpha> : PI x:A,B^~%>"
 end}
@@ -94,22 +94,12 @@ Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
 {let open Infer in displaymath begin
   rule ~label:mu
     [rule ~label:cutrule
-        ["<%Xi;Gamma|-t:PI x:A,N%>" ; rule ~label:tensor ["<%Xi;Gamma;Delta|-u:A%>";rule ~label:idrule [] "<%Xi;Gamma;alpha:subst [u,x] N^~ |- alpha : subst [u,x] N^~%>"] "<%Xi;Gamma;Delta,alpha:subst [u,x] N^~|-(u,alpha):SIGMA x:A,N^~%>"]
+        ["<%Xi;Gamma|-t:PI x:A,N%>" ; rule ~label:tensor ["<%Xi;Gamma;Delta|-_v u:A%>";rule ~label:idrule [] "<%Xi;Gamma;alpha:subst [u,x] N^~ |-_v alpha : subst [u,x] N^~%>"] "<%Xi;Gamma;Delta,alpha:subst [u,x] N^~|-_v (u,alpha):SIGMA x:A,N^~%>"]
         "<%Xi;Gamma,Delta,alpha:subst [u,x] N^~|- <t|(u,alpha)>%>"]
     "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
 end}
 
 {subsection"Dependent elimination"~label:ss_depelim}
-
-{let open Infer in
-displaymath begin
-  rule ~label:parr
-    [rule ~label:cutrule
-        ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)^~%>";
-         rule ~label:idrule[]"<%Xi;alpha:subst [(x,y),cv] N_cv|- alpha : subst [(x,y),cv] N_cv%>"]
-        "<%Xi;Gamma,x:A,y:B,alpha:subst [(x,y),cv] N_cv|- < v | alpha >%>"]
-    "<%Xi;Gamma,alpha:N_cv |- mu(x,y), < v | alpha > : A^~`& B^~%>"
-end}
 
 See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
 {let sep = `Mm 2. in
@@ -158,5 +148,37 @@ See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in
    end;
 *)
  ]}
+
+Usual dependent pattern-matching.
+{let open Infer in
+displaymath begin
+  rule ~label:parr
+    [rule ~label:cutrule
+        ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)%>";
+         rule ~label:idrule[]"<%Xi;alpha:\(subst [(x,y),cv] N_cv\)^~|-_v alpha : \(subst [(x,y),cv] N_cv\)^~%>"]
+        "<%Xi;Gamma,x:A,y:B,alpha:\(subst [(x,y),cv] N_cv\)^~|- < v | alpha >%>"]
+    "<%Xi;Gamma,alpha:\(N_cv\)^~ |- mu(x,y), < v | alpha > : A^~`& B^~%>"
+end}
+
+Commutative cuts (see Section~{ref_ ss_optim}). Suppose, that <%N_cv%>, above, is <%\(C_cv\) -o N_cv%>. Then, for <%Xi;Gamma;Delta|-_v u:A<*>B%> and <%Xi;Gamma;Pi|-_v t : subst [u,cv] C_cv%>:(*arnaud: v'erifier les Theta-context de u et t*)
+{displaymath"<%Xi;Gamma,Delta,Pi|-(mu alpha, <u|mu(x,y),<v|alpha>>) t:subst[u,cv]N_cv%>"}
+
+Uniformity lemma: <%Xi;Theta;subst[u,cv] Gamma_cv |-_v t : subst[u,cv] A_cv%> implies <%Xi;Theta,Pi;subst[v,cv] Gamma_cv |-_v t : subst[v,cv] A_cv%>
+
+It is equivalent to: <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>. In Coq, commutative cuts are not well-typed. Term of the former shape are essential to the expressiveness of Coq. In dependent {muname}:
+{let open Infer in
+ displaymath begin
+   rule ~label:mu
+     [rule ~label:cutrule
+         ["<%Xi;Gamma;Delta|-_v u : A<*>B%>";
+          rule ~label:parr
+            [rule ~label:cutrule
+                ["<%Xi;Gamma,x:A,y:B|- v : \(subst[(x,y),cv] C_cv\) -o \(subst[(x,y),cv] N_cv\)%>";
+                 "<%Xi;Gamma,x:A,y:A;Pi,alpha:\(subst[(x,y),cv] N_cv\)^~|-_v (t,alpha) : X%>"]
+                "<%Xi;Gamma,Pi,x:A,y:B,alpha:\(subst[(x,y),cv] N_cv\)^~|- <v|(t,alpha)>%>"]
+            "<%Xi;Gamma,Pi,alpha:\(N_cv\)^~|- mu(x,y), <v|(t,alpha)> : A^~`&B^~%>"]
+         "<%Xi;Gamma,Delta,Pi,alpha:\(subst[u,cv]N_cv\)^~|-<u|mu(x,y), <v|(t,alpha)>>%>"]
+     "<%Xi;Gamma,Delta,Pi|-mu alpha,<u|mu(x,y), <v|(t,alpha)>> : subst[u,cv]N_cv%>"
+ end}
 
 "
