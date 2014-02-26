@@ -29,6 +29,7 @@ let ss_optim = label ~name:\"subsection:commutativecuts\" ()
 let ss_lj = label ~name:\"subsection:lj\" ()
 let s_pol = label ~name:\"section:polarised\" ()
 let s_dep = label ~name:\"section:dependent\" ()
+let ss_depelim = label ~name:\"subsection:dependent-elimitation\" ()
 
 let l_mall = label ~name:\"figure:mall\" ()
 let l_ll = label ~name:\"figure:ll\" ()

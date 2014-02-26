@@ -8,7 +8,11 @@ open Extra
 
 let d = "{section"Dependent types" ~label:s_dep}
 
+Polarised {muname}, with its type-based distinction of values and computations, gives an answer to the question of what it means for type to have effects in them: the answer is, they should not exist. If we see the type <%PI x:A, N%> as a generalisation of the type <%A-oN%>, it is clear that <%x%> only stands for values.
 
+The obvious limitation is that even pure computation are ostensibly forbidden in types, preventing proofs by computation which are quite popular in modern dependent-type-theory-based proof assistants~{cite"Boutin1997"}. Another, somewhat separate, issue which is not addressed in this last section is that of the computation {emph"of"} types, which would be necessary to prove, for instance, the equivalence of <%A<+>B%> and <%SIGMA x:1<+>1, <x|{ mu(1.()), A , mu(2.()), B } >%>. The latter will not even be a valid type.
+
+Despite these limitation, this modest proposal for a dependently typed linear logic is already a fairly expressive logic which includes dependent elimination -- as described in Section~{ref_ ss_depelim}.
 
 {rule_ (`Mm 3.) (`Mm 3.)}
 
@@ -95,7 +99,7 @@ Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
     "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
 end}
 
-{subsection"Dependent elimination"}
+{subsection"Dependent elimination"~label:ss_depelim}
 
 {let open Infer in
 displaymath begin
