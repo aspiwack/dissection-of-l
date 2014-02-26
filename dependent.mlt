@@ -166,7 +166,8 @@ Commutative cuts (see Section~{ref_ ss_optim}). Suppose, that <%N_cv%>, above, i
 Uniformity lemma: <%Xi;Theta;subst[u,cv] Gamma_cv |-_v t : subst[u,cv] A_cv%> implies <%Xi;Theta,Pi;subst[v,cv] Gamma_cv |-_v t : subst[v,cv] A_cv%>
 
 It is equivalent to: <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>. In Coq, commutative cuts are not well-typed. Term of the former shape are essential to the expressiveness of Coq. In dependent {muname}:
-{let open Infer in
+{tiny begin
+ let open Infer in
  displaymath begin
    rule ~label:mu
      [rule ~label:cutrule
@@ -179,6 +180,9 @@ It is equivalent to: <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>. In Coq, commutativ
             "<%Xi;Gamma,Pi,alpha:\(N_cv\)^~|- mu(x,y), <v|(t,alpha)> : A^~`&B^~%>"]
          "<%Xi;Gamma,Delta,Pi,alpha:\(subst[u,cv]N_cv\)^~|-<u|mu(x,y), <v|(t,alpha)>>%>"]
      "<%Xi;Gamma,Delta,Pi|-mu alpha,<u|mu(x,y), <v|(t,alpha)>> : subst[u,cv]N_cv%>"
- end}
+ end
+end}
+
+Shorter problem: <%< t | mu alpha,<u|mu beta,<v|beta> > >%> vs <%< u | mu beta, <v|t>>%>
 
 "
