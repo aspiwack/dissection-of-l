@@ -170,9 +170,9 @@ module Typing = struct
   end
 
   module Dll0 = struct
-    let id = Infer.rule ~label:idrule ["<%Xi,Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
-    let iddup = Infer.rule ~label:iddup ["<%Xi|-A:Type%>"] "<%Xi,x:A;Theta;|-_v x:A%>"
-    let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A|-c%>"] "<%Xi;Gamma|- mu x,c : A^~%>"
+    let id = Infer.rule ~label:idrule ["<%!Xi,Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
+    let iddup = Infer.rule ~label:iddup ["<%!Xi|-A:Type%>"] "<%Xi,x:A;Theta;|-_v x:A%>"
+    let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A,Psi|-c%>"] "<%Xi;Gamma|- mu x,c : A^~%>"
     let cut = Infer.rule ~label:cutrule ["<%Xi;Theta;Gamma|-_v t:A%>";"<%Xi;Theta,Delta|-u:A^~%>"] "<%Xi;Theta,Gamma,Delta|-<t|u>%>"
 
     let pair = Infer.rule ~label:tensor ["<%Xi;Theta;Gamma|-_v t:A%>"; "<%Xi;Theta;Delta|-_v u:subst [t,x] B%>"] "<%Xi;Theta;Gamma,Delta|-_v (t,u):SIGMA x:A, B%>"
@@ -205,8 +205,8 @@ module Typing = struct
 
 
 
-    let id = Infer.rule ~label:idrule ["<%Xi,Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
-    let iddup = Infer.rule ~label:iddup ["<%Xi|-A:Type%>"] "<%Xi,x:A;Theta;|-_v x:A%>"
+    let id = Infer.rule ~label:idrule ["<%!Xi,Theta|-A:Type%>"] "<%Xi;Theta;x:A|-_v x:A%>"
+    let iddup = Infer.rule ~label:iddup ["<%!Xi|-A:Type%>"] "<%Xi,x:A,Psi;Theta;|-_v x:A%>"
     let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A,subst [x,cv] Gamma_cv|-c%>"] "<%Xi;Gamma,Gamma_cv|- mu x,c : A^~%>"
     let cut = Infer.rule ~label:cutrule ["<%Xi;Theta;Gamma|-_v t:A%>";"<%Xi;Theta,Delta_cv|-u:A^~%>"] "<%Xi;Theta,Gamma,subst [t,cv] Delta_cv|-<t|u>%>"
 

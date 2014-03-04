@@ -28,16 +28,9 @@ This new typing context affects principally the identity and cut rules. Indeed a
 {displaymath begin array [`C;`Sep(qquad^^qquad);`C] [
   array_line [ Rules.Typing.Dll0.id ; Rules.Typing.Dll0.cut ];
  ]end}
-In the cut rule, the variables which are necessary to make sense of the types in <%Gamma%> and <%A%> but occur in the computation <%u%> are kept in the typing context of the value <%t%>. In the identity rule, the typing context and the duplicable context are joined to check the type is well-formed: types do not make a difference between linear and duplicable variables.
+In the cut rule, the variables which are necessary to make sense of the types in <%Gamma%> and <%A%> but occur in the computation <%u%> are kept in the typing context of the value <%t%>. In the identity rule, the duplicable context is promoted -- each binding $"<%x%>"{Latex.block$:$}"<%A%>"$ is replaced by $"<%x%>"{Latex.block$:$}"<%!A%>"$ -- and adjoined the typing context: types do not make a difference between linear and duplicable variables, so the duplicable one must have their implicit exponential connective back.
 
-The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypothesis that the type of duplicable variables does not depend on linear variables. When we write $"<%Gamma%>","<%Delta%>"$, it is implied that types in <%Delta%> may depend on variables of <%Gamma%> but types of <%Gamma%> may not depend on variables of <%Delta%>. Also, all context which appear in the premise of a typing rule is supposed to make sense, hence in the cut and tensor rule, it is understood that <%Gamma%> and <%Delta%> do not depend on each other, and in the introduction rule for <%?A^~%>, <%Gamma%> does not depend on <%x%>.
-
-As a consequence of this presentation, values do not reference the linear variable which occur in their types. In that sense, values are uniform with respect to type dependencies.
-
-{rule_ (`Mm 3.) (`Mm 3.)}
-
-See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
-
+The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypothesis that the type of duplicable variables does not depend on linear variables. When we write $"<%Gamma%>","<%Delta%>"$, it is implied that types in <%Delta%> may depend on variables of <%Gamma%> but types of <%Gamma%> may not depend on variables of <%Delta%>. Also, all context which appear in the premise of a typing rule is supposed to make sense, hence in the cut and tensor rule, it is understood that <%Gamma%> and <%Delta%> do not depend on each other, and in the introduction rule for <%?A^~%>, the context <%Gamma%> does not depend on <%x%>. These independence constraints are omitted for the sake of readability. Apart from the dependencies between bindings in the context, the context is not assumed to have a particular ordering. In particular, the context does not have a linear structure, in contrast with common practice in dependently typed natural deduction.
 {let sep = `Mm 2. in
  
  figurerules ~label:f_wdll ~caption:"Weak dependent {muname}" [
@@ -86,6 +79,13 @@ See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
 *)
  ]}
 
+As a consequence of this presentation, values do not reference the linear variables which occur in their types. This is a form of uniformity which values have to conform to: in the types of values, term variables behave a little like the type variables of the Hindley-Milner type system.
+
+{rule_ (`Mm 3.) (`Mm 3.)}
+
+Can encode dependently typed {lambda}-calculus.
+
+
 Typing derivation for $"<%lambda x,t%>"="<%mu(x,alpha),<t|alpha>%>"$:
 {let open Infer in displaymath begin
   rule ~label:parr
@@ -115,6 +115,18 @@ Typing derivation for $"<%t u%>"="<%mu alpha,<t|(u,alpha)>%>"$:
     "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
 end}
 
+$"<%lambda |_x_|,t%>"="<%mu(|_x_|,alpha),<t|alpha>%>"="<%mu(beta,alpha), <beta|mu|_x_|, <t|alpha>>%>"$. Typing derivation:
+{let open Infer in
+ displaymath begin
+   rule ~label:tensor
+     [rule ~label:cutrule
+         [rule~label:idrule[]"<%Xi;;beta:!A|-_v beta : !A%>";
+          rule ~label:whynotrule
+            ["<%Xi,x:A;alpha:N^~|- <t|alpha>%>"]
+            "<%Xi;alpha:N^~|-mu|_x_|, <t|alpha> : ?A^~%>"]
+         "<%Xi;beta:!A,alpha:N^~|-<beta|mu|_x_|, <t|alpha>>%>"]
+     "<%Xi;|-mu(beta,alpha), <beta|mu|_x_|, <t|alpha>> : PI x:!A, N%>"
+end}
 {subsection"Dependent elimination"~label:ss_depelim}
 
 See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
