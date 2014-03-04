@@ -14,11 +14,27 @@ The obvious limitation is that even pure computation are ostensibly forbidden in
 
 Despite these limitation, this modest proposal for a dependently typed linear logic is already a fairly expressive logic which includes dependent elimination -- as described in Section~{ref_ ss_depelim}.
 
-{rule_ (`Mm 3.) (`Mm 3.)}
-
 {subsection"Weak dependent types"}
 
-As the duplicable context behaves like a natural deduction context, it would be straightforward to make types depend only on the duplicable context. It is essentially what was done in~{cite"Cervesato1996"}. This approach, however, has strong limitations, and cannot be easily extended. We propose a dependent type system for {muname} where types can depend on non-duplicable variable.
+A first approach to extend linear {muname} or polarised {muname} with dependent types is to leverage the remark that the duplicable context behaves like a natural deduction context. We could therefore define a dependent product <%PI x:A,N%> like in natural deduction. This dependent product would generalise <%!A-oN%> and we would retain a separate, non-dependent, linear arrow <%A-oN%>. Such a system would be along the lines of linear {textsc"lf"}~{cite"Cervesato1996"}, except in sequence calculus form rather than a natural deduction.
+
+There are no particular difficulty with this approach, but it has severe limitations. The most important limitation is that such a system cannot be extended to dependent elimination. The system we propose in this section has a dependent product which generalises the linear arrow. In Section~{ref_ ss_depelim}, we enrich it with dependent elimination.
+
+A key point of our presentation of {muname} so far, is that <%mu alpha,<t|alpha>%> is essentially the same as just <%t%>, this underlies, in particular, our encoding of pattern-matching, and of linear {lambda}-calculus. This is problematic if types depend on linear variables. Indeed, if <%t%> has type <%N%>, which depend on some linear variable <%x%>, we need <%alpha%> to have type <%N^~%> which also depends on <%x%>. But variables have to be split between <%t%> and <%alpha%> so <%x%> can only go on one side of the cut.
+
+This is where the polarised discipline helps: as variables represent only values, we can restrict type to contain values which are harmless in that they cannot perform effects by themselves. So, it is innocuous to allow variable duplication in types. In this proposal, it is manifested by a third context -- usually denoted by a <%theta%> -- in the typing judgement of value, which represents variables accessible from the type, but not from the value.
+
+This new typing context affects principally the identity and cut rules. Indeed another way one can think about the typing context is that it allows variables to have any type.
+{displaymath begin array [`C;`Sep(qquad^^qquad);`C] [
+  array_line [ Rules.Typing.Dll0.id ; Rules.Typing.Dll0.cut ];
+ ]end}
+In the cut rule, the variables which are necessary to make sense of the types in <%Gamma%> and <%A%> but occur in the computation <%u%> are kept in the typing context of the value <%t%>. In the identity rule, the typing context and the duplicable context are joined to check the type is well-formed: types do not make a difference between linear and duplicable variables.
+
+The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypothesis that the type of duplicable variables does not depend on linear variables. When we write $"<%Gamma%>","<%Delta%>"$, it is implied that types in <%Delta%> may depend on variables of <%Gamma%> but types of <%Gamma%> may not depend on variables of <%Delta%>. Also, all context which appear in the premise of a typing rule is supposed to make sense, hence in the cut and tensor rule, it is understood that <%Gamma%> and <%Delta%> do not depend on each other, and in the introduction rule for <%?A^~%>, <%Gamma%> does not depend on <%x%>.
+
+As a consequence of this presentation, values do not reference the linear variable which occur in their types. In that sense, values are uniform with respect to type dependencies.
+
+{rule_ (`Mm 3.) (`Mm 3.)}
 
 See Figure~{ref_ f_wdll}. Can encode dependently typed {lambda}-calculus.
 
