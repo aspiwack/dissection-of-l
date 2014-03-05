@@ -56,7 +56,7 @@ let keywords = [
   "Sequent calculus";
   "Dependent types";
   "Linear logic";
-  "Focusing";
+  "Polarised logic";
   "System L";
 (*  "μμ̃"; Confuses latex *)
 ]
