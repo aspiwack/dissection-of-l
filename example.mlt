@@ -93,9 +93,9 @@ It is possible, if quite a bit of work, to extend patterns to all of the value c
 
 {subsection "Natural deduction" ~label:ss_lj}
 
-Going back to Figure~{ref_ l_ll}, we can observe that the no rule modify the duplicable context except the dereliction rule. In the dereliction rule, the duplicable context, <%Xi%>, of the conclusion is adjoined an extra variable <%x%> in the premise.
+Going back to Figure~{ref_ l_ll}, we can observe that no rule modifies the duplicable context except the dereliction rule. In the dereliction rule, the duplicable context, <%Xi%>, of the conclusion is adjoined an extra variable <%x%> in the premise.
 
-This means like that the duplicable context is more similar to a natural deduction context than a natural deduction context. In fact, if we restrict our attention to the sequents of the form <%Xi;|-t:A%>, we essentially get {emph"intuitionistic natural deduction"}. Types make brief appearances in the linear context, but this can be hidden by macros.
+This means like that the duplicable context is more similar to a natural deduction context than a standard sequent calculus context. In fact, if we restrict our attention to the sequents of the form <%Xi;|-t:A%>, we essentially get {emph"intuitionistic natural deduction"}. Types make brief appearances in the linear context, but this can be hidden by macros.
 
 In Figure~{ref_ l_lambda}, we give the translation of simply typed {lambda}-calculus inside linear {mu}. It is probably comforting that using the duplicable context as a natural deduction context, the intuitionistic arrow is naturally interpreted, as it is most common, as <%!A-oB%>. Conjunction can be interpreted by either conjunction connectives, though the additive conjunction is simpler (because in the case of multiplicative conjunction the right encoding is <%!A<*>!B%>, instead of the more straightforward <%A&B%>). Disjunction is encoded as <%!A<+>!B%> (this time we cannot use the multiplicative connective).
 {let sep = `Mm 3. in
