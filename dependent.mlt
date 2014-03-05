@@ -261,16 +261,35 @@ This is quite precisely what dependent elimination provides:
  end}
 Note the necessary step which uses the cut variable, without the cut variable the derivation is no longer valid (in weak dependent {muname}, the final line would be  <%;;|-refl:x=(y,z)%>, certainly an underivable sequent).
 
-{rule_ (`Mm 3.) (`Mm 3.)}
+There is a limit to dependent {muname}, however: it does not enjoy subject reduction. This is due to the fact that commutative cuts are simply reductions in {muname}. Commutative conversion are not usually correct in dependently typed languages with dependent elimination (though there are much more many correct commutative conversion with Coquand elimination than with Paulin elimination).
 
-
-
-Commutative cuts (see Section~{ref_ ss_optim}). Suppose, that <%N_cv%>, above, is <%\(C_cv\) -o N_cv%>. Then, for <%Xi;Gamma;Delta|-_v u:A<*>B%> and <%Xi;Gamma;Pi|-_v t : subst [u,cv] C_cv%>:(*arnaud: v'erifier les Theta-context de u et t*)
+As we have seen above, elimination of a value of tensor type can be given the following (specialised) type:
+{let open Infer in
+ displaymath begin
+   rule
+     ["<%Xi;Gamma;Delta|-_v u : A<*>B%>";
+      "<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] \(C_cv\)\) -o subst [(x,y),cv] \(N_cv\)%>"]
+     "<%Xi;Gamma,Delta|- mu alpha, < u | mu(x,y), < v | alpha > > : \(subst [u,cv] \(C_cv\)\) -o subst [u,cv] N_cv%>"
+ end}
+With <%Xi;Gamma,Delta;Pi|-_v t : \(subst [u,cv] \(C_cv\)\)%> we have
 {displaymath"<%Xi;Gamma,Delta,Pi|-(mu alpha, <u|mu(x,y),<v|alpha>>) t:subst[u,cv]N_cv%>"}
 
-Uniformity lemma: <%Xi;Theta;subst[u,cv] Gamma_cv |-_v t : subst[u,cv] A_cv%> implies <%Xi;Theta,Pi;subst[v,cv] Gamma_cv |-_v t : subst[v,cv] A_cv%>
+However, <%(mu alpha, <u|mu(x,y),<v|alpha>>) t%> reduces (against any continuation) to <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%> (see Section~{ref_ ss_optim}). And, unfortunately, the latter is not necessarily well-typed. For it to be well-typed we need a stronger statement on <%t%>:
+{displaymath${forall}"<%v%>""<%Psi%>", ("<%Xi;Gamma;Psi|-v:A<*>B%>"){rightarrow}("<%Xi;Gamma,Psi;subst [v,cv] Pi_cv |- t : subst [v,cv] C_cv%>")$}
+If <%t%> has such types, then in particular <%Xi;Gamma,x:A,y:B;subst [(x,y),cv] Pi_cv |- t : subst [(x,y),cv] C_cv%>, which will be the proof obligation since dependent elimination takes care of evolving the <%Pi_cv%> context through the proof.
 
-It is equivalent to: <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>. In Coq, commutative cuts are not well-typed. Term of the former shape are essential to the expressiveness of Coq. In dependent {muname}:
+Not all values are as such, however, and subject reduction may indeed fail. To fix subject reduction, we would need to rely on a more involved mechanism than simple substitutions to specialise the context. Some sort of equality constraints would probably work.
+
+However, the lack of subject reduction is not necessarily bad. Indeed, if <%u%>, above, is of the form <%(a,b)%> (which every closed <%u%> is), then <%mu alpha,<(a,b)|mu(x,y), <v|(t,alpha)>>%> further reduces to <%mu alpha, <subst [a,x;b,y] v|(t,alpha)>%> which has indeed the appropriate type. So, at least for closed terms, a failure of subject reduction can be fixed by additional reductions. This sort of type safety property can be proved using Krivine realisability~{cite"Munch2009"}. This proof is left to future work, so let it be the last act of this article to state the following conjecture:
+
+{let conj ?name x =
+   let opt = match name with Some n -> Some(T,n) | None -> None in
+   environment\"conj\" ?opt (T,x) T in
+ conj ~name:"Type safety" begin
+   "For any closed term <%;|-t:N%> of negative type, the normal form <%c%> of the command <%<t|alpha>%> has type <%;alpha:N^~|-c%>."
+ end}
+
+(* some prototypes of proofs for the subject reduction issue
 {tiny begin
  let open Infer in
  displaymath begin
@@ -289,6 +308,6 @@ It is equivalent to: <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%>. In Coq, commutativ
 end}
 
 Shorter problem: <%< t | mu alpha,<u|mu beta,<v|beta> > >%> vs <%< u | mu beta, <v|t>>%>
-
+*)
 
 "
