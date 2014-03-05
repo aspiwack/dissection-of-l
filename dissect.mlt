@@ -28,6 +28,11 @@ let focusing = Polarised.d
 
 let dependent = Dependent.d
 
+let concl = "{section"Conclusion"}
+
+{rule_ (`Mm 3.) (`Mm 3.)}
+"
+
 let d = concat [
   Intro.d;
   Core.d;
@@ -35,6 +40,7 @@ let d = concat [
   Example.d;
   Polarised.d;
   Dependent.d;
+  concl;
 (*  command \"bibliography\" [A,"library"] A;*)
   environment \"bibliography\" ~args:[A,"library"] (A,empty) A;
 ]
