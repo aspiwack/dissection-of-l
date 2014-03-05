@@ -30,7 +30,7 @@ This new typing context affects principally the identity and cut rules. Indeed a
  ]end}
 In the cut rule, the variables which are necessary to make sense of the types in <%Gamma%> and <%A%> but occur in the computation <%u%> are kept in the typing context of the value <%t%>. In the identity rule, the duplicable context and the typing context are joined: types do not make a difference between linear and duplicable variables.
 
-The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypothesis that the type of duplicable variables does not depend on linear variables. When we write $"<%Gamma%>","<%Delta%>"$, it is implied that types in <%Delta%> may depend on variables of <%Gamma%> but types of <%Gamma%> may not depend on variables of <%Delta%>. Also, all context which appear in the premise of a typing rule is supposed to make sense, hence in the cut and tensor rule, it is understood that <%Gamma%> and <%Delta%> do not depend on each other, and in the introduction rule for <%?A^~%>, the context <%Gamma%> does not depend on <%x%>. These independence constraints are omitted for the sake of readability. Apart from the dependencies between bindings in the context, the context is not assumed to have a particular ordering. In particular, the context does not have a linear structure, in contrast with common practice in dependently typed natural deduction.
+The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypothesis that the type of duplicable variables does not depend on linear variables. When we write $"<%Gamma%>","<%Delta%>"$, it is implied that types in <%Delta%> may depend on variables of <%Gamma%> but types of <%Gamma%> may not depend on variables of <%Delta%>. Also, all context which appear in the premise of a typing rule is supposed to make sense, hence in the cut and tensor rule, it is understood that <%Gamma%> and <%Delta%> do not depend on each other, and in the introduction rule for <%?A^~%>, the context <%Gamma%> does not depend on <%x%>. These independence constraints are omitted for the sake of readability. Apart from the dependencies between bindings in the context, the context is not assumed to have a particular ordering. In particular, the context does not have a linear structure, in contrast with common practice in dependently typed natural deduction. Notice that we use a dependent product <%PI x:A,N%> which generalises the linear arrow, rather than a more symmetric generalisation of <%N`&M%>, this is simply by lack of a notation for the latter. We assume that duality commutes with conversion{footnote"Weakly dependent {muname}, as is stands cannot actually feature values in their type, so of course, substitution~--~which is the identity~--~commutes with dualisation. This assumption should be seen as a constraint on extensions of the system."}.
 {let sep = `Mm 2. in
  
  figurerules ~label:f_wdll ~caption:"Weak dependent {muname}" [
@@ -127,9 +127,10 @@ And introduction rule
     ["<%Xi,Theta|-u=u:Type%>"]
     "<%Xi;Theta;Gamma|-_v refl:u=u%>"
 end}
+We will not need the dual type.
 
 With such a type it would be desirable, but is not possible in weak dependent {muname}, to prove the statement
-{displaymath"<%PI x:A<*>B, SIGMA y:A, SIGMA z:B, x=(y,z)%>"}
+{displaymath"<%PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"}
 That every value in <%A<*>B%> is a pair.
 
 Dependent elimination allows, in <@let (x,y) = u in v@> to link <@u@> with <@(x,y)@> in the type of <@v@>. Dependent elimination comes in two main brands: Paulin's style~{citation_needed}, as used by Coq, and Coquand's style~{citation_needed}, as used by Agda. In Paulin elimination, the type of <@v@> may contain references to <@(x,y)@> which are transformed into occurrences of <@u@> in the type of the whole term. Coquand's elimination does the same to the whole typing context. Since, in {muname}, elimination is introduced over commands, which do not have a distinguished type, dependent elimination in dependent {muname} will resemble Coquand elimination most.
@@ -138,12 +139,39 @@ Looking closely at the representation of elimination in {muname}
 {displaymath"<%mu alpha, < u | mu(x,y),<v|alpha> >%>"}
 we can observe that dependent elimination must be split in two parts -- in contrast with natural deduction where elimination is a single operation. First, in <%mu(x,y), <v|alpha>%>, the types of <%v%> and <%alpha%> may depend on <%(x,y)%> and this dependency must be hidden as <%x%> and <%y%> are going out of scope. And in a second time -- when cutting with <%u%> -- <%u%> must be linked into the type.
 
-This leads to the idea of introducing a special variable or placeholder, which we write <%cv%> which stands for the value against which the current computation will be cut{footnote"Credit where credit is due: this idea was originally formulated by Hugo Herbelin in an unpublished draft. The context was an intuitionistic dependent type theory in sequent calculus form."}.
+This leads to the idea of introducing a distinguished variable, which we write <%cv%> which stands for the value against which the current computation will be cut{footnote"Credit where credit is due: this idea was originally formulated by Hugo Herbelin in an unpublished draft. The context was an intuitionistic dependent type theory in sequent calculus form."}. Notice that by definition, since variables only stand for values and values are cut against computation, the {emph"cut variable"} <%cv%> can only appear in the typing judgement of computations, not of values, nor of commands.
 
-{rule_ (`Mm 3.) (`Mm 3.)}
+In the typing judgements of computations, we use names such as <%N_cv%> or <%Gamma_cv%> as reminders that the type or context can contain the cut variable. Here is the cut rule:
+{displaymath Rules.Typing.Dll1.cut}
+Notice how, since the duplicable context is shared between the value and the computation, it does not make sense for it to contain the cut variable. The cut rule eliminates the cut variable by replacing it with the value <%t%> as the semantics of the cut variable mandates.
 
+The cut variable is introduced by the {mu}-binders, notably in the introduction rule for <%N`&M%>:
+{displaymath Rules.Typing.Dll1.copair}
+So, indeed, <%c%> is typed as if the hypothetical cut value was <%(x,y)%>. In this rule <%PI x:A, B^~%> does not mention the cut variable. Just as in the cut rule, the type <%A^~%> does not mention the cut variable. Types of computation are duals of types of values which do not have the cut variable. All of the mentions of type variable are in the context, which is not a problem since the current continuation can be hosted there. Indeed here is the rule for dependent elimination of pairs:
+{let open Infer in
+displaymath begin
+  rule ~label:parr
+    [rule ~label:cutrule
+        ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)%>";
+         rule ~label:idrule
+           ["<%Xi,Gamma,x:A,y:B|-\(subst [(x,y),cv] N_cv\)^~ : Type%>"]
+           "<%Xi;Gamma,x:A,y:B;alpha:\(subst [(x,y),cv] N_cv\)^~|-_v alpha : \(subst [(x,y),cv] N_cv\)^~%>"]
+        "<%Xi;Gamma,x:A,y:B,alpha:\(subst [(x,y),cv] N_cv\)^~|- < v | alpha >%>"]
+    "<%Xi;Gamma,alpha:\(N_cv\)^~ |- mu(x,y), < v | alpha > : A^~`& B^~%>"
+end}
+Which can be further combined with a value <%u%> to obtain a rule akin to dependent elimination in natural deduction (omitting the type well-formedness constraint):
+{let open Infer in
+ displaymath begin
+   rule ~label:mu
+     [rule ~label:cutrule
+         ["<%Xi;Gamma;Delta|-_v u : A<*>B%>";
+          derived
+            ["<%Xi;Gamma,x:A,y:B|- v : subst [(x,y),cv] \(N_cv\)%>"]
+            "<%Xi;Gamma,alpha:\(N_cv\)^~|- mu(x,y), < v | alpha > : A^~`& B^~%>"]
+         "<%Xi;Gamma,Delta,alpha:subst [u,cv] \(N_cv\)^~|- < u | mu(x,y), < v | alpha > > %>"]
+     "<%Xi;Gamma,Delta|- mu alpha, < u | mu(x,y), < v | alpha > > : subst [u,cv] N_cv%>"
+ end}
 
-See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in types when typing a computation, and corresponds to the value against which it will be cut. We use names such as <%Gamma_cv%>, to represent contexts which may have <%cv%> in their types.
 {let sep = `Mm 2. in
  figurerules ~label:f_dll ~caption:"Dependent {muname} with dependent elimination" [
    simple_block "Syntax" begin
@@ -190,17 +218,52 @@ See Figure~{ref_ f_dll}. There is a special variable <%cv%>, which can appear in
    end;
 *)
  ]}
-
-Usual dependent pattern-matching.
+The full system can be found in Figure~{ref_ f_dll}. Let us illustrate dependent {muname} further by showing the rules for dependent product of duplicable terms. That is, the typing derivation for <%lambda|_x_|, t%> which is defined (see Section~{ref_ ss_patterns}) as
+<%mu(|_x_|,alpha),<t|alpha> = mu(beta,alpha), <beta|mu|_x_|, <t|alpha>>%> (using shortcut rules for variables as in Section~{ref_ ss_patterns}, the shortcut omit type well-formedness verification):
 {let open Infer in
-displaymath begin
-  rule ~label:parr
-    [rule ~label:cutrule
-        ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)%>";
-         rule ~label:idrule[]"<%Xi;alpha:\(subst [(x,y),cv] N_cv\)^~|-_v alpha : \(subst [(x,y),cv] N_cv\)^~%>"]
-        "<%Xi;Gamma,x:A,y:B,alpha:\(subst [(x,y),cv] N_cv\)^~|- < v | alpha >%>"]
-    "<%Xi;Gamma,alpha:\(N_cv\)^~ |- mu(x,y), < v | alpha > : A^~`& B^~%>"
+ displaymath begin
+   rule ~label:tensor
+     [rule ~label:(cutp"<%beta%>")
+         [rule ~label:whynotrule
+            [rule ~label:(cutp"<%alpha%>")
+                ["<%Xi,x:A;|- t : subst [|_x_|,cv] \(N_cv\)%>"]
+                "<%Xi,x:A;alpha:subst [|_x_|,cv] \(N_cv\)^~|- <t|alpha>%>"]
+            "<%Xi;alpha:\(N_cv\)^~|-mu|_x_|, <t|alpha> : ?A^~%>"]
+         "<%Xi;beta:!A,alpha:subst [beta,cv] \(N_cv\)^~|-<beta|mu|_x_|, <t|alpha>>%>"]
+     "<%Xi;|-mu(beta,alpha), <beta|mu|_x_|, <t|alpha>> : PI beta:!A, subst[beta,cv]N_cv%>"
 end}
+As it happens this is not exactly the rule of dependent product in {lambda}-calculus. Namely, all the free variables in a type are of the form <%|_x_|%> while it is not necessarily the case of bound variables. Remember, however, from Section~{ref_ ss_lj} how intuitionistic conjunction and disjunction could be encoded as <%!A<*>!B%> and <%!A<+>!B%> respectively. Encoding of intuitionistic positive connectives require a strict interleaving of linear positive connectives and the duplicability modality. This is essentially the same phenomenon which is reflected in the duplicable dependent product rule.
+
+As a last example, let us return to the equality example of the beginning of the present section. We promised a proof derivation for:
+{displaymath"<%PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"}
+This is quite precisely what dependent elimination provides:
+{let open Infer in
+ displaymath begin
+   rule ~label:lambda
+     [rule ~label:mu
+         [rule ~label:(cutp"<%x%>")
+             [rule ~label:parr
+                 [rule ~label:(cutp"<%alpha%>")
+                     [rule ~label:positiveshift
+                         [rule ~label:tensor
+                             [rule ~label:idrule [] "<%;;y:A |-_v y : A%>";
+                              rule ~label:tensor
+                                [rule ~label:idrule [] "<%;;z:B |-_v z : B%>";
+                                 rule [] "<%;;|-_v refl : (y,z)=(y,z) %>"]
+                                "<%;;z:B |-_v (z,refl) : SIGMA z':B, (y,z)=(y,z') %>"]
+                             "<%;;y:A,z:B |-_v (y,(z,refl)) : SIGMA y':A, SIGMA z':B, (y,z)=(y',z') %>"]
+                         "<%;y:A,z:B |- val (y,(z,refl)) : shiftp SIGMA y':A, SIGMA z':B, (y,z)=(y',z') %>"]
+                     "<%;y:A,z:B,alpha:(shiftp SIGMA y':A, SIGMA z':B, (y,z)=(y',z'))^~|- < val (y,(z,refl))|alpha >%>"]
+                 "<%;alpha:(shiftp SIGMA y:A, SIGMA z:B, cv=(y,z))^~|- mu (y,z), < val (y,(z,refl))|alpha > : A^~`&B^~%>"]
+             "<%;x:A<*>B,alpha:(shiftp SIGMA y:A, SIGMA z:B, x=(y,z))^~|- < x | mu (y,z), < val (y,(z,refl))|alpha > > %>"]
+         "<%;x:A<*>B|- mu alpha, < x | mu (y,z), < val (y,(z,refl))|alpha > > : shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"]
+     "<%;|-lambda x, mu alpha, < x | mu (y,z), < val (y,(z,refl))|alpha > > : PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"
+ end}
+Note the necessary step which uses the cut variable, without the cut variable the derivation is no longer valid (in weak dependent {muname}, the final line would be  <%;;|-refl:x=(y,z)%>, certainly an underivable sequent).
+
+{rule_ (`Mm 3.) (`Mm 3.)}
+
+
 
 Commutative cuts (see Section~{ref_ ss_optim}). Suppose, that <%N_cv%>, above, is <%\(C_cv\) -o N_cv%>. Then, for <%Xi;Gamma;Delta|-_v u:A<*>B%> and <%Xi;Gamma;Pi|-_v t : subst [u,cv] C_cv%>:(*arnaud: v'erifier les Theta-context de u et t*)
 {displaymath"<%Xi;Gamma,Delta,Pi|-(mu alpha, <u|mu(x,y),<v|alpha>>) t:subst[u,cv]N_cv%>"}
@@ -227,17 +290,5 @@ end}
 
 Shorter problem: <%< t | mu alpha,<u|mu beta,<v|beta> > >%> vs <%< u | mu beta, <v|t>>%>
 
-$"<%lambda |_x_|,t%>"="<%mu(|_x_|,alpha),<t|alpha>%>"="<%mu(beta,alpha), <beta|mu|_x_|, <t|alpha>>%>"$. Typing derivation:
-{let open Infer in
- displaymath begin
-   rule ~label:tensor
-     [rule ~label:cutrule
-         [rule~label:idrule[]"<%Xi;;beta:!A|-_v beta : !A%>";
-          rule ~label:whynotrule
-            ["<%Xi,x:A;alpha:subst [|_x_|,cv] \(N_cv\)^~|- <t|alpha>%>"]
-            "<%Xi;alpha:\(N_cv\)^~|-mu|_x_|, <t|alpha> : ?A^~%>"]
-         "<%Xi;beta:!A,alpha:subst [beta,cv] \(N_cv\)^~|-<beta|mu|_x_|, <t|alpha>>%>"]
-     "<%Xi;|-mu(beta,alpha), <beta|mu|_x_|, <t|alpha>> : PI x:!A, subst[beta,cv]N_cv%>"
-end}
 
 "
