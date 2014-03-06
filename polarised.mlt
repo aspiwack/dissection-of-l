@@ -16,7 +16,7 @@ which reduces both to
 two distinct normal forms, yet has the following type:
 {displaymath "<%;t:A,z:A^~,v:A^~`&A,w:A^~`&A|-<mu x,<(x,z)|v> | mu y,<(t,y)|w>>%>"}
 
-There are several ways to think about this example. On the first hand, it could be said that the syntax is inadequate and we should move to a syntax which identifies both terms, like proof nets(*arnaud:citation?*). On the other hand, we can also point out that <%mu x,c%> does not really make sense by itself: it is an active term which expects a counterpart. In that view, it does not really make sense to capture such a term in a pair <%(mu x,c,u)%> where the {mu} cannot be resolved.
+There are several ways to think about this example. On the first hand, it could be said that the syntax is inadequate and we should move to a syntax which identifies both terms, like proof nets. On the other hand, we can also point out that <%mu x,c%> does not really make sense by itself: it is an active term which expects a counterpart. In that view, it does not really make sense to capture such a term in a pair <%(mu x,c,u)%> where the {mu} cannot be resolved.
 
 {subsection"Restricting substitution"}
 
@@ -194,7 +194,7 @@ Despite the call-by-value slant of polarised {muname}, both call-by-value and ca
    array_line [absenc];
  ]end}
 
-In call-by-name {lambda}-calculus, the arguments of functions are suspended so that their computation happens at use point: when the variables are used and forced. This translation, which is mostly forced by the choice that all types are interpreted as negative, happens to correspond closely to simple implementations, for instance Krivine's abstract machine~{citation_needed}.
+In call-by-name {lambda}-calculus, the arguments of functions are suspended so that their computation happens at use point: when the variables are used and forced. This translation, which is mostly forced by the choice that all types are interpreted as negative, happens to correspond closely to simple implementations, for instance Krivine's abstract machine.
 
 {subsubsection"Call-by-value {lambda}-calculus"} Dually, in call-by-value {lambda}-calculus all of the types are interpreted as positive. Since a {lambda}-term is a computation, not a value, the type of the terms -- rather than the hypotheses as in call by name -- must be shifted. Also, the encoding of functions is a little more involved: <%shiftn(A-oshiftp B)%>. Again, this translation follows straightforwardly from the choice that every type is positive.
 {let sep = `Mm 3. in

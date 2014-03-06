@@ -133,7 +133,7 @@ With such a type it would be desirable, but is not possible in weak dependent {m
 {displaymath"<%PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"}
 That every value in <%A<*>B%> is a pair.
 
-Dependent elimination allows, in <@let (x,y) = u in v@> to link <@u@> with <@(x,y)@> in the type of <@v@>. Dependent elimination comes in two main brands: Paulin's style~{citation_needed}, as used by Coq, and Coquand's style~{citation_needed}, as used by Agda. In Paulin elimination, the type of <@v@> may contain references to <@(x,y)@> which are transformed into occurrences of <@u@> in the type of the whole term. Coquand's elimination does the same to the whole typing context. Since, in {muname}, elimination is introduced over commands, which do not have a distinguished type, dependent elimination in dependent {muname} will resemble Coquand elimination most.
+Dependent elimination allows, in <@let (x,y) = u in v@> to link <@u@> with <@(x,y)@> in the type of <@v@>. Dependent elimination comes in two main brands: Paulin's style~{cite"Paulin-Mohring1993"}, as used by Coq, and Coquand's style~{cite"Coquand1992"}, as used by Agda. In Paulin elimination, the type of <@v@> may contain references to <@(x,y)@> which are transformed into occurrences of <@u@> in the type of the whole term. Coquand's elimination does the same to the whole typing context. Since, in {muname}, elimination is introduced over commands, which do not have a distinguished type, dependent elimination in dependent {muname} will resemble Coquand elimination most.
 
 Looking closely at the representation of elimination in {muname}
 {displaymath"<%mu alpha, < u | mu(x,y),<v|alpha> >%>"}
