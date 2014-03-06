@@ -3,7 +3,7 @@
 open Prelude
 
 
-let muname = "L"
+let muname = textsc"l"(* "L" *)
 
 let symbsep s = `Sep ${quad}{s}{quad}$
 let syntax_line k ?(extend=false) l =
