@@ -140,7 +140,7 @@ Dually, the type <%shiftn N%> represents the type of suspended computations. A s
 (* arnaud: ce paragraphe est trop bref, il faudra probablement y retourner *)
 A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are computations <%A-oN%>. They are not made into closure unless they are suspended into the type <%shiftn(A-oN)%>. If closures are considered expensive to make, which they often are, this property can be useful as functions of multiple arguments <%A-oB-oC-oN%> do not need intermediate closures.
 
-As a matter of fact, the Rust programming language~{citation_needed} has, for efficiency purposes, so-called {emph"stack closures"}, which are, in fact, not closures. Stack closures are functions which can be used only as argument of another function, and be called, but {emph"not"} be stored in a value. From the point of view of polarised {muname}, this would correspond to having variables of negative type, with restricted usage.
+As a matter of fact, the Rust programming language has, for efficiency purposes, so-called {emph"stack closures"}, which are, in fact, not closures by that definition. Stack closures are functions which can be used only as argument of another function, and be called, but {emph"not"} be stored in a value. From the point of view of polarised {muname}, this would correspond to having variables of negative type, with restricted usage.
 
 Suspended values, again inspired by {textsc"cbpv"}, can be turned back into computation with a <%force%> combinator:
 {displaymath"<%force t = mu alpha, < t | val alpha>%>"}
