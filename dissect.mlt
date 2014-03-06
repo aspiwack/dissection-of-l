@@ -12,7 +12,6 @@ open Extra
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
 
 (*** doc ***)
-(* arnaud: ne pas oublier l'abstract *)
 let abstract = "This article describes a one-sided variant of system~{muname} whose typing corresponds to linear sequent calculus and its application. A polarised version of the system is introduced to control the reduction strategy. The polarised type system is then extended to dependent linear types. The system with dependent type supports dependent elimination of positive connectives."
 
 let intro = Intro.d
@@ -99,65 +98,3 @@ let _ = emit ~file (document
 			     ~packages
                              ~abstract
 			     d)
-
-(* arnaud: random trucs sur la version polarisee:
-
-have: t:A -o N , u:↓A
-need: N
-
-μk.⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
-
-
-have: t:A -o N, u:↓A, k:N~
-need: command
-
-⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
-
-have: t:A -o N, x:A, k:N~
-need: command
-
-⟨ t x | k ⟩
-
-
-=====================================================
-
-Unary product
-
-Γ ⊢v t:A
-————————
-Γ ⊢v (t):⊗A
-
-
-have: t:↓A
-need: ↓⊗A
-
-μk.⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
-
-have: t:↓A k:↑(⊗A)~
-need: command
-
-⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
-
-have x:A, k:↑(⊗A)~
-need command
-
-⟨ k | ⇓(x) ⟩
-
-=====================================================
-
-have x:↓↑↓A
-need ↓A
-
-μk.⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
-
-have x:↓↑↓A, k:↑A~
-need command
-
-⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
-
-have y:↑↓A k:↑A~
-need command
-
-⟨ ⇓k | y ⟩
-
-*)

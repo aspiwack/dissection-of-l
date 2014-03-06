@@ -432,3 +432,66 @@ Like in the call-by-value case, if we translated a two-sided sequent calculus, w
 (* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
 
 "
+
+
+(* random trucs sur la version polarisee:
+
+have: t:A -o N , u:↓A
+need: N
+
+μk.⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
+
+
+have: t:A -o N, u:↓A, k:N~
+need: command
+
+⟨ μ⇓x.⟨ t x | k ⟩ | u ⟩
+
+have: t:A -o N, x:A, k:N~
+need: command
+
+⟨ t x | k ⟩
+
+
+=====================================================
+
+Unary product
+
+Γ ⊢v t:A
+————————
+Γ ⊢v (t):⊗A
+
+
+have: t:↓A
+need: ↓⊗A
+
+μk.⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
+
+have: t:↓A k:↑(⊗A)~
+need: command
+
+⟨ μ⇓x.⟨ k | ⇓(x) ⟩ | t ⟩
+
+have x:A, k:↑(⊗A)~
+need command
+
+⟨ k | ⇓(x) ⟩
+
+=====================================================
+
+have x:↓↑↓A
+need ↓A
+
+μk.⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
+
+have x:↓↑↓A, k:↑A~
+need command
+
+⟨ μ⇓y. ⟨ ⇓k | y ⟩ | x ⟩
+
+have y:↑↓A k:↑A~
+need command
+
+⟨ ⇓k | y ⟩
+
+*)
