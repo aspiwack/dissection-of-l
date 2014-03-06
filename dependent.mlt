@@ -67,6 +67,14 @@ The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypot
            block_line ~sep [ bang ; whynot ];
          ]
    end;
+   block "Types" [`C;`C;`C;`C] begin
+     let open Rules.Typing.Dtypes in
+     [
+           block_line ~sep [ tensor ; par ; one ; bot ];
+           block_line ~sep [ plus ; witha ; zero ; top ];
+           block_line ~sep [ shiftn ; shiftp ; bang ; whynot ];
+     ]
+   end
 (*
    block "Derived typing rules" [`C;`C] begin
      let open Rules.Typing.Mall in

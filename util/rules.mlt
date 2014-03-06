@@ -175,6 +175,7 @@ module Typing = struct
     let mu = Infer.rule ~label:mu ["<%Xi;Gamma, x:A,Psi|-c%>"] "<%Xi;Gamma|- mu x,c : A^~%>"
     let cut = Infer.rule ~label:cutrule ["<%Xi;Theta;Gamma|-_v t:A%>";"<%Xi;Theta,Delta|-u:A^~%>"] "<%Xi;Theta,Gamma,Delta|-<t|u>%>"
 
+    (* arnaud: well-formedness du Sigma et du Pi, dans Dll1 aussi *)
     let pair = Infer.rule ~label:tensor ["<%Xi;Theta;Gamma|-_v t:A%>"; "<%Xi;Theta;Delta|-_v u:subst [t,x] B%>"] "<%Xi;Theta;Gamma,Delta|-_v (t,u):SIGMA x:A, B%>"
     let copair = Infer.rule ~label:parr ["<%Xi;Gamma,x:A,y:B|-c%>"] "<%Xi;Gamma|-mu(x,y),c:PI x:A, B^~%>"
     let unit = Infer.rule ~label:one [] "<%Xi;Theta;|-_v ():1%>"
@@ -198,6 +199,23 @@ module Typing = struct
     let record = Infer.rule ~label:recordrule ["<%Xi;Gamma|-t:A%>";"<%Xi;Gamma|-u:B%>"] "<%Xi;Gamma|-{1=t,2=u} : A&B%>"
     let pi1 = Infer.rule ~label:pi1rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.1:A%>"
     let pi2 = Infer.rule ~label:pi2rule ["<%Xi;Gamma|-t:A&B%>"] "<%Xi;Gamma|-t.2:B%>"
+  end
+
+  module Dtypes = struct
+
+    let one = Infer.rule [] "<%Theta|-1%>"
+    let bot = Infer.rule [] "<%Theta|-bot%>"
+    let tensor = Infer.rule ["<%Theta|-A%>";"<%Theta,x:A|-B%>"] "<%Theta|-SIGMA x:A,B%>"
+    let par = Infer.rule ["<%Theta|-A%>";"<%Theta,x:A|-N%>"] "<%Theta|-PI x:A,N%>"
+    let top = Infer.rule [] "<%Theta|-top%>"
+    let zero = Infer.rule [] "<%Theta|-0%>"
+    let plus = Infer.rule ["<%Theta|-A%>";"<%Theta|-B%>"] "<%Theta|-A<+>B%>"
+    let witha = Infer.rule ["<%Theta|-N%>";"<%Theta|-M%>"] "<%Theta|-N&M%>"
+    let shiftp = Infer.rule ["<%Theta|-A%>"] "<%Theta|-shiftp A%>"
+    let shiftn = Infer.rule ["<%Theta|-N%>"] "<%Theta|-shiftn N%>"
+    let bang = Infer.rule ["<%Theta|-A%>"] "<%Theta|-!A%>"
+    let whynot = Infer.rule ["<%Theta|-N%>"] "<%Theta|-?N%>"
+
   end
 
   module Dll1 = struct
