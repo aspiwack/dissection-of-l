@@ -10,7 +10,6 @@ open Extra
 (* arnaud: fix le kerning de ?, en particulier ?0 *)
 (* arnaud: un mode ocaml pour <@@> *)
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
-(* arnaud: Wadler's writeup and Harper's natural deduction classical logic should be mentionned in intro *)
 
 (*** doc ***)
 (* arnaud: ne pas oublier l'abstract *)
@@ -30,7 +29,13 @@ let dependent = Dependent.d
 
 let concl = "{section' "Conclusion"}
 
-{rule_ (`Mm 3.) (`Mm 3.)}
+Linear~{muname}, together with its polarised and dependent flavours, is a rich toolkit which models a wide variety of phenomena in programming languages. It is very expressive, with many features from programming languages being macro-expressible in linear and polarised~{muname}.
+
+A testimony to the robustness of the diverse variants is that the macros -- {lambda}-abstraction and deep pattern matching -- defined for linear~{muname} are left unchanged in polarised and dependent~{muname}. Only their typing evolves. Though polarised {muname} enforces a strong call-by-value style restriction, which forces translations from programming language to be more complex (but still macros) as we have finer control on their behaviour. This expressiveness makes linar~{muname} and its variants good candidates both as intermediate languages and as programming languages.
+
+Dependent~{muname} gives a novel account of dependent types, where positive connectives -- hence dependent elimination -- are an essential part of the design. The limitations of dependent~{muname} clearly have to be addressed in the future. In particular, the lack of strong elimination. In a sense the types of dependent~{muname} are values, but strong elimination mandates that they be computations. This is still unclear what it would mean in this context, however. It is nonetheless desirable to expand the expressiveness of dependent~{muname} to have a family of system of the same kind as {textsc"pts"}, which requires strong elimination.
+
+To give a more realistic account of programming languages (with or without dependent types), the logical types should be extended with inductive types. In the context of one-sided sequent calculus, the dual of an inductive type would be a co-inductive type. Inductive types would be positive, and hence introduced by values and eliminated by recursive fixed points (presumably defined by pattern-matching). Dually, co-inductive types are introduced by recursive fixed points and eliminated by values. This would validate the co-pattern point of view, heralded for instance in~{cite"Abel2013"}.
 "
 
 let d = concat [
