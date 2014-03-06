@@ -359,6 +359,8 @@ A product continuation waits for the computation to be finished and continues wi
  end}
 The introduction rules of nullary connectives <%1%> and <%bot%> are straightforward.
 
+The small discrepancy which prevents this translation to be only done with macro is due to the fact that linear~{muname} is a single-sided sequent calculus. In a two-sided sequent calculus, the cut rule is already asymetric and their are two {mu}-binders: one for the left-hand side variables and one for the right-hand side variables. The call-by-value translation of a two-sided linear~{muname} has right-hand types translated to positive types, and left-hand types to negative types. This is loosely the same as the call-by-value restriction in the original system~{muname} paper~{cite"Curien2000"}.
+
 {subsubsection"Call-by-name linear {muname}"} The negative translation of linear {muname} follows along the same lines. It has a call-by-name flavour, as witnessed by the identity rule
 {let open Infer in
  displaymath begin
@@ -426,6 +428,7 @@ Like in the call-by-value translation, the {mu} rule is duplicated:
 
 The evaluation strategy of the negative translation of linear {muname}, evaluating the outermost constructor on demand, is essentially the same behaviour as lazy programming language such as Haskell (except that lazy programming languages have a call-by-need strategy, hence suspended computations must be shared rather than duplicated).
 
+Like in the call-by-value case, if we translated a two-sided sequent calculus, we would obtain a macro-translation. And it would correspond to the call-by-name calculus of~{cite"Curien2000"}.
 (* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
 
 "
