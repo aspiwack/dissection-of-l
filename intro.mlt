@@ -22,42 +22,7 @@ it makes a good foundation for programming languages. There has also been linear
 
 Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all to often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough study of system~{muname} to date is Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
 
+My goal with this article is threefold. First, I aim at giving an overview of the system~{muname} literature. Second, I want to outline how sequent calculus is relevant for programming language design. Third and last, I give my modest proposal for a dependently typed linear sequent calculus based on system~{muname}.
 
-{rule_ (`Mm 3.) (`Mm 3.)}
-
-In this article I will discuss typing of a calculus -- or, to be
-fair, a family of calculus -- I call {muname}. It originates from a
-paper by Herbelin \& Curien~{cite"Curien2000"}, where it was
-called ${bar lambda}{mu}{tilde mu}$-calculus. It has since been
-often called simply ${mu}{tilde mu}$, or system L
-syntax~{cite"Herbelin08"}. (* The latter name comes from *)
-(* proof-theoretical investigations, this article has more a programming *)
-(* language feel, and will not feature a {tilde mu}. Hence simply {muname}. *)
-
-The {foreign "tour de force"} of {muname}, in my opinion, is to provide
-a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
-for natural deduction, contraction and weakening are done through
-variables: a bound variable which isn't used is weakened, if it is
-used twice or more it is contracted. This is, I would argue, why
-it makes a good foundation for a programming language.
-
-To me at least, the appeal of sequent calculus is hard to resist. It
-has a more symmetric structure than natural deduction, and proof search
-is more naturally expressed in it. Importantly for this article, Lengrand, Dyckhoff and McKinna
-have shown~{cite"Lengrand2010"} that proof search is expressed naturally
-in a dependently typed (intuitionist) sequent calculus.
-
-The object of this paper, is to study {muname} as a programming language whose
-typing rules correspond to linear sequent calculus. And then to add dependent
-types to the mix. The main motivation is to use this calculus as a stepping
-stone to understand mathematics in presence of computational effects (as
-linear logic can be used, to some extent, to model effects~{cite"Benton1996"}).
-I also hope to use dependent linear {muname} as a new lense through which
-usual dependently typed language could be further analysed.
-(* The choice of linear logic rather than some flavour of intuitionist linear *)
-(* logic might be a matter of taste, I tend to favour symmetry when I can; it *)
-(* was originally a challenge as well, as dependent types are somewhat antagonistic *)
-(* to the kind of commutation sequent calculus allow. In retrospect, though, *)
-(* it may very well be that linear dependent types are easier -- at least using *)
-(* {muname} as a framework -- than intuitionist linear dependent types. *)
+Readers familiar with system~{muname} and want to jump quickly to dependent types should scheme through Figures~{ref_ l_ll} and~{ref_ f_fll} then go to Section~{ref_ s_dep}. The notations in this article are somewhat non-standard, for which I apologise, but I believe the notations I use serve a useful purpose in the setting of this article. The reader should keep in mind that, even if the notations may suggest that the type system is intuitionistic linear logic, this article is actually about single-sided sequent calculus for full linear logic.
 "
