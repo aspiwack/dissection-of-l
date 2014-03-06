@@ -25,4 +25,6 @@ Despite the growing importance of sequent calculus in programming language desig
 My goal with this article is threefold. First, I aim at giving an overview of the system~{muname} literature. Second, I want to outline how sequent calculus is relevant for programming language design. Third and last, I give my modest proposal for a dependently typed linear sequent calculus based on system~{muname}.
 
 Readers familiar with system~{muname} and want to jump quickly to dependent types should scheme through Figures~{ref_ l_ll} and~{ref_ f_fll} then go to Section~{ref_ s_dep}. The notations in this article are somewhat non-standard, for which I apologise, but I believe the notations I use serve a useful purpose in the setting of this article. The reader should keep in mind that, even if the notations may suggest that the type system is intuitionistic linear logic, this article is actually about single-sided sequent calculus for full linear logic.
+
+{paragraph"Acknowledgement"} This article may not have been written if it had not been for the long discussions I had with Pierre-Louis Curien, Hugo Herbelin, Guillaume Munch-Maccagnoni, and Pierre-Marie Pédrot.
 "
