@@ -13,7 +13,7 @@ open Extra
 
 (*** doc ***)
 (* arnaud: ne pas oublier l'abstract *)
-let abstract = "There will be an abstract some day."
+let abstract = "This article describes a one-sided variant of system~{muname} whose typing corresponds to linear sequent calculus and its application. A polarised version of the system is introduced to control the reduction strategy. The polarised type system is then extended to dependent linear types. The system with dependent type supports dependent elimination of positive connectives."
 
 let intro = Intro.d
 
