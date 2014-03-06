@@ -4,7 +4,26 @@ open Prelude
 open Extra
 
 
-let d = "{section' "Foreword"}
+let d = "{section' "Introduction"}
+
+It is my strong belief that, if natural deduction has enlightened out path through programming language design in the past half-century, sequent calculus will have a preponderant role in the next one. Ever since the turn of the millennium, new results have been pointing towards this conclusion.
+
+Sequent calculus has been linked to strategy of evaluation~{cite"Curien2000,Dyckhoff2006,Zeilberger2008"}. Lengrand, Dyckhoff and McKinna have shown~{cite"Lengrand2010"} that the edge sequent calculus has in proof search extends to the dependently typed case. The quite popular bidirectional type-checking discipline is well-modelled by sequent calculus~{cite"Dunfield2013"}. Sequent calculus is also know to be connected to program optimisation~{cite"Marlow1995"}.
+
+Another tool which is becoming important for programming language is linear logic. It offers an alternative to commutative monads to represent effects~{cite"Benton1996"}, there is a fragment, known as effect calculus~{cite"Egger2009"}, which actually models arbitrary monadic effects. An outstanding recent manifestation of linear types is~{cite"Krishnaswami2011"} where linear typing is leveraged for graphical interface programming.
+
+The main technology for sequent-calculus based programming language originates in~{cite"Curien2000"} where it was called ${bar lambda}{mu}{tilde mu}$-calculus. It is more commonly known as system~{muname}~{cite"Herbelin08"} (for Gentzen's name for sequent calculi: {textsc"lk"} and {textsc"lj"}).
+The {foreign "tour de force"} of {muname}, in my opinion, is to provide
+a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
+for natural deduction, contraction and weakening are done through
+variables: a bound variable which isn't used is weakened, if it is
+used twice or more it is contracted. This is, I would argue, why
+it makes a good foundation for programming languages. There has also been linear incarnations of system~{muname}~{cite"Munch2009"}.
+
+Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all to often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough study of system~{muname} to date is Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
+
+
+{rule_ (`Mm 3.) (`Mm 3.)}
 
 In this article I will discuss typing of a calculus -- or, to be
 fair, a family of calculus -- I call {muname}. It originates from a

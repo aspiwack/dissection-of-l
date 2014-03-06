@@ -280,7 +280,7 @@ If <%t%> has such types, then in particular <%Xi;Gamma,x:A,y:B;subst [(x,y),cv] 
 
 Not all values are as such, however, and subject reduction may indeed fail. To fix subject reduction, we would need to rely on a more involved mechanism than simple substitutions to specialise the context. Some sort of equality constraints would probably work.
 
-However, the lack of subject reduction is not necessarily bad. Indeed, if <%u%>, above, is of the form <%(a,b)%> (which every closed <%u%> is), then <%mu alpha,<(a,b)|mu(x,y), <v|(t,alpha)>>%> further reduces to <%mu alpha, <subst [a,x;b,y] v|(t,alpha)>%> which has indeed the appropriate type. So, at least for closed terms, a failure of subject reduction can be fixed by additional reductions. This sort of type safety property can be proved using Krivine realisability~{cite"Munch2009"}. This proof is left to future work, so let it be the last act of this article to state the following conjecture:
+However, the lack of subject reduction is not necessarily bad. Indeed, if <%u%>, above, is of the form <%(a,b)%> (which every closed <%u%> is), then <%mu alpha,<(a,b)|mu(x,y), <v|(t,alpha)>>%> further reduces to <%mu alpha, <subst [a,x;b,y] v|(t,alpha)>%> which has indeed the appropriate type. So, at least for closed terms, a failure of subject reduction can be fixed by additional reductions. This sort of type safety property can be proved using Krivine realisability~{cite"Munch2009"}. Such a proof is left to future work, so let it be the last act of this article to state the following conjecture:
 
 {let conj ?name x =
    let opt = match name with Some n -> Some(T,n) | None -> None in

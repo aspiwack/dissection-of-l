@@ -28,7 +28,7 @@ let focusing = Polarised.d
 
 let dependent = Dependent.d
 
-let concl = "{section"Conclusion"}
+let concl = "{section' "Conclusion"}
 
 {rule_ (`Mm 3.) (`Mm 3.)}
 "
@@ -68,7 +68,7 @@ let keywords = [
 ]
 
 let acmclass = [
-  "F.3.1"; (* (un peu douteux) Specifying, and verifying and reasoning about programs http://dl.acm.org/ccs.cfm?part=author&coll=DL&dl=ACM&row=F.3.1&idx=6&idx2=F.3.1&idx3=3&query=Subject%3A%22Logics%20of%20programs%22&CFID=83889239&CFTOKEN=84492988 *)
+  (* "F.3.1"; (\* (un peu douteux) Specifying, and verifying and reasoning about programs http://dl.acm.org/ccs.cfm?part=author&coll=DL&dl=ACM&row=F.3.1&idx=6&idx2=F.3.1&idx3=3&query=Subject%3A%22Logics%20of%20programs%22&CFID=83889239&CFTOKEN=84492988 *\) *)
   "F.3.3"; (* (moins douteux) Studies of program constructs http://dl.acm.org/ccs.cfm?part=author&coll=DL&dl=ACM&row=F.3.3&idx=6&idx2=F.3.3&idx3=5&query=Subject%3A%22Type%20structure%22&CFID=83889239&CFTOKEN=84492988 *)
 ]
 
