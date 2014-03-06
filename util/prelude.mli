@@ -80,4 +80,4 @@ end
 
 (*** Holes ***)
 
-val citation_needed : Latex.t
+(* val citation_needed : Latex.t *)
