@@ -6,13 +6,13 @@ open Extra
 
 let d = "{section' "Introduction"}
 
-It is my strong belief that, if natural deduction has enlightened out path through programming language design in the past half-century, sequent calculus will have a preponderant role in the next one. Ever since the turn of the millennium, new results have been pointing towards this conclusion.
+It is my strong belief that, if natural deduction has enlightened our path through programming language design in the past half-century, sequent calculus will have a preponderant role in the next one. Ever since the turn of the millennium, new results have been pointing towards this conclusion.
 
-Sequent calculus has been linked to strategy of evaluation~{cite"Curien2000,Dyckhoff2006,Zeilberger2008"}. Lengrand, Dyckhoff and McKinna have shown~{cite"Lengrand2010"} that the edge sequent calculus has in proof search extends to the dependently typed case. The quite popular bidirectional type-checking discipline is well-modelled by sequent calculus~{cite"Dunfield2013"}. Sequent calculus is also know to be connected to program optimisation~{cite"Marlow1995"}.
+Sequent calculus has been linked to strategy of evaluation~{cite"Curien2000,Dyckhoff2006,Zeilberger2008"}. Lengrand, Dyckhoff and McKinna have shown~{cite"Lengrand2010"} that the edge which sequent calculus has in proof search extends to the dependently typed case. The quite popular bidirectional type-checking discipline is well-modelled by sequent calculus~{cite"Dunfield2013"}. Sequent calculus is also know to be connected to program optimisation~{cite"Marlow1995"}.
 
-Another tool which is becoming important for programming language is linear logic. It offers an alternative to commutative monads to represent effects~{cite"Benton1996"}, there is a fragment, known as effect calculus~{cite"Egger2009"}, which actually models arbitrary monadic effects. An outstanding recent manifestation of linear types is~{cite"Krishnaswami2011"} where linear typing is leveraged for graphical interface programming.
+Another tool which is becoming important for programming languages is linear logic. It offers an alternative to commutative monads to represent effects~{cite"Benton1996"}, there is a fragment, known as effect calculus~{cite"Egger2009"}, which actually models arbitrary monadic effects. An outstanding recent manifestation of linear types is~{cite"Krishnaswami2011"} where linear typing is leveraged for graphical interface programming.
 
-The main technology for sequent-calculus based programming language originates in~{cite"Curien2000"} where it was called ${bar lambda}{mu}{tilde mu}$-calculus. It is more commonly known as system~{muname}~{cite"Herbelin08"} (for Gentzen's name for sequent calculi: {textsc"lk"} and {textsc"lj"}).
+The main technology for sequent-calculus based programming languages originates in~{cite"Curien2000"} where it was called ${bar lambda}{mu}{tilde mu}$-calculus. It is more commonly known as system~{muname}~{cite"Herbelin08"} (for Gentzen's name for sequent calculi: {textsc"lk"} and {textsc"lj"}).
 The {foreign "tour de force"} of {muname}, in my opinion, is to provide
 a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
 for natural deduction, contraction and weakening are done through
@@ -20,11 +20,11 @@ variables: a bound variable which isn't used is weakened, if it is
 used twice or more it is contracted. This is, I would argue, why
 it makes a good foundation for programming languages. There has also been linear incarnations of system~{muname}~{cite"Munch2009"}.
 
-Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all to often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough study of system~{muname} to date is Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
+Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all too often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough study of system~{muname} to date is Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
 
-My goal with this article is threefold. First, I aim at giving an overview of the system~{muname} literature. Second, I want to outline how sequent calculus is relevant for programming language design. Third and last, I give my modest proposal for a dependently typed linear sequent calculus based on system~{muname}.
+My goal with this article is threefold. First, I aim at giving an overview of the system~{muname} literature. Second, I want to outline how sequent calculus is relevant for programming language design. Third and last, I give a proposal for a dependently typed linear sequent calculus based on system~{muname}.
 
-Readers familiar with system~{muname} and want to jump quickly to dependent types should scheme through Figures~{ref_ l_ll} and~{ref_ f_fll} then go to Section~{ref_ s_dep}. The notations in this article are somewhat non-standard, for which I apologise, but I believe the notations I use serve a useful purpose in the setting of this article. The reader should keep in mind that, even if the notations may suggest that the type system is intuitionistic linear logic, this article is actually about single-sided sequent calculus for full linear logic.
+Readers familiar with system~{muname} who wish to jump quickly to dependent types should skim through Figures~{ref_ l_ll} and~{ref_ f_fll} then go to Section~{ref_ s_dep}. (* The notations in this article are somewhat non-standard, for which I apologise, but I believe the notations I use serve a useful purpose in the setting of this article. *) (* The reader should keep in mind that, even if the notations may suggest that the type system is intuitionistic linear logic, this article is actually about single-sided sequent calculus for full linear logic. *)
 
 {paragraph"Acknowledgement"} This article may not have been written if it had not been for the long discussions I had with Pierre-Louis Curien, Hugo Herbelin, Guillaume Munch-Maccagnoni, and Pierre-Marie Pédrot.
 "

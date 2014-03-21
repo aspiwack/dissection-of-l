@@ -113,8 +113,6 @@ end}
 
 Weak dependent {muname} is not very expressive, nonetheless the various implementations of {textsc"lf"} have demonstrated that this kind of dependent types can already be quite useful. It is also pleasant that we could derive a natural definition for a dependently typed {emph"linear"} {lambda}-calculus from design choices which are largely technical, and were not meant to force this definition.
 
-(* arnaud: typing rules for types *)
-
 {subsection"Dependent elimination"~label:ss_depelim}
 
 If weak dependent {muname} can encode dependently typed linear {lambda}-calculus, as it happens, this does not extend to regular {lambda}-calculus, as we shall demonstrate momentarily. This is because it lacks so-called dependent elimination. Going back to the always quite representative multiplicative fragment, let us consider the following statement, in {textsc"ml"}-like syntax:

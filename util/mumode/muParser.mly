@@ -39,7 +39,7 @@ let empty_context = Latex.cdot
 %token VAL THUNK
 
 %token REDUCES
-%token SUBST
+%token SUBST FILL
 
 %token SUB SUP
 
@@ -130,6 +130,7 @@ expr:
     in
     concat [e;text"[";subst;text"]"]
   }
+| FILL u=expr t=expr {t^^Latex.block(concat[text"[";u;text"]"])}
 | e=expr REDUCES f=expr { concat [e;leadsto;f] }
 
 | e=expr EQUAL f=expr { concat [e;text"=";f] }

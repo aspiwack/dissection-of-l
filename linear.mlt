@@ -33,13 +33,28 @@ The typing rules follow naturally, keeping in mind that these are linear logic c
 
 The multiplicative connectives alone bring a lot of expressiveness: linear {lambda}-calculus is macro-expressible. The intuition comes from abstract machines: in abstract machines for {lambda}-calculus, {lambda}-terms interact with a stack. The idea is to represent the stack as iterated pairs; then the application must be a {emph"push"} operation, adding its second operand on the stack, while abstraction must {emph"pop"} the first stack element and substitute it in the function body.
 
-This is an important insight, so it bears repeating: in {muname} the stack is {emph"first-class"}. Programming in {muname} is quite like programming directly an abstract machine. If the idea might sound daunting, the author hopes that the reader will be convinced by this article that it is not unimaginable either.
+This is an important insight, so it bears repeating: in {muname} the stack is {emph"first-class"}. Programming in {muname} is quite like programming directly an abstract machine. (* If the idea might sound daunting, the author hopes that the reader will be convinced by this article that it is not unimaginable either. *) Giving a definition to application and abstraction hence amounts to solving the equations:
+{displaymath begin array [`C] [
+  array_line ["<%<t u | v> ~~> <t|(u,v)>%>"];
+  array_line ["<%<lambda x,t | (u,v)> ~~> <subst[u,x]t|v>%>"];
+]end}
+Solving these equations ensures that the reduction rules of {muname} simulate {beta}-reduction:
+{displaymath "<%<(lambda x, t) u|v> ~~> <lambda x,t|(u,v)> ~~> <subst [u,x] t| v>%>"}
+
+The equation defining the application is of particular interest because it is a special case of an adjoint equation~{cite"Munch2013"~extra:"Chapter 1"}, that is an equation of the form
+{displaymath begin array [`C] [
+  array_line["<%<fill t phi | u> ~~> <t|fill u psi>%>"]
+]end}
+For two functions on terms <%phi%> and <%psi%> compatible with substitution. One rôle played by the {mu}-binder is to solve these adjoint equation generically. Specifically, when <%psi%> is completely specified, <%fill t phi = mu alpha, <t|fill alpha psi>%>, for a fresh variable <%alpha%>:
+{displaymath begin array [`C] [
+  array_line["<%<fill t phi | u> = <mu alpha, <t|fill alpha psi>|u> ~~> <t|fill u psi>%>"]
+]end}
+
 
 (* arnaud: on peut vouloir pr'eciser ici qu'on utilise les lettres grecques pour les variables fraiches. *)
-Following this intuition, we define the application <%t u%> to be <%mu alpha, <t|(u,alpha)>%>: the current continuation ({emph"i.e."} stack) is named <%alpha%>, a fresh name, <%t%> is then run against <%(u,alpha)%>, the current stack augmented with <%u%>.
+Accordingly, application <%t u%> is defined as <%mu alpha, <t|(u,alpha)>%>: explicitely, the current context ({emph"i.e."} stack) is named <%alpha%> and <%t%> is then run against <%(u,alpha)%>, the current stack on top of which <%u%> has been pushed.
 
-Similarly, the {lambda}-abstraction <%lambda x,t%> is defined as <%mu(x,alpha),<t|alpha>%>: the first element of the stack is called <%x%> and the rest <%alpha%>, for a fresh <%alpha%>, the body <%t%> of the abstraction is then run against <%alpha%>, the popped stack. Remember that <%x%> is binds a variable of <%t%>, so there is, implicitly a substitution in <%t%>. In fact, since we are in linear logic, typing will impose that <%x%> is, in some sense, used exactly once in <%t%>. These definition ensure, as they should, that the reduction rules of {muname} simulate {beta}-reduction:
-{displaymath "<%<(lambda x, t) u|v> ~~> <lambda x,t|(u,v)> ~~> <subst [u,x] t| v>%>"}
+Abstraction does not enjoy such a generic description. However, the equation suggests that <%lambda x,t%> ought to be defined as <%mu(x,alpha),<t|alpha>%>: the first element of the stack is called <%x%> and the rest <%alpha%>, for a fresh <%alpha%>, the body <%t%> of the abstraction is then run against <%alpha%>, the popped stack. Remember that <%x%> is binds a variable of <%t%>, so there is, implicitly a substitution in <%t%>. In fact, since we are in linear logic, typing will impose that <%x%> is, in some sense, used exactly once in <%t%>. This definition is indeed a valid solution for the {lambda}-abstraction equation.
 
 Writing <%A-o B%> for the linear arrow connective <%A^~ `& B%>, the typing rules of application and abstraction are familiar:
 
@@ -82,12 +97,12 @@ In the dual typing rules, the missing type is materialised from thin air, since 
 
 There is a dual way to think about additive connectives, in which <%A&B%> is the type of {emph"records"} (with two fields labelled <%1%> and <%2%>), and the injections <%1.t%> and <%2.t%> play the role of {emph"projections"}. Similarly to the case of {lambda}-calculus in Section~{ref_ ss_mll}, we read <%1.k%> as a stack which begins with the first projection, and <%2.k%> with the second projection.
 
-Hence the projections <%t.1%> and <%t.2%> push the appropriate instruction on the top of the stack and then run <%t%>:
+Hence the projections <%t.1%> and <%t.2%> push the appropriate instruction on the top of the stack and then run <%t%>. They are, like application, solutions to adjoint equations:
 {displaymath begin array [`L; symbsep $=$; `L] [
   array_line ["<%t.1%>"; "<%mu alpha,<t|1.alpha>%>"];
   array_line ["<%t.2%>"; "<%mu alpha,<t|2.alpha>%>"];
  ]end}
-and <%{1=t,2=u}%> pattern-matches on the top of the stack:
+and the record <%{1=t,2=u}%> (whose syntax is inspired by {textsc"ml"}) pattern-matches on the top of the stack:
 {displaymath begin array [`L; symbsep $=$; `L] [
   array_line ["<%{1=t,2=u}%>"; "<%{mu(1.alpha),<t|alpha> , mu(2.alpha),<u|alpha>}%>"];
 ]end}
@@ -138,7 +153,7 @@ The binary <%A<+>B%> and <%A&B%> are accompanied by the nullary <%0%> -- the emp
    end;
  ]}
 
-Notice how all the syntactic sugar so far defines computations. This is no coïncidence: computations, as there name suggests, is where the fun happens. In other words, we program functions, not pairs. The raw syntax of {muname} is dry, and wholly unfamiliar; however, with a few macros, familiar programming construct emerge, and {muname} looks like a normal programming language.
+Notice how all the syntactic sugar so far defines computations. This is no coïncidence: computations, as their name suggests, is where the fun happens. In other words, we program functions, not pairs. The raw syntax of {muname} is dry, and wholly unfamiliar; however, with a few macros, familiar programming construct emerge, and {muname} looks like a normal programming language.
 
 {subsection "Exponentials" ~label:ss_exponentials}
 The typing rules presented so far are purely linear, in the sense that there is no contraction
@@ -149,7 +164,7 @@ One way to incorporate the exponential connectives within linear {muname}, propo
 {displaymath (Infer.rule ["<%Gamma,x:!A,y:!A|-c%>"] "<%Gamma,x:!A|-subst [x,y] c%>")}
 This rule mimics accurately the traditional linear sequent calculus, however it does not follow the discipline of classical {muname}, where contraction and weakening is only a matter of using a variable several times or not at all.
 
-In order to retain this property, we choose to use of the dyadic presentation of linear logic. This presentation, due to Andreoli~{cite"Andreoli1992"}, classifies hypotheses according to whether they are {emph"duplicable"} or not, and renders the duplicable hypotheses in a separate context which behaves additively. The exponential connective <%!A%> reflects duplicable hypotheses in the linear context.
+In order to retain this property, we choose to use the dyadic presentation of linear logic. This presentation, due to Andreoli~{cite"Andreoli1992"}, classifies hypotheses according to whether they are {emph"duplicable"} or not, and renders the duplicable hypotheses in a separate context which behaves additively. The exponential connective <%!A%> reflects duplicable hypotheses in the linear context.
 
 The typing judgement in (dyadic) linear {muname} of the form <%Xi;Gamma|-t:A%> and <%Xi;Gamma|-c%>, where
 <%Gamma%> is the linear context, and <%Xi%> is the new duplicable context. Contraction and weakening are, like in classical L in Section~{ref_ ss_classical}, are implicit as the duplicable context is copied by cut and ignored by identity (more generally, the duplicable context is distributed on each premise of inference rules):
@@ -171,7 +186,7 @@ The duplicable identity rule makes it so that a duplicable hypothesis of type <%
   in
   rule ~label:tensor [ idx ; idx ] "<%x:A;|- (x,x) : A<*>A%>"
 end}
-Variables in the duplicable context can, hence, be used freely, whereas variables of the linear context must be use in a linear fashion. Precisely what we expected to achieve.
+Variables in the duplicable context can, hence, be used freely, whereas variables of the linear context must be used in a linear fashion. Precisely what we expected to achieve.
 
 As a sanity check, let us consider the derivation of the copy rule from the duplicable identity:
 {displaymath begin
@@ -229,5 +244,5 @@ is derivable. In the dyadic system, it is replaced, depending on the context, by
 or the more complex
 {displaymath"<%;x:!A|-mu beta, <x|mu |_alpha_|,<(|_alpha_|,|_alpha_|)|beta>> : !A<*>!A%>"}
 
-More acutely, in~{cite"Munch2009"}, the promotion rule is a computation constructor and dereliction a value constructor. Because of this, using the substitution system would be incompatible with the treatment of Section~{ref_ s_pol}.
+More acutely, in~{cite"Munch2009"}, it is required for type safety that the promotion rule is a computation constructor. Because of this, using the substitution system would be incompatible with the treatment of Section~{ref_ s_pol}.
 "

@@ -23,9 +23,9 @@ The intent being that the vertical bar be read as commutative. We shall use it
 as such from now on.
 
 Given a command <%c%>, the term <%mu x, c%> can be thought as ``let <%x%> be
-the current continuation, do <%c%>''. Conversely, for two terms, <%t%> and <%u%>
-<%<t|u>%> runs <%t%> with continuation <%u%> (or symmetrically, <%u%> with
-continuation <%t%>) it is read ``<%t%> against <%u%>''.
+the current context, do <%c%>''. Conversely, for <%t%> and <%u%>, two terms
+<%<t|u>%> runs <%t%> with context <%u%> (or symmetrically, <%u%> with
+context <%t%>) it is read ``<%t%> against <%u%>''.
 (*Terms reduce to a value, whereas command just compute -- they are played only
 for there effects. Though it is possible to imagine otherwise, and consider
 {textsc"io"} of sorts, the only effects available to a computation in pure {muname}
@@ -82,11 +82,11 @@ The typing rules for variables and interaction correspond, on the logical side, 
   array_line ~sep:(`Mm 2.) [Rules.Typing.Classical.id];
   array_line [Rules.Typing.Classical.cut];
 ]end}
-The cut rule emphasises the rôle of of the dual type <%A^~%> in the programming point of view: <%A^~%> is the type of the continuations of <%A%>. Also, as <%A^~^~=A%>, <%A%> is, conversely, the type of continuation of <%A^~%>: the idempotence of the duality operator goes hand to hand with the commutativity of the interaction.
+The cut rule emphasises the rôle of of the dual type <%A^~%> in the programming point of view: <%A^~%> is the type of the contexts of <%A%>. Also, as <%A^~^~=A%>, <%A%> is, conversely, the type of context of <%A^~%>: the idempotence of the duality operator goes hand to hand with the commutativity of the interaction.
 
 The typing rule for {mu} abstraction does not correspond to a logical rule: from the point of view of sequent calculus, it corresponds to choosing a formula, and placing it to the right-hand side of the sequent to make it {emph"active"}.
 {displaymath Rules.Typing.Classical.mu}
-From a programming point of view, <%mu x,c%> expects a value for <%x%> and {emph"continues"} with <%c%>. In other words, <%mu x,c%> interacts with values of type <%A%>: it has type <%A^~%>.
+From a programming point of view, <%mu x,c%> expects a value for <%x%> and continues with <%c%>. In other words, <%mu x,c%> interacts with values of type <%A%>: it has type <%A^~%>.
 
 What makes is so that these typing rules correspond to classical logic is that {emph"weakening"} and {emph"contraction"} are admissible. In fact contraction is even derivable:
 {displaymath begin
@@ -105,7 +105,7 @@ As long as there is no type <%A%> such that <%A^~ = A%>, the reduction of typed 
        Infer.rule ["<%Gamma,beta:A|- c_2%>"] "<%Gamma|-mu beta,c_2 : A^~%>"]
   "<%Gamma|-<mu alpha,c_1|mu beta, c_2>%>"
 end}
-Which we can conclude by weakening. So again, any two typed commands have a common antecedent. This is not an emergent property of {muname}: in classical sequent calculus, a cut between two weakening exhibits the same non-confluent behaviour.
+Which we can conclude by weakening. So again, any two typed commands have a common antecedent. This is not specifically a property of {muname}: in classical sequent calculus, a cut between two weakening exhibits the same non-confluent behaviour.
 
 {subsection "Typing as linear sequent calculus"}
 

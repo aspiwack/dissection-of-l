@@ -30,6 +30,7 @@ let map_ident = [
   "chain" , FUN3 (fun m x n -> concat[m;mathrm (text"\\,to\\,");x;text".\\,";n]) ;
 
   "subst", SUBST;
+  "fill" , FILL;
 
   "cv" , SYMB bullet ;
 
