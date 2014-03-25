@@ -10,6 +10,7 @@ open Extra
 (* arnaud: fix le kerning de ?, en particulier ?0 *)
 (* arnaud: un mode ocaml pour <@@> *)
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
+(* arnaud: donner g'en'eralement un nom devant les citations au moins la premi`ere fois *)
 
 (*** doc ***)
 let abstract = "This article describes a one-sided variant of system~{muname} whose typing corresponds to linear sequent calculus and its application. A polarised version of the system is introduced to control the reduction strategy. The polarised type system is then extended to dependent linear types. The system with dependent type supports dependent elimination of positive connectives."

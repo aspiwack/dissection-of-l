@@ -22,7 +22,7 @@ There are several ways to think about this example. On the first hand, it could 
 
 The solution suggested by the latter view is to take more seriously the distinction between {emph"values"} and {emph"computations"}. That is <%mu x,c%> is a computation, yet we take the point of view that variables should only be substituted with values. This is a form of {emph"call by value"}, even though, as we will see below, this does not preclude call by name functions. Such a restriction can be achieved by a syntactic criterion: identifying a syntactic class of values, and restricting reduction rules to only substitute values. This is the strategy used in the setting of {lambda}-calculus~{cite"Plotkin1975"} or in the original {muname} paper~{cite"Curien2000"}.
 
-To offer a counter-point we will account for this restriction purely by typing. This is merely a difference in presentation, though, as the syntactic restriction can be read off directly from the typing rules. This idea leads to a {emph"polarised"} logic, where type are classified on whether their introduction rules are value constructors ({emph"positive"} types) or computation constructors ({emph"negative"} types). The restriction that variables can only be substituted with values then translates to the restriction that {emph"variables all are of positive type"}.
+To offer a counter-point we will account for this restriction purely by typing. This is merely a difference in presentation, though, as the syntactic restriction can be read off directly from the typing rules. This idea leads to a {emph"polarised"} logic, where types are classified on whether their introduction rules are value constructors ({emph"positive"} types) or computation constructors ({emph"negative"} types). The restriction that variables can only be substituted with values then translates to the restriction that {emph"variables all are of positive type"}.
 
 This rule has strong consequences: in <%mu(x,y),c%>, <%x%> and <%y%> must be of positive type, hence the two component of a pair must be values. In particular terms of the form <%(mu x,c,u)%>, like above, are no longer permissible. It is now well understood~{cite"Dyckhoff2006,Zeilberger2008,Munch2009,Curien2010"}, that this call-by-value restriction of sequent calculus is akin to focusing~{cite"Andreoli1992"}, though, on the details, it need not correspond too closely.
 
@@ -112,7 +112,7 @@ And has as a reduction rule:
 
 The other typing rules for polarised {muname} are given in Figure~{ref_ f_fll}. They are, actually, textually identical to the rules of linear {muname}, except that now <%A%> and <%B%> stand for positive types. Polarised {muname} is really only a matter of constraining the variables to have positive types.
 
-The shift are not simple coercions between negative and positive types: they have a real computational significance. Indeed <%shiftp A%> is a bigger type than <%A%>: if <%A%> contains only values <%v%>, <%shiftp A%> contains any computation which {emph"evaluates to <%v%>"}. For instance, <%1%> only contains the value <%()%>, but <%shiftp 1%> contains computations like <%(lambda(),val ()) ()%>. In fact, polarised {muname} is a linear variant of Levy's call-by-push-value language~{cite"Levy2001"} ({textsc"cbpv"}. With <%shiftp A%> and <%shiftn N%> playing the role, respectively, of $F A$ and $U N$.
+The shift are not simple coercions between negative and positive types: they have a real computational significance. Indeed <%shiftp A%> is a bigger type than <%A%>: if <%A%> contains only values <%v%>, <%shiftp A%> contains any computation which {emph"evaluates to <%v%>"}. For instance, <%1%> only contains the value <%()%>, but <%shiftp 1%> contains computations like <%(lambda(),val ()) ()%>. In fact, polarised {muname} is a linear variant of Levy's call-by-push-value ({textsc"cbpv"}) language~{cite"Levy2001"}. With <%shiftp A%> and <%shiftn N%> playing the role, respectively, of $F A$ and $U N$.
 
 Like in {textsc"cbpv"}, computations can be chained, with the expression <%chain t x u%>, so that the value computed by <%t%> is bound to <%x%> in <%u%>, in a manner reminiscent of monadic composition.
 {displaymath"<%chain t x u = mu alpha, < t | mu\(val x\), <u|alpha>>%>"}
@@ -142,7 +142,7 @@ A feature shared by {textsc"cbpv"} and polarised {muname}, is that functions are
 
 As a matter of fact, the Rust programming language has, for efficiency purposes, so-called {emph"stack closures"}, which are, in fact, not closures by that definition. Stack closures are functions which can be used only as argument of another function, and be called, but {emph"not"} be stored in a value. From the point of view of polarised {muname}, this would correspond to having variables of negative type, with restricted usage.
 
-Suspended values, again inspired by {textsc"cbpv"}, can be turned back into computation with a <%force%> combinator:
+Suspended values, again inspired by {textsc"cbpv"}, can be turned back into computation with a <%force%> combinator, which is adjoint to return:
 {displaymath"<%force t = mu alpha, < t | val alpha>%>"}
 Typed as
 {let open Infer in
@@ -244,7 +244,7 @@ When it is applied to two arguments. It can be done by partial evaluation like i
 {displaymath"<%< chain v y \(chain (chain u x \(chain (val thunk lambda x,val thunk lambda y,t) f \(force f y\)\)) g \(force g x\)\) | alpha >%>"}
 Is convertible to
 {displaymath"<%< chain v y \(chain u x t\) | alpha >%>"}
-It requires some care to avoid code duplication, however. Compared to the solution of the {textsc"zinc"} abstract machine~{cite"Leroy1990"~extra:"Chapter 3"}, this optimisation only applies to statistically detectable situation, whereas the {textsc"zinc"} tries dynamically to avoid intermediate closures. So partial evaluation of polarised {muname} is more efficient (as it forgoes dynamic tests), but does not apply as often.
+It requires some care to avoid code duplication, however. Compared to the solution of the {textsc"zinc"} abstract machine~{cite"Leroy1990"~extra:"Chapter 3"}, this optimisation only applies to statistically detectable situation, whereas the {textsc"zinc"} tries dynamically to avoid intermediate closures (by checking the number of available arguments on the stack). So partial evaluation of polarised {muname} is more efficient (as it forgoes dynamic tests), but does not apply as often.
 
 (* proofs
 
