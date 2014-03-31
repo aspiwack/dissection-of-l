@@ -279,8 +279,7 @@ The behaviour of exceptions can be modelled in linear {muname}. Instead of the t
 Where <%<e|theta>%> should be understood as {emph"throwing"} the exception <%e%> and <%<a|rho>%> as {emph"returning"} value <%a%>. The composition still threads functions in a monadic style to use values of type <%?B%> and <%?C%>, however, when an exception is raised, the continuation is simply not executed as there is no value of type <%B%> or <%C%> to go on with. Indeed, <%f x |_theta_|%> has type <%?B%>: if an exception is raised no value is returned. With the type <%A<+>E%>, on the other hand, a value of type <%E%> is returned.
 
 This representation of exceptions is often called the two-continuation encoding of exception. Where <%rho%> is called the success continuation, and <%theta%> the failure continuation. Because continuations are lexically bound, the <%theta%> operation behaves differently from Ocaml's <@raise@>: instead of {emph"dynamically"} looking for the enclosing <@try@>,
-(* arnaud: attention `a ce try si on utilise un mode ocaml, ,ca peut etre moche *)
-<%theta%> jumps to a {emph"statically"} determined continuation. Much like with callcc, it means that <%theta%> can be captured and escape its scope, in which case executing <%<e|theta>%> would still resume at <%theta%>.
+<%theta%> jumps to a {emph"statically"} determined context. Much like with callcc, it means that <%theta%> can be captured and escape its scope, in which case executing <%<e|theta>%> would still resume at <%theta%>.
 
 It should be no surprise that, actually, callcc itself can be implemented in linear {muname}. In fact, we have already claimed in Section~{ref_ ss_lj} that classical logic can be embedded in linear {muname}; but we can give a more direct implementation with a more precise type than what would be achieved through such an embedding.
 
@@ -311,13 +310,12 @@ To complete callcc, let us consider Peirce's law: $((A{rightarrow}B){rightarrow}
   "<%callcc = lambda f, mu |_k_|, < f |_ throw k _| | |_k_| >%>"
 end}
 Notice how <%k%> is indeed duplicated, hence forces the return type to be <%?A%>. The full type derivation is as follows:
-(* arnaud: il y a probablement un overful hbox here*)
    {displaymath begin
        Infer.rule ~label:lambda
          [ Infer.rule ~label:whynotrule
              [Infer.rule ~label:(cutp "<%|_k_|%>")
                 [Infer.rule ~label:apprule
-                   [ Infer.rule ~label:idrule [] "<%k:A^~;f:!(A-o?B)-o?A |- f:!(A-o?B)-o?A%>";
+                   [ Infer.rule ~label:idrule [] (scriptsize "<%k:A^~;f:!(A-o?B)-o?A |- f:!(A-o?B)-o?A%>");
                      Infer.derived [] "<%k:A^~; |- |_throw k_| : !(A-o?B)%>"]
                    "<%k:A^~;f:!(A-o?B)-o?A |- f |_ throw k _| : ?A%>"]
                 "<%k:A^~;f:!(A-o?B)-o?A |- < f |_ throw k _| | |_k_| >%>"]
@@ -343,9 +341,10 @@ This reduction is an example of what is called, in proof theory, a {emph"commuta
 Transforming programs according to such commutative cut is crucial to the optimisation strategy of {textsc"ghc"}. Going even further, the {textsc"mlj"} compiler~{cite"Benton1999"} transformed programs according to every commutative cut.
 
 In linear {muname}, commutative cuts are, as is expected of cut elimination in a sequent calculus, mere reductions. Indeed, the pattern matching of linear {muname} do not return terms, but commands. Hence the term-returning flavour of pattern matching from natural deduction must be encoded, by capturing the current continuation: <@let(x,y) = u in v@> is encoded as <%mu alpha, < u | mu(x,y), <v|alpha>>%>. We then have that <@(let (x,y) = u in v) t@> is as follows:
-{displaymath"<%mu alpha, < mu beta, <u|mu(z,i),<v|beta>> | mu(x,y), <t|alpha> >
-~~> mu alpha, < u | mu (z,i), <v| mu(x,y), <t|alpha>>>%>"}
-Which is almost the encoding of <@let(z,i) = u in let(x,y) = v in t@>. In fact, it is one innocuous reduction better than the actual one:
+{displaymath"<%mu alpha, < mu beta, <u|mu(z,i),<v|beta>> | mu(x,y), <t|alpha> >%>"}
+Reducing the redex for ${mu}{beta}$, we obtain:
+{displaymath "<%mu alpha, < u | mu (z,i), <v| mu(x,y), <t|alpha>>>%>"}
+which is almost the encoding of <@let(z,i) = u in let(x,y) = v in t@>. In fact, it is one innocuous reduction better than the actual one:
 {displaymath"<%mu alpha, <u | mu(z,i), < mu beta, < v | mu(x,y),<t|beta>> | alpha >>%>"}
 The case of <@(let (x,y) = u in v) t@> works just as well:
 {displaymath"<%mu alpha, < mu beta, <u|mu(x,y),<v|beta>> | (t,alpha)>

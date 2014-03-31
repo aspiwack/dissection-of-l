@@ -116,7 +116,8 @@ The binary <%A<+>B%> and <%A&B%> are accompanied by the nullary <%0%> -- the emp
  figurerules ~label:l_mall ~caption:"Multiplicative and additive fragment" [
    simple_block "Syntax" begin
      syntax [
-       syntax_line `Term Rules.Syntax.(core@multiplicative@additive);
+       syntax_line `Term Rules.Syntax.(core@multiplicative);
+       syntax_line ~defsymb:false (`Other empty) Rules.Syntax.additive;
        commands
      ]
    end;

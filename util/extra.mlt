@@ -6,16 +6,17 @@ open Prelude
 let muname = textsc"l"(* "L" *)
 
 let symbsep s = `Sep ${quad}{s}{quad}$
-let syntax_line k ?(extend=false) l =
+let syntax_line k ?(extend=false) ?(defsymb=true) l =
   let k = match k with
     | `Term -> "<%t%>, <%u%>"
     | `Command -> "<%c%>"
     | `Other x -> x
   in
   let l = if extend then ldots::l else l in
-  array_line [ k ; concat_with_sep l mid ]
+  let grammardef = if defsymb then grammardef else empty in
+  array_line [ k ; grammardef ; concat_with_sep l mid ]
 let commands = syntax_line `Command ["<%<t|u>%>"]
-let syntax l = array [`L;symbsep grammardef; `L] l
+let syntax l = array [`L;`C;`L] l
 let reduction l = array [`L; symbsep leadsto; `L] l
 
 (*** labels ***)

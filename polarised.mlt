@@ -212,11 +212,11 @@ In call-by-name {lambda}-calculus, the arguments of functions are suspended so t
         ["<%Gamma|-t : shiftp shiftn (A -o shiftp B)%>";
          rule ~label:"app"
             [rule ~label:"force"
-                [rule ~label:idrule [] "<%f:shiftn (A-oshiftp B)|-_v f: shiftn (A-oshiftp B)%>"]
-                "<%f:shiftn (A-oshiftp B)|- force f: A-oshiftp B%>";
+                [rule ~label:idrule [] (scriptsize "<%f:shiftn (A-oshiftp B)|-_v f: shiftn (A-oshiftp B)%>")]
+              (scriptsize "<%f:shiftn (A-oshiftp B)|- force f: A-oshiftp B%>");
              rule ~label:idrule
                []
-               "<%x:A |-_v x:A%>"]
+               (scriptsize "<%x:A |-_v x:A%>")]
             "<%x:A,f:shiftn (A-oshiftp B)|- force f x : shiftp B%>"]
         "<%Gamma,x:A|-chain t f \(force f x\) : shiftp B%>";]
      "<%Gamma,Delta|- chain u x \(chain t f \(force f x\)\) : shiftp B%>"
@@ -369,7 +369,7 @@ The small discrepancy which prevents this translation to be only done with macro
      [rule ~label:idrule[]"<%x:shiftn N |-_v x:shiftn N%>"]
      "<%x:shiftn N|- force x : N%>"
 end}
-Hypotheses are shifted, and forced at use point. A product <%N<*>M%> is encoded as <%shiftp (shiftn [[N]] <*> shiftn [[M]])%>, so that a pair contains suspended computations:
+Hypotheses are shifted in the context, and forced at use point. A product <%N<*>M%> is encoded as <%shiftp (shiftn [[N]] <*> shiftn [[M]])%>, so that a pair contains suspended computations:
 {let open Infer in
  displaymath begin
    rule ~label:positiveshift
@@ -391,7 +391,6 @@ While a pair continuation, whose type is <%[[N^~`&M^~]] = shiftp[[N]]^~ `& shift
      "<%Gamma|-mu(x,y),c :  shiftp[[N]]^~ `& shiftp[[M]]^~%>"
  end}
 
-(* arnaud: peut-^etre des notations plus coh'erentes dans la r`egle de cut, j'ai plus ou moins l'inverse de la d'efinition de la traduction ou N et M forment des paires alors que N^~ et M^~ forment des validations *)
 For the cut rule, we proceed like in the call-by-value case: we have either <%[[N^~]]=shiftp [[N]]^~%> or <%shiftn [[N^~]] = [[N]]^~%>. The cut rule is oriented such that cutting with a pair continuation amounts to forcing the outermost pair constructor.
 {let open Infer in
  displaymath begin
@@ -423,15 +422,14 @@ Like in the call-by-value translation, the {mu} rule is duplicated:
         "<%Gamma|- mu x,c : shiftp shiftn [[N^~]]%>";]
      "<%Gamma|- chain \(mu x,c\) y \(force y\) : [[N^~]]%>"
  in
- displaymath begin array [`C;`Sep (qquad^^qquad) ;`C] [
-   array_line [ direct ; chain ]
+ displaymath begin array [`C] [
+   array_line ~sep:(`Mm 3.) [ direct ];
+   array_line [ chain ]
  ]end}
 
 The evaluation strategy of the negative translation of linear {muname}, evaluating the outermost constructor on demand, is essentially the same behaviour as lazy programming language such as Haskell (except that lazy programming languages have a call-by-need strategy, hence suspended computations must be shared rather than duplicated).
 
 Like in the call-by-value case, if we translated a two-sided sequent calculus, we would obtain a macro-translation. And it would correspond to the call-by-name calculus of~{cite"Curien2000"}.
-(* arnaud: cette section a potentiellement besoin d'un peu de mise en page tout de m^eme *)
-
 "
 
 

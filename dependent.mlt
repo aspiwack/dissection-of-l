@@ -162,8 +162,8 @@ displaymath begin
     [rule ~label:cutrule
         ["<%Xi;Gamma,x:A,y:B|- v : \(subst [(x,y),cv] N_cv\)%>";
          rule ~label:idrule
-           ["<%Xi,Gamma,x:A,y:B|-\(subst [(x,y),cv] N_cv\)^~ : Type%>"]
-           "<%Xi;Gamma,x:A,y:B;alpha:\(subst [(x,y),cv] N_cv\)^~|-_v alpha : \(subst [(x,y),cv] N_cv\)^~%>"]
+           [small "<%Xi,Gamma,x:A,y:B|-\(subst [(x,y),cv] N_cv\)^~ : Type%>"]
+           (small "<%Xi;Gamma,x:A,y:B;alpha:\(subst [(x,y),cv] N_cv\)^~|-_v alpha : \(subst [(x,y),cv] N_cv\)^~%>")]
         "<%Xi;Gamma,x:A,y:B,alpha:\(subst [(x,y),cv] N_cv\)^~|- < v | alpha >%>"]
     "<%Xi;Gamma,alpha:\(N_cv\)^~ |- mu(x,y), < v | alpha > : A^~`& B^~%>"
 end}
