@@ -1,4 +1,5 @@
 ##verbatim '%' = MuPlugin.mumode
+##verbatim '@' = Ocamlmode.ocamlmode
 
 open Prelude
 open Extra

@@ -1,4 +1,5 @@
 ##verbatim '%' = MuPlugin.mumode
+##verbatim '@' = Ocamlmode.ocamlmode
 
 open Prelude
 open Extra
@@ -212,9 +213,7 @@ The rest of the rules for linear {muname} can be found in Figure~{ref_ l_ll}. Th
  figurerules ~label:l_ll ~caption:"Linear {muname}" [
    simple_block "Syntax" begin
      syntax [
-       (* arnaud: on va probablement avoir besoin d'aller à la ligne ici pour
-          éviter l'overfull box *)
-       syntax_line `Term Rules.Syntax.(core@multiplicative@additive@exponential);
+       syntax_line ~extend:true `Term Rules.Syntax.(exponential);
        commands
      ]
    end;

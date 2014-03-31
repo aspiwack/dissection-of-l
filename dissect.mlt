@@ -1,13 +1,13 @@
 (* -*- compile-command: "ocamlbuild -classic-display dissect.pdf && evince _build/dissect.pdf" -*- *)
 
 ##verbatim '%' = MuPlugin.mumode
+##verbatim '@' = Ocamlmode.ocamlmode
 
 open Prelude
 open Extra
 (* arnaud: note, la fonte pour sans serif (textsf) a l'air de n'être
    pas à la même taille que celle de la fonte romane… ça n'est
    pas très beau. *)
-(* arnaud: fix le kerning de ?, en particulier ?0 *)
 (* arnaud: un mode ocaml pour <@@> *)
 (* arnaud: noter que les duaux apparaissent face-à-face dans les figures *)
 (* arnaud: donner g'en'eralement un nom devant les citations au moins la premi`ere fois *)

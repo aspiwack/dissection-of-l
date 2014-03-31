@@ -1,4 +1,5 @@
 ##verbatim '%' = MuPlugin.mumode
+##verbatim '@' = Ocamlmode.ocamlmode
 
 open Prelude
 open Extra
@@ -34,12 +35,12 @@ The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypot
 {let sep = `Mm 2. in
  
  figurerules ~label:f_wdll ~caption:"Weak dependent {muname}" [
-   simple_block "Syntax" begin
-     syntax [
-       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
-       commands
-     ]
-   end;
+   (* simple_block "Syntax" begin *)
+   (*   syntax [ *)
+   (*     syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential); *)
+   (*     commands *)
+   (*   ] *)
+   (* end; *)
    simple_block "Reduction" begin
      reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
    end;
@@ -181,12 +182,12 @@ Which can be further combined with a value <%u%> to obtain a rule akin to depend
 
 {let sep = `Mm 2. in
  figurerules ~label:f_dll ~caption:"Dependent {muname} with dependent elimination" [
-   simple_block "Syntax" begin
-     syntax [
-       syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential);
-       commands
-     ]
-   end;
+   (* simple_block "Syntax" begin *)
+   (*   syntax [ *)
+   (*     syntax_line `Term Rules.Syntax.(core@shift@multiplicative@additive@exponential); *)
+   (*     commands *)
+   (*   ] *)
+   (* end; *)
    simple_block "Reduction" begin
      reduction Rules.Reduction.(core@shift@multiplicative@additive@exponential)
    end;
@@ -281,7 +282,7 @@ As we have seen above, elimination of a value of tensor type can be given the fo
 With <%Xi;Gamma,Delta;Pi|-_v t : \(subst [u,cv] \(C_cv\)\)%> we have
 {displaymath"<%Xi;Gamma,Delta,Pi|-(mu alpha, <u|mu(x,y),<v|alpha>>) t:subst[u,cv]N_cv%>"}
 
-However, <%(mu alpha, <u|mu(x,y),<v|alpha>>) t%> reduces (against any continuation) to <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%> (see Section~{ref_ ss_optim}). And, unfortunately, the latter is not necessarily well-typed. For it to be well-typed we need a stronger statement on <%t%>:
+However, the application <%(mu alpha, <u|mu(x,y),<v|alpha>>) t%> reduces (against an arbitrary context) to <%mu alpha,<u|mu(x,y), <v|(t,alpha)>>%> (see Section~{ref_ ss_optim}). And, unfortunately, the latter is not necessarily well-typed. For it to be well-typed we need a stronger statement on <%t%>:
 {displaymath${forall}"<%v%>""<%Psi%>", ("<%Xi;Gamma;Psi|-v:A<*>B%>"){rightarrow}("<%Xi;Gamma,Psi;subst [v,cv] Pi_cv |- t : subst [v,cv] C_cv%>")$}
 If <%t%> has such types, then in particular <%Xi;Gamma,x:A,y:B;subst [(x,y),cv] Pi_cv |- t : subst [(x,y),cv] C_cv%>, which will be the proof obligation since dependent elimination takes care of evolving the <%Pi_cv%> context through the proof.
 

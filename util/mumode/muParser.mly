@@ -109,8 +109,8 @@ expr:
 | a=expr OPLUS b=expr  { concat[a;plus;b] }
 | a=expr WITH b=expr  { concat[a;withc;b] }
 | a=expr PAR b=expr  { concat[a;parr;b] }
-| BANG a=expr { concat [text"\\,!";a] }
-| WHYNOT a=expr { concat [text"\\,?\\!";a] }
+| BANG a=expr {  Latex.block(text"!")^^a }
+| WHYNOT a=expr { Latex.block(text"?")^^a }
 | SHIFTP a = expr { just_left `Up a }
 | SHIFTN a = expr { just_left `Down a }
 | PI p=typedpattern COMMA b=expr { concat [ index prod p ; b ] }

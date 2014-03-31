@@ -1,4 +1,5 @@
 ##verbatim '%' = MuPlugin.mumode
+##verbatim '@' = Ocamlmode.ocamlmode
 
 open Prelude
 open Extra
@@ -123,27 +124,6 @@ In Figure~{ref_ l_lambda}, we give the translation of simply typed {lambda}-calc
 etc...
 
 *)
-
-(* arnaud: tout ,ca c'est faux
-The case of disjunction is more interesting. Indeed there are two disjunctions: either <%?A`&?B%> (or equivalently <%?(A<+>B)%>) which is the proper dual of the conjunction and corresponds to classical disjunction, or the stronger <%A<+>B%> which corresponds to intuitionistic disjunction. The natural elimination rule for <%?A`&?B%> is the usual elimination rule for natural deduction disjunction:
-{let open Infer in
- rule
-   [
-   ]
-   "<%Xi;|- t : C%>"
-}
-
-The same can be said about disjunction. The encoding using multiplicative disjunction is actually fairly interesting. Here is the left introduction rule:
-{ let open Infer in
-  displaymath begin
-    rule ~label:(mup"<%(alpha,|_beta_|)%>")
-      [rule ~label:(cutp"<%alpha%>")
-          [rule ~label:bangrule
-              ["<%Xi,beta:B;|-t:A%>"]
-              "<%Xi,beta:B;|-|_t_|:!A%>"]
-          "<%Xi,beta:B;alpha:?A^~|-<|_t_||alpha>%>"]
-      "<%Xi;|- mu(alpha,|_beta_|), <|_t_||alpha> : ?A`&?B%>"
-end}*)
 
 Intuitionistic natural deduction (a.k.a. typed {lambda}-calculus) is indeed the logic of duplicable formulæ in dyadic linear {muname}. However, with extra type constructor, unusual manipulations can be made. The reader who enjoys this sort of things can have fun proving that classical logic can be encoded replacing the usual double-negation modality by the ``why-not'' modality: classical formulæ are those such that <%?A-oA%> holds. In that case, the disjunction becomes <%?(!A<+>!B)%> and the falsity <%?0%>, or, isomorphically, <%?!A`&?!B%> and <%bot%>.
 
