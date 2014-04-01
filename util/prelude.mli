@@ -30,7 +30,7 @@ type block_line
 type block
 val block : Latex.t -> Latex.alignment list -> block_line list -> block
 val simple_block : Latex.t -> Latex.t -> block
-val block_line : ?sep:Latex.size -> Latex.t list -> block_line
+val block_line : ?sep:Latex.size -> ?sync:bool -> Latex.t list -> block_line
 val figurerules : label:Latex.label -> caption:Latex.t -> block list -> Latex.t
 
 val tensor : Latex.t

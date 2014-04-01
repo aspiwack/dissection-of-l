@@ -121,14 +121,14 @@ expr:
 | DOUBLEBRACKETL a=expr DOUBLEBRACKETR { concat [llbracket;a;rrbracket] }
 
 | SUBST l=delimited(BRACKETL, separated_nonempty_list(SEMICOLON,separated_pair(expr,COMMA,expr)) ,BRACKETR) e=expr
-  { let single (t,x) = concat[x;setminus;t] in
+  { let single (t,x) = concat[raisebox ~shift:(`Ex (-0.2)) (small x);Latex.block setminus;raisebox ~shift:(`Ex 0.4) (small t)] in
     let subst =
       match l with
       | s::r ->
           single s ^^ concat (List.map (fun s -> text", "^^single s) r)
       | [] -> assert false
     in
-    concat [e;text"[";subst;text"]"]
+    concat [e;text"[\\,";subst;text"\\,]"]
   }
 | FILL u=expr t=expr {t^^Latex.block(concat[text"[";u;text"]"])}
 | e=expr REDUCES f=expr { concat [e;leadsto;f] }

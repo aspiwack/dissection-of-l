@@ -60,7 +60,8 @@ The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypot
            block_line ~sep [ id ; cut ];
            block_line ~sep [ iddup ; mu ];
            block_line ~sep [ shiftn ; shiftp ; ];
-           block_line ~sep [ pair ; copair ];
+           block_line ~sep ~sync:false [ pair ; empty ];
+           block_line ~sep ~sync:false [ empty ; copair ];
            block_line ~sep [ unit ; counit ];
            block_line ~sep [ iota1 ; case ];
            block_line ~sep [ iota2 ; empty];
@@ -71,8 +72,8 @@ The full system is given in Figure~{ref_ f_wdll}. It makes the simplifying hypot
    block "Types" [`C;`C;`C;`C] begin
      let open Rules.Typing.Dtypes in
      [
-           block_line ~sep [ tensor ; par ; one ; bot ];
-           block_line ~sep [ plus ; witha ; zero ; top ];
+           block_line ~sep [ one ; bot ; tensor ; par ; ];
+           block_line ~sep [ zero ; top ; plus ; witha ; ];
            block_line ~sep [ shiftn ; shiftp ; bang ; whynot ];
      ]
    end
@@ -207,7 +208,8 @@ Which can be further combined with a value <%u%> to obtain a rule akin to depend
            block_line ~sep [ id ; cut ];
            block_line ~sep [ iddup ; mu ];
            block_line ~sep [ shiftn ; shiftp ; ];
-           block_line ~sep [ pair ; copair ];
+           block_line ~sep ~sync:false [ pair ; empty ];
+           block_line ~sep ~sync:false [ empty ; copair ];
            block_line ~sep [ unit ; counit ];
            block_line ~sep [ iota1 ; case ];
            block_line ~sep [ iota2 ; empty];

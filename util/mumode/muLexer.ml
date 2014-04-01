@@ -22,6 +22,7 @@ let map_ident = [
 
   "bot" , SYMB bottom ;
   "top" , SYMB top;
+  "Type" , SYMB star;
 
   "val" , VAL ;
   "thunk" , THUNK ;

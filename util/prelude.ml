@@ -58,8 +58,8 @@ let foreign = emph
 
 let grammardef = mode M (text"::=")
 
-type block_line = (Latex.size option)*Latex.t list
-let block_line ?sep l = sep , l
+type block_line = (Latex.size option)*bool*Latex.t list
+let block_line ?sep ?(sync=true) l = sep , sync , l
 
 type block = t * alignment list * block_line list
 let block title alignment content =
@@ -87,7 +87,22 @@ let figurerules ~label ~caption (l:block list) =
   let widths = List.map (fun (_,a,_) -> List.length a) l in
   let lcm = List.fold_left lcm 1 widths in
   Format.printf "lcm: %i\n" lcm;
-  let title_line x = array_line ~layout:[lcm,`C]~sep:(`Mm 3.) [textsc x] in
+  let a =
+    let rec mk n =
+      if n = 0 then []
+      else `C::(mk (n-1))
+    in
+    mk lcm
+  in
+  let title_line x = array_line ~layout:[lcm,`C] ~sep:(`Mm 3.) [textsc x] in
+  let format_line layout (sep,sync,b) =
+    let line = array_line ~layout ?sep b in
+    if sync then
+      line
+    else
+      let arr = array a [line] in
+      array_line ~layout:[lcm,`C] [arr]
+  in
   let block a bs =
     let n = List.length a in
     let w = lcm/n in
@@ -95,17 +110,10 @@ let figurerules ~label ~caption (l:block list) =
     (*array_line ~layout ~sep:(`Mm 15.) b*)
     Format.printf "w: %i\n" w;
     Format.printf "length layout: %i\n" (List.length layout);
-    List.map (fun (sep,b) -> array_line ~layout ?sep b) bs
+    List.map (format_line layout) bs
   in
   let l =
     List.flatten (List.map (fun (t,a,b) -> title_line t :: block a b ) l)
-  in
-  let a =
-    let rec mk n =
-      if n = 0 then []
-      else `C::(mk (n-1))
-    in
-    mk lcm
   in
   Format.printf "length a: %i\n" (List.length a);
   figure ~label ~caption ~pos:[`T;`P] begin
