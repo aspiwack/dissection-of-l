@@ -13,7 +13,7 @@ Sequent calculus has been linked to strategy of evaluation~{cite"Curien2000,Dyck
 
 Another tool which is becoming important for programming languages is linear logic. It offers an alternative to commutative monads to represent effects~{cite"Benton1996"}, there is a fragment, known as effect calculus~{cite"Egger2009"}, which can be use to encode arbitrary monadic effects. An outstanding recent manifestation of linear types is~{cite"Krishnaswami2011"} where linear typing is leveraged for graphical interface programming.
 
-The main technology for sequent-calculus based programming languages originates in~{cite"Curien2000"} where it was called ${bar lambda}{mu}{tilde mu}$-calculus. It is more commonly known as system~{muname}~{cite"Herbelin08"} (for Gentzen's name for sequent calculi: {textsc"lk"} and {textsc"lj"}).
+The main technology for sequent-calculus based programming languages originates in~{cite"Curien2000"} where it was called ${bar lambda}{mu}{tilde mu}$-calculus. It is more commonly known as system~{muname}(* ~{cite"Herbelin08"} Hugo n'aime pas trop cette citation*) (for Gentzen's name for sequent calculi: {textsc"lk"} and {textsc"lj"}).
 The {foreign "tour de force"} of {muname}, in my opinion, is to provide
 a syntax for classical sequent calculus proofs in which, like {lambda}-calculus
 for natural deduction, contraction and weakening are done through
@@ -21,7 +21,7 @@ variables: a bound variable which isn't used is weakened, if it is
 used twice or more it is contracted. This is, I would argue, why
 it makes a good foundation for programming languages. There has also been linear incarnations of system~{muname}~{cite"Munch2009"}.
 
-Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all too often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough study of system~{muname} to date is Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
+Despite the growing importance of sequent calculus in programming language design, the literature on system~{muname} is scattered, and it still all too often feels impenetrable to outsiders. There is, however, an excellent introductory write-up by Philip Wadler on the classical version in~{cite"Wadler2003"}. The most thorough studies of system~{muname} to date are Hugo Herbelin's habilitation~{cite"Herbelin2005"} (see in particular the first chapter for historical notes) and Guillaume Munch-Maccagnoni's doctoral thesis~{cite"Munch2013"}.
 
 My goal with this article is threefold. First, I aim at giving an overview of the system~{muname} literature. Second, I want to outline how sequent calculus is relevant for programming language design. Third and last, I give a proposal for a dependently typed linear sequent calculus based on system~{muname}.
 
