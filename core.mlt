@@ -57,7 +57,7 @@ arranged on a single side (or any convenient arrangement). In classical logic, n
 connective is a reflection of dualisation, and it may be tempting -- and is indeed often done -- to forgo the
 negation altogether and keep only dualisation. In that case, the de Morgan laws are not just tautologies,
 they are {emph"definitions"} for the negation. An option which is more appealing from a programming language
-standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{cite"Harper2012"~extra:"Chapter 31"}. Duality, on the other
+standpoint is to keep negation as a connective, give it a dual, and equip them both with introduction rules~{cite"Harper2012"~extra:"Chapter 31"}{cite"Munch2013"~extra:"Chapter 4"}. Duality, on the other
 hand, does not have introduction rules -- unless we count the identity and cut rules as introduction rules.
 
 To follow the tradition of programming languages, let us choose to leave all the variables on the left-hand

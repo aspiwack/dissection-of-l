@@ -113,8 +113,7 @@ The typing derivation of the application <%t u = mu alpha,<t|(u,alpha)>%> indeed
     "<%Xi;Gamma,Delta |- mu alpha, <t|(u,alpha)> : subst [u,x] N%>"
 end}
 
-Weak dependent {muname} is not very expressive, nonetheless the various implementations of {textsc"lf"} have demonstrated that this kind of dependent types can already be quite useful. It is also pleasant that we could derive a natural definition for a dependently typed {emph"linear"} {lambda}-calculus from design choices which are largely technical, and were not meant to force this definition.
-(* arnaud: une citation pour lf *)
+Weak dependent {muname} is not very expressive, nonetheless the various implementations of {textsc"lf"} have demonstrated that this weak kind of dependent types can already be quite useful~{cite"Pfenning1991,Avron1992,Harper1993,Pfenning1999"}. It is also pleasant that we could derive a natural definition for a dependently typed {emph"linear"} {lambda}-calculus from design choices which are largely technical, and were not meant to force this definition.
 
 {subsection"Dependent elimination"~label:ss_depelim}
 
@@ -246,8 +245,9 @@ As it happens this is not exactly the rule of dependent product in {lambda}-calc
 
 As a last example, let us return to the equality example of the beginning of the present section. We promised a proof derivation for:
 {displaymath"<%PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"}
-This is quite precisely what dependent elimination provides:
-{let open Infer in
+This sort of statement is quite precisely what dependent elimination provides. A derivation of this statement can be found in Figure~{ref_ f_depelimeq}
+{figure begin
+ let open Infer in
  displaymath begin
    rule ~label:lambda
      [rule ~label:mu
@@ -268,8 +268,9 @@ This is quite precisely what dependent elimination provides:
              "<%;x:A<*>B,alpha:(shiftp SIGMA y:A, SIGMA z:B, x=(y,z))^~|- < x | mu (y,z), < val (y,(z,refl))|alpha > > %>"]
          "<%;x:A<*>B|- mu alpha, < x | mu (y,z), < val (y,(z,refl))|alpha > > : shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"]
      "<%;|-lambda x, mu alpha, < x | mu (y,z), < val (y,(z,refl))|alpha > > : PI x:A<*>B, shiftp SIGMA y:A, SIGMA z:B, x=(y,z)%>"
- end}
-Note the necessary step which uses the cut variable, without the cut variable the derivation is no longer valid (in weak dependent {muname}, the final line would be  <%;;|-refl:x=(y,z)%>, certainly an underivable sequent).
+ end
+end ~label:f_depelimeq ~caption:"Derivation of an equality result with dependent elimination"}
+Note the necessary step which uses the cut variable, without the cut variable the derivation is no longer valid (in weak dependent {muname}, the cut rule would lead to  <%;;|-refl:x=(y,z)%>, which is certainly an underivable sequent).
 
 There is a limit to dependent {muname}, however: it does not enjoy subject reduction. This is due to the fact that commutative cuts are simply reductions in {muname}. Commutative conversion are not usually correct in dependently typed languages with dependent elimination (though there are much more many correct commutative conversion with Coquand elimination than with Paulin elimination).
 

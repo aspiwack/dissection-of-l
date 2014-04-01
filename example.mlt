@@ -125,7 +125,7 @@ etc...
 
 *)
 
-Intuitionistic natural deduction (a.k.a. typed {lambda}-calculus) is indeed the logic of duplicable formulæ in dyadic linear {muname}. However, with extra type constructor, unusual manipulations can be made. The reader who enjoys this sort of things can have fun proving that classical logic can be encoded replacing the usual double-negation modality by the ``why-not'' modality: classical formulæ are those such that <%?A-oA%> holds. In that case, the disjunction becomes <%?(!A<+>!B)%> and the falsity <%?0%>, or, isomorphically, <%?!A`&?!B%> and <%bot%>.
+Intuitionistic natural deduction (a.k.a. typed {lambda}-calculus) is indeed the logic of duplicable formulæ in dyadic linear {muname}. However, with extra type constructor, unusual manipulations can be made. The reader who enjoys this sort of things can have fun proving that classical logic can be encoded replacing the usual double-negation modality by the ``why-not'' modality: classical formulæ are those such that <%?A-oA%> holds. In that case, the disjunction becomes <%?(!A<+>!B)%> and the falsity <%?0%>, or, isomorphically, <%?!A`&?!B%> and <%bot%>~{cite"Laurent2002" ~extra:"Chapter 9"}.
 
 {subsection "Linear logic proofs"}
 
@@ -323,7 +323,7 @@ Notice how <%k%> is indeed duplicated, hence forces the return type to be <%?A%>
          "<%|- callcc : (!(A-o?B)-o ?A)-o ?A%>"
     end}
 
-The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of classical logic may be resolved by favouring one way or another. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
+The type of <%callcc%> illustrates how embedding classical principles in linear {mu} requires annotations with both exponential connectives. Depending on the precise annotations used, the ambiguous critical pairs of classical logic may be resolved by favouring one way or another~{cite"Laurent2002" ~extra:"Chapter 9"}. However, it is probably unnecessary to use a callcc combinator to program in linear {mu}, as the {mu} binder already fills its function.
 (* arnaud: Guillaume conseille les travaux d'Olivier Laurent quant au r^ole des annotations dans la r'esolutions des paires critiques contraction/contraction (etc) en logique classique *)
 
 {subsection"Commutative cuts"~label:ss_optim}
